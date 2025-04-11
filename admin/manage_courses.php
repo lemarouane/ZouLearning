@@ -1,19 +1,27 @@
 <?php
+session_start();
 require_once '../includes/db_connect.php';
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$courses = $db->query("SELECT c.*, s.name AS subject_name, l.name AS level_name FROM courses c JOIN subjects s ON c.subject_id = s.id JOIN levels l ON s.level_id = l.id ORDER BY c.created_at DESC");
+$courses_query = $db->query("
+    SELECT c.id, c.title, c.difficulty, s.name AS subject_name, 
+           GROUP_CONCAT(cc.content_type) AS content_types
+    FROM courses c
+    JOIN subjects s ON c.subject_id = s.id
+    LEFT JOIN course_contents cc ON c.id = cc.course_id
+    GROUP BY c.id, c.title, c.difficulty, s.name
+");
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Courses - Zouhair E-Learning</title>
+    <title>Gérer les Cours - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,35 +31,32 @@ $courses = $db->query("SELECT c.*, s.name AS subject_name, l.name AS level_name 
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-book"></i> Manage Courses</h1>
-        <a href="add_course.php" class="btn-action add"><i class="fas fa-plus"></i> Add New Course</a>
+        <h1><i class="fas fa-book"></i> Gérer les Cours</h1>
+        <?php if (isset($_SESSION['message'])): ?>
+            <p style="color: #4caf50;"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
+        <?php endif; ?>
+        <a href="add_course.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter un Cours</a>
         <table id="coursesTable" class="display">
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Subject</th>
-                    <th>Level</th>
-                    <th>Difficulty</th>
-                    <th>Type</th>
-                    <th>Created</th>
+                    <th>Titre</th>
+                    <th>Matière</th>
+                    <th>Difficulté</th>
+                    <th>Type de Contenu</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while ($course = $courses->fetch_assoc()): ?>
+                <?php while ($course = $courses_query->fetch_assoc()): ?>
                     <tr>
-                        <td><?php echo $course['id']; ?></td>
                         <td><?php echo htmlspecialchars($course['title']); ?></td>
                         <td><?php echo htmlspecialchars($course['subject_name']); ?></td>
-                        <td><?php echo htmlspecialchars($course['level_name']); ?></td>
                         <td><?php echo $course['difficulty']; ?></td>
-                        <td><?php echo $course['content_type']; ?></td>
-                        <td><?php echo $course['created_at']; ?></td>
+                        <td><?php echo $course['content_types'] ?: 'Aucun'; ?></td>
                         <td>
-                            <a href="view_course.php?id=<?php echo $course['id']; ?>" class="btn-action view" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="edit_course.php?id=<?php echo $course['id']; ?>" class="btn-action edit" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="delete_course.php?id=<?php echo $course['id']; ?>" class="btn-action delete" onclick="return confirm('Are you sure?');" title="Delete"><i class="fas fa-trash"></i></a>
+                            <a href="view_course.php?id=<?php echo $course['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="edit_course.php?id=<?php echo $course['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
+                            <a href="delete_course.php?id=<?php echo $course['id']; ?>" class="btn-action delete" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?');"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -62,11 +67,7 @@ $courses = $db->query("SELECT c.*, s.name AS subject_name, l.name AS level_name 
 
     <script>
         $(document).ready(function() {
-            $('#coursesTable').DataTable({
-                pageLength: 10,
-                lengthChange: false,
-                order: [[6, 'desc']] // Sort by created_at descending
-            });
+            $('#coursesTable').DataTable({ pageLength: 10, lengthChange: false });
         });
     </script>
 </body>

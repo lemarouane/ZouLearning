@@ -7,11 +7,25 @@ if (!isset($_SESSION['student_id'])) {
 }
 
 $student_id = (int)$_SESSION['student_id'];
-$courses = $db->query("SELECT c.id, c.title, s.name AS subject 
-                       FROM student_courses sc 
-                       JOIN courses c ON sc.course_id = c.id 
-                       JOIN subjects s ON c.subject_id = s.id 
-                       WHERE sc.student_id = $student_id");
+$courses_query = $db->query("
+    SELECT DISTINCT c.id, c.title, s.name AS subject 
+    FROM (
+        SELECT sc.course_id 
+        FROM student_courses sc 
+        WHERE sc.student_id = $student_id
+        UNION
+        SELECT c.id AS course_id 
+        FROM student_subjects ss 
+        JOIN courses c ON ss.subject_id = c.subject_id 
+        WHERE ss.student_id = $student_id AND ss.all_courses = 1
+    ) AS unique_courses
+    JOIN courses c ON unique_courses.course_id = c.id 
+    JOIN subjects s ON c.subject_id = s.id
+");
+if (!$courses_query) {
+    die("Erreur dans la requête des cours : " . $db->error);
+}
+$courses = $courses_query;
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +61,12 @@ $courses = $db->query("SELECT c.id, c.title, s.name AS subject
                         <td><?php echo htmlspecialchars($course['title']); ?></td>
                         <td><?php echo htmlspecialchars($course['subject']); ?></td>
                         <td>
-                            <a href="view_course.php?id=<?php echo $course['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="view_course.php?id=<?php echo $course['id']; ?>" 
+                               class="btn-action view" 
+                               title="Voir" 
+                               onclick="console.log('Clicked View for Course ID: <?php echo $course['id']; ?>');">
+                                <i class="fas fa-eye"></i>
+                            </a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -59,6 +78,10 @@ $courses = $db->query("SELECT c.id, c.title, s.name AS subject
     <script>
         $(document).ready(function() {
             $('#coursesTable').DataTable({ pageLength: 10, lengthChange: false });
+            $('.btn-action.view').on('click', function(e) {
+                var courseId = $(this).attr('href').split('id=')[1];
+                console.log('Redirecting to view_course.php?id=' + courseId);
+            });
         });
     </script>
 </body>

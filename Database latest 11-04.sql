@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 11 avr. 2025 à 04:27
+-- Généré le : ven. 11 avr. 2025 à 16:53
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -63,7 +63,23 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `user_type`, `action`, `details`, 
 (20, 1, 'admin', 'Added course', 'Added course: axert for subject ID 3', '2025-04-11 02:46:39'),
 (21, 1, 'admin', 'Added course', 'Added course: x for subject ID 1', '2025-04-11 02:47:45'),
 (22, 15, 'admin', 'Screenshot taken', 'Captured page 1 of course \'axert\' (ID: 11)', '2025-04-11 03:02:50'),
-(23, 1, 'admin', 'Added course', 'Added course: 01 for subject ID 3', '2025-04-11 03:26:00');
+(23, 1, 'admin', 'Added course', 'Added course: 01 for subject ID 3', '2025-04-11 03:26:00'),
+(24, 1, 'admin', 'Added course', 'Added course: axe for subject ID 1', '2025-04-11 11:31:23'),
+(25, 1, 'admin', 'Added course', 'Added course: axe for subject ID 3', '2025-04-11 11:31:34'),
+(26, 1, 'admin', 'Added course', 'Added course: axe for subject ID 4', '2025-04-11 11:49:15'),
+(27, 1, 'admin', 'Added course', 'Added course: axe for subject ID 1', '2025-04-11 11:49:52'),
+(28, 1, 'admin', 'Added course', 'Added course: axe for subject ID 3', '2025-04-11 11:50:23'),
+(29, 1, 'admin', 'Added course', 'Added course: aze for subject ID 1', '2025-04-11 12:05:50'),
+(30, 1, 'admin', 'Added course', 'Added course: aze for subject ID 3', '2025-04-11 12:14:02'),
+(31, 1, 'admin', 'Added course', 'Added course: last one added for subject ID 3', '2025-04-11 12:26:03'),
+(32, 1, 'admin', 'Added course', 'Added course: x for subject ID 3', '2025-04-11 12:26:43'),
+(33, 1, 'admin', 'Added course', 'Added course: last one added maths for subject ID 1', '2025-04-11 12:28:09'),
+(34, 1, 'admin', 'Added course', 'Added course: testing video  for subject ID 3', '2025-04-11 12:50:08'),
+(35, 1, 'admin', 'Screenshot taken', 'Captured page 3 of course \'last one added maths\' (ID: 23)', '2025-04-11 13:08:46'),
+(36, 1, 'admin', 'Added course', 'Added course: both for subject ID 3', '2025-04-11 15:04:58'),
+(37, 17, 'admin', 'Screenshot taken', 'Captured page 2 of course \'both\' (ID: 25)', '2025-04-11 15:05:24'),
+(38, 1, 'admin', 'Added course', 'Added course: 1only one for subject ID 3', '2025-04-11 15:16:52'),
+(39, 1, 'admin', 'Added course', 'Added course: x for subject ID 5', '2025-04-11 15:50:25');
 
 -- --------------------------------------------------------
 
@@ -96,8 +112,6 @@ CREATE TABLE `courses` (
   `title` varchar(100) NOT NULL,
   `subject_id` int(11) NOT NULL,
   `difficulty` enum('Easy','Medium','Hard') NOT NULL,
-  `content_type` enum('PDF','Video') NOT NULL,
-  `content_path` varchar(255) NOT NULL,
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -105,33 +119,82 @@ CREATE TABLE `courses` (
 -- Déchargement des données de la table `courses`
 --
 
-INSERT INTO `courses` (`id`, `title`, `subject_id`, `difficulty`, `content_type`, `content_path`, `created_at`) VALUES
-(1, 'Algebra Basics', 1, 'Easy', 'PDF', '/uploads/pdfs/algebra_basics.pdf', '2025-04-09 14:11:33'),
-(2, 'Mechanics Intro', 2, 'Medium', 'Video', 'https://youtube.com/watch?v=mech101', '2025-04-09 14:11:33'),
-(3, 'Python Programming', 3, 'Medium', 'PDF', '/uploads/pdfs/python_intro.pdf', '2025-04-09 14:11:33'),
-(4, 'Calculus Advanced', 4, 'Hard', 'PDF', '/uploads/pdfs/calculus_advanced.pdf', '2025-04-09 14:11:33'),
-(5, 'Quantum Physics', 5, 'Hard', 'Video', 'https://youtube.com/watch?v=quantum101', '2025-04-09 14:11:33'),
-(6, 'A', 4, 'Easy', 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-09 16:09:02'),
-(7, 'B', 4, 'Easy', 'PDF', '../uploads/pdfs/BL L\'ENSA TANGER - Copie.pdf', '2025-04-09 16:16:06'),
-(8, 'C', 3, 'Easy', 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-09 16:17:38'),
-(9, 'D', 3, 'Easy', 'Video', 'https://www.youtube.com/watch?v=LAIL6aHua-U', '2025-04-09 16:20:38'),
-(10, 'aze', 3, 'Easy', 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-09 16:40:52'),
-(11, 'axert', 3, 'Easy', 'PDF', '../uploads/pdfs/oncf-voyages-ismail haddad.pdf', '2025-04-11 02:46:39'),
-(12, 'x', 1, 'Easy', 'PDF', '../uploads/pdfs/CIN MAROUANE HADDAD.pdf', '2025-04-11 02:47:45'),
-(13, '01', 3, 'Easy', 'PDF', '../uploads/pdfs/oncf-voyages-ismail haddad.pdf', '2025-04-11 03:26:00');
+INSERT INTO `courses` (`id`, `title`, `subject_id`, `difficulty`, `created_at`) VALUES
+(1, 'Algebra Basics', 1, 'Easy', '2025-04-09 14:11:33'),
+(2, 'Mechanics Intro', 2, 'Medium', '2025-04-09 14:11:33'),
+(3, 'Python Programming', 3, 'Medium', '2025-04-09 14:11:33'),
+(4, 'Calculus Advanced', 4, 'Hard', '2025-04-09 14:11:33'),
+(5, 'Quantum Physics', 5, 'Hard', '2025-04-09 14:11:33'),
+(6, 'A', 4, 'Easy', '2025-04-09 16:09:02'),
+(7, 'B', 4, 'Easy', '2025-04-09 16:16:06'),
+(8, 'C', 3, 'Easy', '2025-04-09 16:17:38'),
+(9, 'D', 3, 'Easy', '2025-04-09 16:20:38'),
+(10, 'aze', 3, 'Easy', '2025-04-09 16:40:52'),
+(11, 'axert', 3, 'Easy', '2025-04-11 02:46:39'),
+(12, 'x', 1, 'Easy', '2025-04-11 02:47:45'),
+(13, '01', 3, 'Easy', '2025-04-11 03:26:00'),
+(14, 'axe', 1, 'Easy', '2025-04-11 11:31:23'),
+(15, 'axe', 3, 'Easy', '2025-04-11 11:31:34'),
+(16, 'axe', 4, 'Easy', '2025-04-11 11:49:15'),
+(17, 'axe', 1, 'Easy', '2025-04-11 11:49:52'),
+(18, 'axe', 3, 'Easy', '2025-04-11 11:50:23'),
+(19, 'aze', 1, 'Easy', '2025-04-11 12:05:50'),
+(20, 'aze', 3, 'Easy', '2025-04-11 12:14:02'),
+(21, 'last one added', 3, 'Easy', '2025-04-11 12:26:03'),
+(22, 'x', 3, 'Easy', '2025-04-11 12:26:43'),
+(23, 'last one added maths', 1, 'Easy', '2025-04-11 12:28:09'),
+(24, 'testing video ', 3, 'Easy', '2025-04-11 12:50:08'),
+(25, 'both', 3, 'Easy', '2025-04-11 15:04:58'),
+(26, '1only one', 3, 'Easy', '2025-04-11 15:16:52'),
+(27, 'x', 5, 'Easy', '2025-04-11 15:50:25');
+
+-- --------------------------------------------------------
 
 --
--- Déclencheurs `courses`
+-- Structure de la table `course_contents`
 --
-DELIMITER $$
-CREATE TRIGGER `after_course_insert` AFTER INSERT ON `courses` FOR EACH ROW BEGIN
-    INSERT INTO student_courses (student_id, course_id, assigned_at)
-    SELECT ss.student_id, NEW.id, NOW()
-    FROM student_subjects ss
-    WHERE ss.subject_id = NEW.subject_id;
-END
-$$
-DELIMITER ;
+
+CREATE TABLE `course_contents` (
+  `id` int(11) NOT NULL,
+  `course_id` int(11) NOT NULL,
+  `content_type` enum('PDF','Video') NOT NULL,
+  `content_path` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `course_contents`
+--
+
+INSERT INTO `course_contents` (`id`, `course_id`, `content_type`, `content_path`, `created_at`) VALUES
+(1, 1, 'PDF', '/uploads/pdfs/algebra_basics.pdf', '2025-04-09 14:11:33'),
+(2, 2, 'Video', 'https://youtube.com/watch?v=mech101', '2025-04-09 14:11:33'),
+(3, 3, 'PDF', '/uploads/pdfs/python_intro.pdf', '2025-04-09 14:11:33'),
+(4, 4, 'PDF', '/uploads/pdfs/calculus_advanced.pdf', '2025-04-09 14:11:33'),
+(5, 5, 'Video', 'https://youtube.com/watch?v=quantum101', '2025-04-09 14:11:33'),
+(6, 6, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-09 16:09:02'),
+(7, 7, 'PDF', '../uploads/pdfs/BL L\'ENSA TANGER - Copie.pdf', '2025-04-09 16:16:06'),
+(8, 8, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-09 16:17:38'),
+(9, 9, 'Video', 'https://www.youtube.com/watch?v=LAIL6aHua-U', '2025-04-09 16:20:38'),
+(10, 10, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-09 16:40:52'),
+(11, 11, 'PDF', '../uploads/pdfs/oncf-voyages-ismail haddad.pdf', '2025-04-11 02:46:39'),
+(12, 12, 'PDF', '../uploads/pdfs/CIN MAROUANE HADDAD.pdf', '2025-04-11 02:47:45'),
+(13, 13, 'PDF', '../uploads/pdfs/oncf-voyages-ismail haddad.pdf', '2025-04-11 03:26:00'),
+(14, 14, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 11:31:23'),
+(15, 15, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 11:31:34'),
+(16, 16, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 11:49:15'),
+(17, 17, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 11:49:52'),
+(18, 18, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 11:50:23'),
+(19, 19, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 12:05:50'),
+(20, 20, 'PDF', '../uploads/pdfs/Detail_consultation.pdf', '2025-04-11 12:14:02'),
+(21, 21, 'PDF', '../uploads/pdfs/Detail_consultation.pdf', '2025-04-11 12:26:03'),
+(22, 22, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 12:26:43'),
+(23, 23, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 12:28:09'),
+(24, 24, 'Video', 'https://www.youtube.com/watch?v=rXxLCMf2CXY', '2025-04-11 12:50:08'),
+(32, 25, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 15:04:58'),
+(33, 25, 'Video', 'https://www.youtube.com/watch?v=rXxLCMf2CXY', '2025-04-11 15:04:58'),
+(34, 26, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 15:16:52'),
+(35, 27, 'PDF', '../uploads/pdfs/قرار فتح المباراة (1).pdf', '2025-04-11 15:50:25');
 
 -- --------------------------------------------------------
 
@@ -191,7 +254,9 @@ INSERT INTO `students` (`id`, `full_name`, `email`, `password`, `status`, `devic
 (11, 'michu2xx', 'e@e.com', '$2y$10$NzO7gmj1eHz9V4jlswQJAemhtgglpJtQw3HUu5pHvAsJxMqAWHXqq', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:44:09'),
 (12, 'mar3', 'r@r.com', '$2y$10$R.2RWfwqEwbvQQalHgHpGO98VFQxQaN6Oqsy2c5MRwHc2kK09WK8a', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, NULL, '2025-04-11 01:03:58'),
 (15, 'MAROUANE HADDAD', 'marouanehaddad08@gmail.com', '$2y$10$7s70Iv31utajASfMtSBf0u0XuKFMkjF.3WL8S1Mj2Y7d5WlWYRSdG', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73548510, -5.88934810, 1, '2025-04-11 02:45:16'),
-(16, 'MAROUANE HADDAD', 'marouanehaddad09@gmail.com', '$2y$10$IcJNMIXlXllII1p90A9mcesWVNTgtlzTCuG9x/mcpyIUN1gQ34Vvq', 'approved', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73549920, -5.88935180, 1, '2025-04-11 03:23:54');
+(16, 'MAROUANE HADDAD', 'marouanehaddad09@gmail.com', '$2y$10$IcJNMIXlXllII1p90A9mcesWVNTgtlzTCuG9x/mcpyIUN1gQ34Vvq', 'approved', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73549920, -5.88935180, 1, '2025-04-11 03:23:54'),
+(17, 'Marouane Sami', 'm@m.fr', '$2y$10$lEXoCLx8NTxkTPfuTJA/0.hoFXDSNuBq27mRxdqjpEhPjvO6rlPMS', 'approved', '275f8639-96f8-4db7-b9db-4d61d10d95e2', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73270000, -5.89160000, 1, '2025-04-11 11:27:49'),
+(18, 'Wiame Rachade', 'w@w.com', '$2y$10$obIdwu7T9uwB4v0KGWDwLOfaMvMR0ijM2PSV63Jey90QF6NRhFxNq', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73747000, -5.89478800, 2, '2025-04-11 15:48:48');
 
 -- --------------------------------------------------------
 
@@ -272,7 +337,51 @@ INSERT INTO `student_courses` (`id`, `student_id`, `course_id`, `assigned_at`) V
 (82, 9, 13, '2025-04-11 03:26:00'),
 (83, 11, 13, '2025-04-11 03:26:00'),
 (84, 15, 13, '2025-04-11 03:26:00'),
-(85, 16, 13, '2025-04-11 03:26:00');
+(85, 16, 13, '2025-04-11 03:26:00'),
+(96, 2, 14, '2025-04-11 11:31:23'),
+(97, 9, 14, '2025-04-11 11:31:23'),
+(98, 11, 14, '2025-04-11 11:31:23'),
+(99, 15, 14, '2025-04-11 11:31:23'),
+(103, 5, 15, '2025-04-11 11:31:34'),
+(104, 6, 15, '2025-04-11 11:31:34'),
+(105, 4, 15, '2025-04-11 11:31:34'),
+(106, 8, 15, '2025-04-11 11:31:34'),
+(107, 9, 15, '2025-04-11 11:31:34'),
+(108, 11, 15, '2025-04-11 11:31:34'),
+(109, 15, 15, '2025-04-11 11:31:34'),
+(110, 16, 15, '2025-04-11 11:31:34'),
+(124, 3, 16, '2025-04-11 11:49:15'),
+(125, 1, 16, '2025-04-11 11:49:15'),
+(127, 2, 17, '2025-04-11 11:49:52'),
+(128, 9, 17, '2025-04-11 11:49:52'),
+(129, 11, 17, '2025-04-11 11:49:52'),
+(130, 15, 17, '2025-04-11 11:49:52'),
+(134, 5, 18, '2025-04-11 11:50:23'),
+(135, 6, 18, '2025-04-11 11:50:23'),
+(136, 4, 18, '2025-04-11 11:50:23'),
+(137, 8, 18, '2025-04-11 11:50:23'),
+(138, 9, 18, '2025-04-11 11:50:23'),
+(139, 11, 18, '2025-04-11 11:50:23'),
+(140, 15, 18, '2025-04-11 11:50:23'),
+(141, 16, 18, '2025-04-11 11:50:23'),
+(149, 17, 1, '2025-04-11 12:05:37'),
+(150, 17, 12, '2025-04-11 12:05:37'),
+(151, 17, 14, '2025-04-11 12:05:37'),
+(152, 17, 17, '2025-04-11 12:05:37'),
+(153, 17, 3, '2025-04-11 12:13:49'),
+(154, 17, 8, '2025-04-11 12:13:49'),
+(155, 17, 9, '2025-04-11 12:13:49'),
+(156, 17, 10, '2025-04-11 12:13:49'),
+(157, 17, 11, '2025-04-11 12:13:49'),
+(158, 17, 13, '2025-04-11 12:13:49'),
+(159, 17, 15, '2025-04-11 12:13:49'),
+(160, 17, 18, '2025-04-11 12:13:49'),
+(168, 17, 23, '2025-04-11 12:48:07'),
+(169, 18, 4, '2025-04-11 15:49:25'),
+(170, 18, 6, '2025-04-11 15:49:25'),
+(171, 18, 7, '2025-04-11 15:49:25'),
+(172, 18, 16, '2025-04-11 15:49:25'),
+(176, 18, 5, '2025-04-11 15:50:02');
 
 -- --------------------------------------------------------
 
@@ -308,7 +417,11 @@ INSERT INTO `student_subjects` (`id`, `student_id`, `subject_id`, `assigned_at`,
 (13, 11, 1, '2025-04-11 02:22:21', 0),
 (14, 15, 3, '2025-04-11 02:46:06', 1),
 (15, 15, 1, '2025-04-11 02:46:06', 0),
-(16, 16, 3, '2025-04-11 03:25:07', 0);
+(16, 16, 3, '2025-04-11 03:25:07', 0),
+(21, 17, 1, '2025-04-11 12:05:37', 0),
+(22, 17, 3, '2025-04-11 12:13:49', 1),
+(24, 18, 4, '2025-04-11 15:49:25', 1),
+(25, 18, 5, '2025-04-11 15:50:02', 0);
 
 -- --------------------------------------------------------
 
@@ -359,6 +472,13 @@ ALTER TABLE `courses`
   ADD KEY `subject_id` (`subject_id`);
 
 --
+-- Index pour la table `course_contents`
+--
+ALTER TABLE `course_contents`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `course_id` (`course_id`);
+
+--
 -- Index pour la table `levels`
 --
 ALTER TABLE `levels`
@@ -405,7 +525,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT pour la table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT pour la table `admins`
@@ -417,7 +537,13 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
+-- AUTO_INCREMENT pour la table `course_contents`
+--
+ALTER TABLE `course_contents`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT pour la table `levels`
@@ -429,19 +555,19 @@ ALTER TABLE `levels`
 -- AUTO_INCREMENT pour la table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT pour la table `student_courses`
 --
 ALTER TABLE `student_courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
 
 --
 -- AUTO_INCREMENT pour la table `student_subjects`
 --
 ALTER TABLE `student_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT pour la table `subjects`
@@ -458,6 +584,12 @@ ALTER TABLE `subjects`
 --
 ALTER TABLE `courses`
   ADD CONSTRAINT `courses_ibfk_1` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
+
+--
+-- Contraintes pour la table `course_contents`
+--
+ALTER TABLE `course_contents`
+  ADD CONSTRAINT `course_contents_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `students`

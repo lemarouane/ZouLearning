@@ -20,18 +20,42 @@ if (!$student_query || $student_query->num_rows == 0) {
 $student = $student_query->fetch_assoc();
 
 // Stats
-$total_courses = $db->query("SELECT COUNT(*) FROM student_courses WHERE student_id = $student_id")->fetch_row()[0] ?? 0;
+$total_courses_query = $db->query("
+    SELECT COUNT(DISTINCT course_id) 
+    FROM (
+        SELECT sc.course_id 
+        FROM student_courses sc 
+        WHERE sc.student_id = $student_id
+        UNION
+        SELECT c.id AS course_id 
+        FROM student_subjects ss 
+        JOIN courses c ON ss.subject_id = c.subject_id 
+        WHERE ss.student_id = $student_id AND ss.all_courses = 1
+    ) AS unique_courses
+");
+$total_courses = $total_courses_query->fetch_row()[0] ?? 0;
+
 $total_subjects = $db->query("SELECT COUNT(*) FROM student_subjects WHERE student_id = $student_id")->fetch_row()[0] ?? 0;
 $level_query = $db->query("SELECT name FROM levels WHERE id = " . (int)$student['level_id']);
 $level = $level_query && $level_query->num_rows > 0 ? $level_query->fetch_assoc()['name'] : 'N/A';
 
 // Recent courses
-$courses_query = $db->query("SELECT c.title, s.name AS subject 
-                             FROM student_courses sc 
-                             JOIN courses c ON sc.course_id = c.id 
-                             JOIN subjects s ON c.subject_id = s.id 
-                             WHERE sc.student_id = $student_id 
-                             LIMIT 5");
+$courses_query = $db->query("
+    SELECT DISTINCT c.title, s.name AS subject 
+    FROM (
+        SELECT sc.course_id 
+        FROM student_courses sc 
+        WHERE sc.student_id = $student_id
+        UNION
+        SELECT c.id AS course_id 
+        FROM student_subjects ss 
+        JOIN courses c ON ss.subject_id = c.subject_id 
+        WHERE ss.student_id = $student_id AND ss.all_courses = 1
+    ) AS unique_courses
+    JOIN courses c ON unique_courses.course_id = c.id 
+    JOIN subjects s ON c.subject_id = s.id 
+    LIMIT 5
+");
 if (!$courses_query) {
     die("Erreur dans la requête des cours : " . $db->error);
 }
@@ -39,12 +63,16 @@ $courses = $courses_query;
 
 // Subjects chart data
 $subjects_chart = [];
-$result = $db->query("SELECT s.name, COUNT(c.id) as count 
-                      FROM student_subjects ss 
-                      JOIN subjects s ON ss.subject_id = s.id 
-                      LEFT JOIN courses c ON s.id = c.subject_id 
-                      WHERE ss.student_id = $student_id 
-                      GROUP BY s.id, s.name");
+$result = $db->query("
+    SELECT s.name, COUNT(DISTINCT c.id) as count 
+    FROM student_subjects ss 
+    JOIN subjects s ON ss.subject_id = s.id 
+    LEFT JOIN courses c ON s.id = c.subject_id 
+    LEFT JOIN student_courses sc ON c.id = sc.course_id AND sc.student_id = $student_id
+    WHERE ss.student_id = $student_id 
+    AND (ss.all_courses = 1 OR sc.course_id IS NOT NULL)
+    GROUP BY s.id, s.name
+");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $subjects_chart[$row['name']] = $row['count'];

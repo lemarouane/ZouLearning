@@ -13,18 +13,47 @@ if (!isset($_GET['id'])) {
 
 $course_id = (int)$_GET['id'];
 $student_id = (int)$_SESSION['student_id'];
-$course = $db->query("SELECT c.*, s.name AS subject_name, l.name AS level_name 
-                      FROM courses c 
-                      JOIN subjects s ON c.subject_id = s.id 
-                      JOIN levels l ON s.level_id = l.id 
-                      JOIN student_courses sc ON c.id = sc.course_id 
-                      WHERE c.id = $course_id AND sc.student_id = $student_id")->fetch_assoc();
-if (!$course) {
+
+// Check if student has access and fetch course details
+$course_query = $db->query("
+    SELECT c.id, c.title, c.difficulty, c.created_at, s.name AS subject_name, l.name AS level_name 
+    FROM (
+        SELECT sc.course_id 
+        FROM student_courses sc 
+        WHERE sc.student_id = $student_id
+        UNION
+        SELECT c.id AS course_id 
+        FROM student_subjects ss 
+        JOIN courses c ON ss.subject_id = c.subject_id 
+        WHERE ss.student_id = $student_id AND ss.all_courses = 1
+    ) AS unique_courses
+    JOIN courses c ON unique_courses.course_id = c.id 
+    JOIN subjects s ON c.subject_id = s.id 
+    JOIN levels l ON s.level_id = l.id 
+    WHERE c.id = $course_id
+");
+if (!$course_query || $course_query->num_rows == 0) {
+    $_SESSION['message'] = "Erreur : Vous n'avez pas accès à ce cours.";
     header("Location: courses.php");
     exit;
 }
 
-$pdf_url = "serve_pdf.php?file=" . urlencode(basename($course['content_path'])) . "&course_id=" . $course_id;
+$course = $course_query->fetch_assoc();
+
+// Fetch all content for this course
+$contents_query = $db->query("SELECT content_type, content_path FROM course_contents WHERE course_id = $course_id");
+$contents = [];
+while ($row = $contents_query->fetch_assoc()) {
+    if ($row['content_type'] === 'PDF') {
+        $contents['PDF'] = "serve_pdf.php?file=" . urlencode(basename($row['content_path'])) . "&course_id=" . $course_id;
+    } elseif ($row['content_type'] === 'Video') {
+        $contents['Video'] = $row['content_path'];
+        if (strpos($contents['Video'], 'youtube.com/watch?v=') !== false) {
+            $video_id = explode('v=', $contents['Video'])[1];
+            $contents['Video'] = "https://www.youtube.com/embed/" . $video_id;
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -37,7 +66,9 @@ $pdf_url = "serve_pdf.php?file=" . urlencode(basename($course['content_path'])) 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
-        .pdf-controls { pointer-events: auto; }
+        .pdf-controls { pointer-events: auto; margin-bottom: 10px; }
+        .content-section { margin-bottom: 20px; }
+        .pdf-viewer, .video-viewer { border: 1px solid #ddd; border-radius: 5px; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -50,43 +81,46 @@ $pdf_url = "serve_pdf.php?file=" . urlencode(basename($course['content_path'])) 
             <p><strong>Matière:</strong> <?php echo htmlspecialchars($course['subject_name']); ?></p>
             <p><strong>Niveau:</strong> <?php echo htmlspecialchars($course['level_name']); ?></p>
             <p><strong>Difficulté:</strong> <?php echo $course['difficulty']; ?></p>
-            <p><strong>Type:</strong> <?php echo $course['content_type']; ?></p>
             <p><strong>Créé:</strong> <?php echo $course['created_at']; ?></p>
         </div>
+
         <div class="detail-card content-preview">
-            <h3><i class="fas fa-eye"></i> Aperçu du Contenu</h3>
-            <?php if ($course['content_type'] === 'PDF'): ?>
-                <div class="pdf-controls">
-                    <button id="zoomInBtn" class="btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
-                    <button id="zoomOutBtn" class="btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
-                    <button id="rotateBtn" class="btn-action"><i class="fas fa-redo"></i> Rotation</button>
-                    <button id="screenshotBtn" class="btn-action"><i class="fas fa-camera"></i> Capture</button>
-                    <span id="screenshotInfo">3 captures restantes</span>
+            <h3><i class="fas fa-eye"></i> Contenu du Cours</h3>
+            <?php if (isset($contents['PDF'])): ?>
+                <div class="content-section">
+                    <h4><i class="fas fa-file-pdf"></i> Document PDF</h4>
+                    <div class="pdf-controls">
+                        <button id="zoomInBtn" class="btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
+                        <button id="zoomOutBtn" class="btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
+                        <button id="rotateBtn" class="btn-action"><i class="fas fa-redo"></i> Rotation</button>
+                        <button id="screenshotBtn" class="btn-action"><i class="fas fa-camera"></i> Capture</button>
+                        <span id="screenshotInfo">3 captures restantes</span>
+                    </div>
+                    <div class="pdf-viewer" id="pdfViewer" tabindex="0"></div>
                 </div>
-                <div class="pdf-viewer" id="pdfViewer" tabindex="0"></div>
-            <?php elseif ($course['content_type'] === 'Video'): ?>
-                <div class="video-viewer">
-                    <?php
-                    $video_url = $course['content_path'];
-                    if (strpos($video_url, 'youtube.com/watch?v=') !== false) {
-                        $video_id = explode('v=', $video_url)[1];
-                        $video_url = "https://www.youtube.com/embed/" . $video_id;
-                    }
-                    ?>
-                    <iframe id="videoFrame" src="<?php echo htmlspecialchars($video_url); ?>" frameborder="0" allowfullscreen></iframe>
+            <?php endif; ?>
+            <?php if (isset($contents['Video'])): ?>
+                <div class="content-section">
+                    <h4><i class="fas fa-video"></i> Vidéo</h4>
+                    <div class="video-viewer">
+                        <iframe id="videoFrame" src="<?php echo htmlspecialchars($contents['Video']); ?>" frameborder="0" allowfullscreen></iframe>
+                    </div>
                 </div>
+            <?php endif; ?>
+            <?php if (empty($contents)): ?>
+                <p>Aucun contenu disponible pour ce cours.</p>
             <?php endif; ?>
         </div>
         <a href="courses.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour aux Cours</a>
     </main>
     <?php include '../includes/footer.php'; ?>
 
-    <?php if ($course['content_type'] === 'PDF'): ?>
+    <?php if (isset($contents['PDF'])): ?>
     <script type="module">
         import * as pdfjsLib from '../assets/js/pdf.mjs';
         pdfjsLib.GlobalWorkerOptions.workerSrc = '../assets/js/pdf.worker.mjs';
 
-        const url = '<?php echo $pdf_url; ?>';
+        const url = '<?php echo $contents['PDF']; ?>';
         const viewer = document.getElementById('pdfViewer');
         let pdfDoc = null;
         let scale = 1.5;

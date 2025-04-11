@@ -29,33 +29,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("sssii", $full_name, $email, $status, $level_id, $student_id);
     $stmt->execute();
 
-    // Clear existing assignments
-    $db->query("DELETE FROM student_courses WHERE student_id = $student_id");
-    $db->query("DELETE FROM student_subjects WHERE student_id = $student_id");
+    // Clear assignments only if requested
+    if (isset($_POST['clear_assignments']) && $_POST['clear_assignments'] == '1') {
+        $db->query("DELETE FROM student_courses WHERE student_id = $student_id");
+        $db->query("DELETE FROM student_subjects WHERE student_id = $student_id");
+    }
 
-    if (isset($_POST['subject_ids']) && isset($_POST['all_courses'])) {
-        foreach ($_POST['subject_ids'] as $subject_id) {
-            $subject_id = (int)$subject_id;
-            $stmt = $db->prepare("INSERT INTO student_subjects (student_id, subject_id, all_courses) VALUES (?, ?, 1)");
-            $stmt->bind_param("ii", $student_id, $subject_id);
-            $stmt->execute();
+    // Handle new assignments
+    if (isset($_POST['subject_ids'])) {
+        $subject_ids = array_map('intval', $_POST['subject_ids']);
+        
+        // "All Courses" mode
+        if (isset($_POST['all_courses']) && $_POST['all_courses'] == '1') {
+            foreach ($subject_ids as $subject_id) {
+                $stmt = $db->prepare("INSERT INTO student_subjects (student_id, subject_id, all_courses) 
+                                      VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE all_courses = 1");
+                $stmt->bind_param("ii", $student_id, $subject_id);
+                $stmt->execute();
 
-            $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) SELECT ?, id FROM courses WHERE subject_id = ?");
-            $stmt->bind_param("ii", $student_id, $subject_id);
-            $stmt->execute();
-        }
-    } elseif (isset($_POST['subject_ids']) && isset($_POST['course_ids'])) {
-        foreach ($_POST['subject_ids'] as $subject_id) {
-            $subject_id = (int)$subject_id;
-            $stmt = $db->prepare("INSERT INTO student_subjects (student_id, subject_id, all_courses) VALUES (?, ?, 0)");
-            $stmt->bind_param("ii", $student_id, $subject_id);
-            $stmt->execute();
-        }
-        foreach ($_POST['course_ids'] as $course_id) {
-            $course_id = (int)$course_id;
-            $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
-            $stmt->bind_param("ii", $student_id, $course_id);
-            $stmt->execute();
+                // Clear existing specific courses for this subject
+                $stmt = $db->prepare("DELETE FROM student_courses WHERE student_id = ? AND course_id IN 
+                                      (SELECT id FROM courses WHERE subject_id = ?)");
+                $stmt->bind_param("ii", $student_id, $subject_id);
+                $stmt->execute();
+
+                // Assign all current courses for this subject
+                $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) 
+                                      SELECT ?, id FROM courses WHERE subject_id = ?");
+                $stmt->bind_param("ii", $student_id, $subject_id);
+                $stmt->execute();
+            }
+        } 
+        // "Specific Courses" mode
+        elseif (isset($_POST['course_ids'])) {
+            foreach ($subject_ids as $subject_id) {
+                $stmt = $db->prepare("INSERT INTO student_subjects (student_id, subject_id, all_courses) 
+                                      VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE all_courses = 0");
+                $stmt->bind_param("ii", $student_id, $subject_id);
+                $stmt->execute();
+            }
+            $course_ids = array_map('intval', $_POST['course_ids']);
+            foreach ($course_ids as $course_id) {
+                $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
+                $stmt->bind_param("ii", $student_id, $course_id);
+                $stmt->execute();
+            }
         }
     }
 
@@ -64,8 +82,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// Fetch levels
+// Fetch levels and current assignments
 $levels = $db->query("SELECT * FROM levels");
+$assigned_subjects = [];
+$subject_result = $db->query("SELECT subject_id, all_courses FROM student_subjects WHERE student_id = $student_id");
+while ($row = $subject_result->fetch_assoc()) {
+    $assigned_subjects[$row['subject_id']] = $row['all_courses'];
+}
+
+$assigned_courses = [];
+$course_result = $db->query("SELECT course_id FROM student_courses WHERE student_id = $student_id");
+while ($row = $course_result->fetch_assoc()) {
+    $assigned_courses[] = $row['course_id'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -77,6 +106,14 @@ $levels = $db->query("SELECT * FROM levels");
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .assignment-container { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        .assignment-container h3 { margin-top: 0; color: #333; }
+        .subject-list, .course-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .subject-item, .course-item { padding: 8px 12px; background: #e0f7fa; border-radius: 5px; display: flex; align-items: center; }
+        .form-group select[multiple] { height: 150px; width: 100%; border-radius: 5px; padding: 5px; }
+        .checkbox-group { margin-top: 10px; }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -109,22 +146,52 @@ $levels = $db->query("SELECT * FROM levels");
                     <?php endwhile; ?>
                 </select>
             </div>
-            <div class="form-group">
-                <label><i class="fas fa-book-open"></i> Matières</label>
-                <select name="subject_ids[]" id="subjectIds" multiple required>
-                    <option value="">Choisir un niveau d'abord</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label><i class="fas fa-book"></i> Cours</label>
-                <select name="course_ids[]" id="courseIds" multiple>
-                    <option value="">Choisir des matières d'abord</option>
-                </select>
+
+            <!-- Current Assignments -->
+            <div class="assignment-container">
+                <h3><i class="fas fa-book-open"></i> Affectations Actuelles</h3>
+                <div class="subject-list">
+                    <?php
+                    foreach ($assigned_subjects as $subject_id => $all_courses) {
+                        $subject = $db->query("SELECT name FROM subjects WHERE id = $subject_id")->fetch_assoc();
+                        echo "<span class='subject-item'>" . htmlspecialchars($subject['name']) . " (" . ($all_courses ? "Tous les cours" : "Cours spécifiques") . ")";
+                        if (!$all_courses) {
+                            $courses = $db->query("SELECT c.title FROM courses c JOIN student_courses sc ON c.id = sc.course_id WHERE sc.student_id = $student_id AND c.subject_id = $subject_id");
+                            while ($course = $courses->fetch_assoc()) {
+                                echo "<br>- " . htmlspecialchars($course['title']);
+                            }
+                        }
+                        echo "</span>";
+                    }
+                    ?>
+                </div>
                 <div class="checkbox-group">
-                    <input type="checkbox" name="all_courses" id="allCourses" value="1">
-                    <label for="allCourses">Tous les cours des matières sélectionnées</label>
+                    <input type="checkbox" name="clear_assignments" id="clearAssignments" value="1">
+                    <label for="clearAssignments">Supprimer toutes les affectations actuelles</label>
                 </div>
             </div>
+
+            <!-- New Assignments -->
+            <div class="assignment-container">
+                <h3><i class="fas fa-plus"></i> Ajouter de Nouvelles Affectations</h3>
+                <div class="form-group">
+                    <label><i class="fas fa-book-open"></i> Matières</label>
+                    <select name="subject_ids[]" id="subjectIds" multiple>
+                        <option value="">Choisir un niveau d'abord</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Cours</label>
+                    <select name="course_ids[]" id="courseIds" multiple>
+                        <option value="">Choisir des matières d'abord</option>
+                    </select>
+                    <div class="checkbox-group">
+                        <input type="checkbox" name="all_courses" id="allCourses" value="1">
+                        <label for="allCourses">Tous les cours des matières sélectionnées</label>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-actions">
                 <button type="submit" class="btn-action"><i class="fas fa-save"></i> Enregistrer</button>
                 <a href="view_student.php?id=<?php echo $student_id; ?>" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour</a>
@@ -140,7 +207,6 @@ $levels = $db->query("SELECT * FROM levels");
             const courseIds = $('#courseIds');
             const allCourses = $('#allCourses');
 
-            // Load subjects on page load if level is selected
             if (levelId.val()) {
                 $.get('ajax/fetch_subjects.php?level_id=' + levelId.val(), function(data) {
                     subjectIds.html(data);

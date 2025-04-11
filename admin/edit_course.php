@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once '../includes/db_connect.php';
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
@@ -10,118 +11,131 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
-$course_id = $_GET['id'];
-$course = $db->query("SELECT * FROM courses WHERE id = $course_id")->fetch_assoc();
-if (!$course) {
+$course_id = (int)$_GET['id'];
+$course_query = $db->query("SELECT c.*, s.name AS subject_name FROM courses c JOIN subjects s ON c.subject_id = s.id WHERE c.id = $course_id");
+if (!$course_query || $course_query->num_rows == 0) {
     header("Location: manage_courses.php");
     exit;
 }
+$course = $course_query->fetch_assoc();
 
-$subjects = $db->query("SELECT s.id, s.name, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id ORDER BY s.name ASC");
+// Fetch existing contents
+$contents_query = $db->query("SELECT id, content_type, content_path FROM course_contents WHERE course_id = $course_id");
+$contents = [];
+while ($row = $contents_query->fetch_assoc()) {
+    $contents[$row['content_type']] = ['id' => $row['id'], 'path' => $row['content_path']];
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = $_POST['title'];
-    $subject_id = $_POST['subject_id'];
-    $difficulty = $_POST['difficulty'];
-    $content_type = $_POST['content_type'];
-    $content_path = $course['content_path'];
+    $title = $db->real_escape_string($_POST['title']);
+    $subject_id = (int)$_POST['subject_id'];
+    $difficulty = $db->real_escape_string($_POST['difficulty']);
 
-    if ($content_type === 'PDF' && isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../uploads/pdfs/';
-        $content_path = $upload_dir . basename($_FILES['pdf_file']['name']);
-        move_uploaded_file($_FILES['pdf_file']['tmp_name'], $content_path);
-    } elseif ($content_type === 'Video' && !empty($_POST['video_url'])) {
-        $content_path = $_POST['video_url'];
+    // Update course
+    $stmt = $db->prepare("UPDATE courses SET title = ?, subject_id = ?, difficulty = ? WHERE id = ?");
+    $stmt->bind_param("sisi", $title, $subject_id, $difficulty, $course_id);
+    $stmt->execute();
+
+    // Handle PDF
+    if (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] == 0) {
+        $pdf_path = "../uploads/pdfs/" . basename($_FILES['pdf_file']['name']);
+        move_uploaded_file($_FILES['pdf_file']['tmp_name'], $pdf_path);
+        if (isset($contents['PDF'])) {
+            $stmt = $db->prepare("UPDATE course_contents SET content_path = ? WHERE id = ?");
+            $stmt->bind_param("si", $pdf_path, $contents['PDF']['id']);
+        } else {
+            $stmt = $db->prepare("INSERT INTO course_contents (course_id, content_type, content_path) VALUES (?, 'PDF', ?)");
+            $stmt->bind_param("is", $course_id, $pdf_path);
+        }
+        $stmt->execute();
+    } elseif (isset($_POST['remove_pdf']) && isset($contents['PDF'])) {
+        $db->query("DELETE FROM course_contents WHERE id = " . (int)$contents['PDF']['id']);
+        @unlink($contents['PDF']['path']);
     }
 
-    $stmt = $db->prepare("UPDATE courses SET title = ?, subject_id = ?, difficulty = ?, content_type = ?, content_path = ? WHERE id = ?");
-    $stmt->bind_param("sisssi", $title, $subject_id, $difficulty, $content_type, $content_path, $course_id);
-    $stmt->execute();
+    // Handle Video
+    if (!empty($_POST['video_url'])) {
+        $video_url = $db->real_escape_string($_POST['video_url']);
+        if (isset($contents['Video'])) {
+            $stmt = $db->prepare("UPDATE course_contents SET content_path = ? WHERE id = ?");
+            $stmt->bind_param("si", $video_url, $contents['Video']['id']);
+        } else {
+            $stmt = $db->prepare("INSERT INTO course_contents (course_id, content_type, content_path) VALUES (?, 'Video', ?)");
+            $stmt->bind_param("is", $course_id, $video_url);
+        }
+        $stmt->execute();
+    } elseif (isset($_POST['remove_video']) && isset($contents['Video'])) {
+        $db->query("DELETE FROM course_contents WHERE id = " . (int)$contents['Video']['id']);
+    }
 
-    // Log the action
-    $stmt = $db->prepare("INSERT INTO activity_logs (user_id, user_type, action, details) VALUES (?, 'admin', 'Edited course', ?)");
-    $details = "Edited course ID $course_id: $title";
-    $stmt->bind_param("is", $_SESSION['admin_id'], $details);
-    $stmt->execute();
-
+    $_SESSION['message'] = "Cours modifié avec succès !";
     header("Location: manage_courses.php");
     exit;
 }
+
+$subjects = $db->query("SELECT id, name FROM subjects");
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Course - Zouhair E-Learning</title>
+    <title>Modifier Cours - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-edit"></i> Edit Course</h1>
-        <form method="POST" class="form-container" enctype="multipart/form-data">
+        <h1><i class="fas fa-edit"></i> Modifier Cours</h1>
+        <form method="POST" enctype="multipart/form-data" class="edit-form">
             <div class="form-group">
-                <label><i class="fas fa-book"></i> Course Title</label>
+                <label><i class="fas fa-book"></i> Titre</label>
                 <input type="text" name="title" value="<?php echo htmlspecialchars($course['title']); ?>" required>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-book-open"></i> Subject</label>
+                <label><i class="fas fa-folder"></i> Matière</label>
                 <select name="subject_id" required>
-                    <?php while ($sub = $subjects->fetch_assoc()): ?>
-                        <option value="<?php echo $sub['id']; ?>" <?php echo $sub['id'] == $course['subject_id'] ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($sub['name'] . " (" . $sub['level_name'] . ")"); ?>
+                    <?php while ($subject = $subjects->fetch_assoc()): ?>
+                        <option value="<?php echo $subject['id']; ?>" <?php echo $course['subject_id'] == $subject['id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($subject['name']); ?>
                         </option>
                     <?php endwhile; ?>
                 </select>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-tachometer-alt"></i> Difficulty</label>
+                <label><i class="fas fa-tachometer-alt"></i> Difficulté</label>
                 <select name="difficulty" required>
-                    <?php foreach (['Easy', 'Medium', 'Hard'] as $diff): ?>
-                        <option value="<?php echo $diff; ?>" <?php echo $course['difficulty'] == $diff ? 'selected' : ''; ?>><?php echo $diff; ?></option>
-                    <?php endforeach; ?>
+                    <option value="Easy" <?php echo $course['difficulty'] == 'Easy' ? 'selected' : ''; ?>>Facile</option>
+                    <option value="Medium" <?php echo $course['difficulty'] == 'Medium' ? 'selected' : ''; ?>>Moyen</option>
+                    <option value="Hard" <?php echo $course['difficulty'] == 'Hard' ? 'selected' : ''; ?>>Difficile</option>
                 </select>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-file-alt"></i> Content Type</label>
-                <select name="content_type" id="contentType" required>
-                    <option value="PDF" <?php echo $course['content_type'] == 'PDF' ? 'selected' : ''; ?>>PDF</option>
-                    <option value="Video" <?php echo $course['content_type'] == 'Video' ? 'selected' : ''; ?>>Video</option>
-                </select>
-            </div>
-            <div class="form-group" id="pdfField" <?php echo $course['content_type'] == 'Video' ? 'style="display: none;"' : ''; ?>>
-                <label><i class="fas fa-upload"></i> Upload New PDF (optional)</label>
+                <label><i class="fas fa-file-pdf"></i> Fichier PDF</label>
+                <?php if (isset($contents['PDF'])): ?>
+                    <p>Actuel: <?php echo htmlspecialchars(basename($contents['PDF']['path'])); ?></p>
+                    <input type="checkbox" name="remove_pdf" id="remove_pdf" value="1">
+                    <label for="remove_pdf">Supprimer le PDF</label><br>
+                <?php endif; ?>
                 <input type="file" name="pdf_file" accept=".pdf">
-                <p>Current: <?php echo basename($course['content_path']); ?></p>
             </div>
-            <div class="form-group" id="videoField" <?php echo $course['content_type'] == 'PDF' ? 'style="display: none;"' : ''; ?>>
-                <label><i class="fas fa-video"></i> Video URL</label>
-                <input type="url" name="video_url" value="<?php echo $course['content_type'] == 'Video' ? htmlspecialchars($course['content_path']) : ''; ?>" placeholder="e.g., https://youtube.com/watch?v=xyz">
+            <div class="form-group">
+                <label><i class="fas fa-video"></i> URL Vidéo</label>
+                <?php if (isset($contents['Video'])): ?>
+                    <p>Actuelle: <?php echo htmlspecialchars($contents['Video']['path']); ?></p>
+                    <input type="checkbox" name="remove_video" id="remove_video" value="1">
+                    <label for="remove_video">Supprimer la vidéo</label><br>
+                <?php endif; ?>
+                <input type="url" name="video_url" value="<?php echo isset($contents['Video']) ? htmlspecialchars($contents['Video']['path']) : ''; ?>" placeholder="https://youtube.com/watch?v=...">
             </div>
-            <button type="submit" class="btn-action"><i class="fas fa-save"></i> Save Changes</button>
-            <a href="manage_courses.php" class="btn-action cancel"><i class="fas fa-times"></i> Cancel</a>
+            <div class="form-actions">
+                <button type="submit" class="btn-action"><i class="fas fa-save"></i> Enregistrer</button>
+                <a href="manage_courses.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour</a>
+            </div>
         </form>
     </main>
     <?php include '../includes/footer.php'; ?>
-
-    <script>
-        $(document).ready(function() {
-            $('#contentType').change(function() {
-                if ($(this).val() === 'PDF') {
-                    $('#pdfField').show();
-                    $('#videoField').hide();
-                    $('#videoField input').prop('required', false);
-                } else {
-                    $('#pdfField').hide();
-                    $('#videoField').show();
-                    $('#videoField input').prop('required', true);
-                }
-            });
-        });
-    </script>
 </body>
 </html>
