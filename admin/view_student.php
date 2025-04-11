@@ -52,6 +52,37 @@ foreach ($assigned_subjects as $subject_id => &$subject) {
         $subject['courses'] = $all_subjects[$subject_id]['courses']; // Include all current courses
     }
 }
+
+
+function getLocationName($lat, $lon) {
+    if (!$lat || !$lon) return 'N/A';
+    $url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=16&addressdetails=1";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'ZouhairElearning/1.0');
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // Log for debugging
+    file_put_contents('geo_debug.log', "Coords: $lat, $lon | HTTP: $httpCode | Response: $response\n", FILE_APPEND);
+
+    $data = json_decode($response, true);
+    if (isset($data['address'])) {
+        $address = $data['address'];
+        $neighborhood = $address['suburb'] ?? $address['neighbourhood'] ?? '';
+        $city = $address['city'] ?? $address['town'] ?? $address['village'] ?? '';
+        if ($neighborhood && $city) {
+            return "$neighborhood, $city";
+        } elseif ($city) {
+            return $city;
+        } elseif ($address['country']) {
+            return $address['country'];
+        }
+    }
+    return 'Unknown Location';
+}
 unset($subject);
 ?>
 
@@ -74,6 +105,11 @@ unset($subject);
             <p><strong>Email:</strong> <?php echo htmlspecialchars($student['email']); ?></p>
             <p><strong>Validated:</strong> <?php echo $student['is_validated'] ? 'Yes' : 'No'; ?></p>
             <p><strong>Created:</strong> <?php echo $student['created_at']; ?></p>
+            <p><strong>Device ID:</strong> <?php echo htmlspecialchars($student['device_id']); ?></p>
+            <p><strong>Location:</strong> <?php echo htmlspecialchars(getLocationName($student['latitude'], $student['longitude'])); ?></p>
+            <p><strong>Last Device:</strong> <?php echo htmlspecialchars($student['device_name']); ?></p>
+ 
+            
         </div>
 
         <div class="detail-card">

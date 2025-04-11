@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once '../includes/db_connect.php';
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
@@ -7,29 +8,33 @@ if (!isset($_SESSION['admin_id'])) {
 
 // Fetch stats
 $total_students = $db->query("SELECT COUNT(*) FROM students")->fetch_row()[0];
-$validated_students = $db->query("SELECT COUNT(*) FROM students WHERE is_validated = 1")->fetch_row()[0];
-$pending_students = $total_students - $validated_students;
-$total_courses = $db->query("SELECT COUNT(*) FROM courses")->fetch_row()[0];
-$total_levels = $db->query("SELECT COUNT(*) FROM levels")->fetch_row()[0];
-$notifications = $db->query("SELECT COUNT(*) FROM activity_logs WHERE timestamp > NOW() - INTERVAL 1 DAY")->fetch_row()[0];
+$validated_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'approved'")->fetch_row()[0];
+$pending_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'pending'")->fetch_row()[0];
+$total_courses = $db->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0; // Fallback if missing
+$total_levels = $db->query("SELECT COUNT(*) FROM levels")->fetch_row()[0] ?? 0;
+$notifications = $db->query("SELECT COUNT(*) FROM activity_logs WHERE timestamp > NOW() - INTERVAL 1 DAY")->fetch_row()[0] ?? 0;
 
 // Recent data
 $recent_students = $db->query("SELECT * FROM students ORDER BY created_at DESC LIMIT 5");
-$recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5");
-$notifs = $db->query("SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 5");
+$recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5") ?? [];
+$notifs = $db->query("SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 5") ?? [];
 
 // Subjects chart data
 $subjects_chart = [];
 $result = $db->query("SELECT s.name, COUNT(c.id) as count FROM subjects s LEFT JOIN courses c ON s.id = c.subject_id GROUP BY s.id, s.name");
-while ($row = $result->fetch_assoc()) {
-    $subjects_chart[$row['name']] = $row['count'];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $subjects_chart[$row['name']] = $row['count'];
+    }
 }
 
 // Activity trend data (last 7 days)
 $activity_trend = [];
 $result = $db->query("SELECT DATE(timestamp) AS day, COUNT(*) AS count FROM activity_logs WHERE timestamp > NOW() - INTERVAL 7 DAY GROUP BY day ORDER BY day ASC");
-while ($row = $result->fetch_assoc()) {
-    $activity_trend[$row['day']] = $row['count'];
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $activity_trend[$row['day']] = $row['count'];
+    }
 }
 ?>
 
@@ -121,13 +126,13 @@ while ($row = $result->fetch_assoc()) {
                         <tr><th>Title</th><th>Subject</th><th>Added</th></tr>
                     </thead>
                     <tbody>
-                        <?php while ($course = $recent_courses->fetch_assoc()): ?>
+                        <?php if ($recent_courses): while ($course = $recent_courses->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($course['title']); ?></td>
-                                <td><?php echo htmlspecialchars($course['subject']); ?></td>
-                                <td><?php echo $course['created_at']; ?></td>
+                                <td><?php echo htmlspecialchars($course['title'] ?? 'N/A'); ?></td>
+                                <td><?php echo htmlspecialchars($course['subject'] ?? 'N/A'); ?></td>
+                                <td><?php echo $course['created_at'] ?? 'N/A'; ?></td>
                             </tr>
-                        <?php endwhile; ?>
+                        <?php endwhile; endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -137,10 +142,12 @@ while ($row = $result->fetch_assoc()) {
         <section class="notifications activity-log">
             <h2><i class="fas fa-history"></i> Recent Activity</h2>
             <ul>
-                <?php while ($notif = $notifs->fetch_assoc()): ?>
-                    <li><?php echo htmlspecialchars($notif['action'] . ' - ' . $notif['details']); ?> 
-                        <span>(<?php echo $notif['timestamp']; ?>)</span></li>
-                <?php endwhile; ?>
+                <?php if ($notifs): while ($notif = $notifs->fetch_assoc()): ?>
+                    <li><?php echo htmlspecialchars(($notif['action'] ?? 'Action') . ' - ' . ($notif['details'] ?? 'Details')); ?> 
+                        <span>(<?php echo $notif['timestamp'] ?? 'N/A'; ?>)</span></li>
+                <?php endwhile; else: ?>
+                    <li>No recent activity.</li>
+                <?php endif; ?>
             </ul>
         </section>
     </main>

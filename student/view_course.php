@@ -1,6 +1,6 @@
 <?php
-require_once '../includes/db_connect.php';
 session_start();
+require_once '../includes/db_connect.php';
 if (!isset($_SESSION['student_id'])) {
     header("Location: login.php");
     exit;
@@ -11,31 +11,29 @@ if (!isset($_GET['id'])) {
     exit;
 }
 
-$student_id = $_SESSION['student_id'];
 $course_id = (int)$_GET['id'];
-$course = $db->query("SELECT c.*, s.name AS subject_name, l.name AS level_name FROM courses c JOIN subjects s ON c.subject_id = s.id JOIN levels l ON s.level_id = l.id WHERE c.id = $course_id")->fetch_assoc();
+$student_id = (int)$_SESSION['student_id'];
+$course = $db->query("SELECT c.*, s.name AS subject_name, l.name AS level_name 
+                      FROM courses c 
+                      JOIN subjects s ON c.subject_id = s.id 
+                      JOIN levels l ON s.level_id = l.id 
+                      JOIN student_courses sc ON c.id = sc.course_id 
+                      WHERE c.id = $course_id AND sc.student_id = $student_id")->fetch_assoc();
 if (!$course) {
     header("Location: courses.php");
     exit;
 }
 
-// Check enrollment (assuming an enrollments table exists)
-$enrolled = $db->query("SELECT * FROM enrollments WHERE student_id = $student_id AND course_id = $course_id")->num_rows > 0;
-if (!$enrolled) {
-    header("Location: courses.php");
-    exit;
-}
-
-$pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_path'])) . "&course_id=" . $course_id;
+$pdf_url = "serve_pdf.php?file=" . urlencode(basename($course['content_path'])) . "&course_id=" . $course_id;
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
- @media name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Course - Zouhair E-Learning</title>
-    <link rel="stylesheet" href="../assets/css/admin.css"> <!-- Reuse admin.css -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voir Cours - Zouhair E-Learning</title>
+    <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
@@ -45,25 +43,25 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
 <body oncontextmenu="return false;">
     <?php include '../includes/student_header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-book"></i> Course Details</h1>
+        <h1><i class="fas fa-book"></i> Détails du Cours</h1>
         <div class="detail-card">
-            <h3><i class="fas fa-info"></i> Course Information</h3>
-            <p><strong>Title:</strong> <?php echo htmlspecialchars($course['title']); ?></p>
-            <p><strong>Subject:</strong> <?php echo htmlspecialchars($course['subject_name']); ?></p>
-            <p><strong>Level:</strong> <?php echo htmlspecialchars($course['level_name']); ?></p>
-            <p><strong>Difficulty:</strong> <?php echo $course['difficulty']; ?></p>
+            <h3><i class="fas fa-info"></i> Informations sur le Cours</h3>
+            <p><strong>Titre:</strong> <?php echo htmlspecialchars($course['title']); ?></p>
+            <p><strong>Matière:</strong> <?php echo htmlspecialchars($course['subject_name']); ?></p>
+            <p><strong>Niveau:</strong> <?php echo htmlspecialchars($course['level_name']); ?></p>
+            <p><strong>Difficulté:</strong> <?php echo $course['difficulty']; ?></p>
             <p><strong>Type:</strong> <?php echo $course['content_type']; ?></p>
-            <p><strong>Created:</strong> <?php echo $course['created_at']; ?></p>
+            <p><strong>Créé:</strong> <?php echo $course['created_at']; ?></p>
         </div>
         <div class="detail-card content-preview">
-            <h3><i class="fas fa-eye"></i> Content Preview</h3>
+            <h3><i class="fas fa-eye"></i> Aperçu du Contenu</h3>
             <?php if ($course['content_type'] === 'PDF'): ?>
                 <div class="pdf-controls">
-                    <button id="zoomInBtn" class="btn-action"><i class="fas fa-search-plus"></i> Zoom In</button>
-                    <button id="zoomOutBtn" class="btn-action"><i class="fas fa-search-minus"></i> Zoom Out</button>
-                    <button id="rotateBtn" class="btn-action"><i class="fas fa-redo"></i> Rotate</button>
-                    <button id="screenshotBtn" class="btn-action"><i class="fas fa-camera"></i> Screenshot</button>
-                    <span id="screenshotInfo">3 shots left</span>
+                    <button id="zoomInBtn" class="btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
+                    <button id="zoomOutBtn" class="btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
+                    <button id="rotateBtn" class="btn-action"><i class="fas fa-redo"></i> Rotation</button>
+                    <button id="screenshotBtn" class="btn-action"><i class="fas fa-camera"></i> Capture</button>
+                    <span id="screenshotInfo">3 captures restantes</span>
                 </div>
                 <div class="pdf-viewer" id="pdfViewer" tabindex="0"></div>
             <?php elseif ($course['content_type'] === 'Video'): ?>
@@ -79,14 +77,13 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
                 </div>
             <?php endif; ?>
         </div>
-        <a href="courses.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Back to Courses</a>
+        <a href="courses.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour aux Cours</a>
     </main>
     <?php include '../includes/footer.php'; ?>
 
     <?php if ($course['content_type'] === 'PDF'): ?>
     <script type="module">
         import * as pdfjsLib from '../assets/js/pdf.mjs';
-
         pdfjsLib.GlobalWorkerOptions.workerSrc = '../assets/js/pdf.worker.mjs';
 
         const url = '<?php echo $pdf_url; ?>';
@@ -113,10 +110,7 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
                     canvas.style.width = '100%';
                     canvas.style.maxWidth = `${viewport.width}px`;
 
-                    const renderContext = {
-                        canvasContext: ctx,
-                        viewport: viewport
-                    };
+                    const renderContext = { canvasContext: ctx, viewport: viewport };
                     page.render(renderContext).promise.then(() => {
                         console.log(`Page ${pageNum} rendered`);
                     });
@@ -128,7 +122,8 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
             pdfDoc = pdf;
             renderPages(pdf, scale, rotation);
         }).catch(error => {
-            viewer.innerHTML = '<p>Error loading PDF: ' + error.message + '</p>';
+            console.error('PDF.js error:', error);
+            viewer.innerHTML = '<p>Erreur de chargement du PDF: ' + error.message + '</p>';
         });
 
         document.getElementById('zoomInBtn').addEventListener('click', () => {
@@ -169,7 +164,7 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
         const fifteenMins = 15 * 60 * 1000;
 
         function updateScreenshotInfo() {
-            document.getElementById('screenshotInfo').textContent = `${screenshotCount} shots left`;
+            document.getElementById('screenshotInfo').textContent = `${screenshotCount} captures restantes`;
         }
 
         function resetCount() {
@@ -210,7 +205,7 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', '../includes/log_screenshot.php', true);
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    const userId = '<?php echo $student_id; ?>';
+                    const userId = '<?php echo $_SESSION['student_id']; ?>';
                     const pageNum = getVisiblePageNum();
                     const data = `user_id=${userId}&course_id=${<?php echo $course_id; ?>}&page_num=${pageNum}&course_title=${encodeURIComponent(courseTitle)}`;
                     xhr.send(data);
@@ -220,7 +215,7 @@ $pdf_url = "../admin/serve_pdf.php?file=" . urlencode(basename($course['content_
                     updateScreenshotInfo();
                 });
             } else {
-                alert('Screenshot limit reached! Wait 15 minutes.');
+                alert('Limite de captures atteinte ! Attendez 15 minutes.');
             }
         });
 

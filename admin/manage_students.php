@@ -1,28 +1,51 @@
 <?php
+session_start();
 require_once '../includes/db_connect.php';
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$students = $db->query("SELECT * FROM students ORDER BY created_at DESC");
+function getLocationName($lat, $lon) {
+    if (!$lat || !$lon) return 'N/A';
+    $url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=16&addressdetails=1";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'ZouhairElearning/1.0');
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $data = json_decode($response, true);
+    if (isset($data['address'])) {
+        $address = $data['address'];
+        $neighborhood = $address['suburb'] ?? $address['neighbourhood'] ?? '';
+        $city = $address['city'] ?? $address['town'] ?? $address['village'] ?? '';
+        if ($neighborhood && $city) return "$neighborhood, $city";
+        elseif ($city) return $city;
+        elseif ($address['country']) return $address['country'];
+    }
+    return 'Unknown Location';
+}
+
+$students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JOIN levels l ON s.level_id = l.id ORDER BY s.created_at DESC");
 
 if (isset($_GET['delete']) && isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = (int)$_GET['id'];
     $stmt = $db->prepare("DELETE FROM students WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
+    $_SESSION['message'] = "Étudiant supprimé avec succès !";
     header("Location: manage_students.php");
     exit;
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Students - Zouhair E-Learning</title>
+    <title>Gérer les Étudiants - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -32,16 +55,23 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-users"></i> Manage Students</h1>
+        <h1><i class="fas fa-users"></i> Gérer les Étudiants</h1>
+        <?php if (isset($_SESSION['message'])): ?>
+            <p style="color: #4caf50;"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['error'])): ?>
+            <p class="error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <?php endif; ?>
         <table id="studentsTable" class="display">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
+                    <th>Nom</th>
                     <th>Email</th>
-                    <th>Validated</th>
-                    <th>Level</th>
-                    <th>Joined</th>
+                    <th>Statut</th>
+                    <th>Niveau</th>
+                     <th>Localisation</th>
+                    <th>Inscrit</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -51,98 +81,25 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
                         <td><?php echo $student['id']; ?></td>
                         <td><?php echo htmlspecialchars($student['full_name']); ?></td>
                         <td><?php echo htmlspecialchars($student['email']); ?></td>
-                        <td><?php echo $student['is_validated'] ? 'Yes' : 'No'; ?></td>
-                        <td><?php 
-                            if ($student['level_id']) {
-                                $level = $db->query("SELECT name FROM levels WHERE id = " . $student['level_id'])->fetch_assoc();
-                                echo htmlspecialchars($level['name']);
-                            } else {
-                                echo 'N/A';
-                            }
-                        ?></td>
+                        <td><?php echo ucfirst($student['status']); ?></td>
+                        <td><?php echo $student['level_name'] ? htmlspecialchars($student['level_name']) : 'N/A'; ?></td>
+                         <td><?php echo htmlspecialchars(getLocationName($student['latitude'], $student['longitude'])); ?></td>
                         <td><?php echo $student['created_at']; ?></td>
                         <td>
-                            <a href="view_student.php?id=<?php echo $student['id']; ?>" class="btn-action view" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="edit_student.php?id=<?php echo $student['id']; ?>" class="btn-action edit" title="Edit"><i class="fas fa-edit"></i></a>
-                            <?php if (!$student['is_validated']): ?>
-                                <a href="#" class="btn-action validate" data-id="<?php echo $student['id']; ?>" title="Validate"><i class="fas fa-check"></i></a>
-                            <?php endif; ?>
-                            <a href="?delete=1&id=<?php echo $student['id']; ?>" class="btn-action delete" onclick="return confirm('Are you sure?');" title="Delete"><i class="fas fa-trash"></i></a>
+                            <a href="view_student.php?id=<?php echo $student['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="edit_student.php?id=<?php echo $student['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
+                            <a href="?delete=1&id=<?php echo $student['id']; ?>" class="btn-action delete" onclick="return confirm('Êtes-vous sûr ?');" title="Supprimer"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
-
-        <!-- Validation Modal -->
-        <div class="modal" id="validateModal" style="display: none;">
-            <div class="modal-content">
-                <span class="close" onclick="$('#validateModal').hide();">×</span>
-                <h2><i class="fas fa-check-circle"></i> Validate Student</h2>
-                <form method="POST" action="validate_student.php" id="validateForm">
-                    <input type="hidden" name="student_id" id="studentId">
-                    <div class="form-group">
-                        <label>Level</label>
-                        <select name="level_id" id="levelId" required>
-                            <?php
-                            $levels = $db->query("SELECT * FROM levels");
-                            while ($level = $levels->fetch_assoc()) {
-                                echo "<option value='{$level['id']}'>" . htmlspecialchars($level['name']) . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Subjects</label>
-                        <select name="subject_ids[]" id="subjectIds" multiple required></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Courses</label>
-                        <select name="course_ids[]" id="courseIds" multiple></select>
-                        <div class="checkbox-group">
-                            <input type="checkbox" name="all_courses" id="allCourses" value="1">
-                            <label for="allCourses">All Courses in Selected Subjects</label>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-action"><i class="fas fa-save"></i> Validate</button>
-                </form>
-            </div>
-        </div>
     </main>
     <?php include '../includes/footer.php'; ?>
 
     <script>
         $(document).ready(function() {
             $('#studentsTable').DataTable({ pageLength: 10, lengthChange: false });
-
-            $('.validate').click(function(e) {
-                e.preventDefault();
-                $('#studentId').val($(this).data('id'));
-                $('#levelId').val('');
-                $('#subjectIds').html('<option value="">Select a level first</option>');
-                $('#courseIds').html('<option value="">Select subjects first</option>');
-                $('#allCourses').prop('checked', false);
-                $('#validateModal').show();
-            });
-
-            $('#levelId').change(function() {
-                let level_id = $(this).val();
-                $.get('ajax/fetch_subjects.php?level_id=' + level_id, function(data) {
-                    $('#subjectIds').html(data);
-                    $('#courseIds').html('<option value="">Select subjects first</option>');
-                });
-            });
-
-            $('#subjectIds').change(function() {
-                let subject_ids = $(this).val();
-                if (subject_ids && subject_ids.length > 0) {
-                    $.post('ajax/fetch_courses.php', { subject_ids: subject_ids }, function(data) {
-                        $('#courseIds').html(data);
-                    });
-                } else {
-                    $('#courseIds').html('<option value="">Select subjects first</option>');
-                }
-            });
         });
     </script>
 </body>
