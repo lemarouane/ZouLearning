@@ -8,11 +8,12 @@ if (!isset($_SESSION['admin_id'])) {
 
 $courses_query = $db->query("
     SELECT c.id, c.title, c.difficulty, s.name AS subject_name, 
-           GROUP_CONCAT(cc.content_type) AS content_types
+           COUNT(cf.id) AS folder_count,
+           (SELECT COUNT(*) FROM course_contents cc WHERE cc.course_id = c.id) AS content_count
     FROM courses c
     JOIN subjects s ON c.subject_id = s.id
-    LEFT JOIN course_contents cc ON c.id = cc.course_id
-    GROUP BY c.id, c.title, c.difficulty, s.name
+    LEFT JOIN course_folders cf ON c.id = cf.course_id
+    GROUP BY c.id
 ");
 ?>
 
@@ -33,16 +34,20 @@ $courses_query = $db->query("
     <main class="dashboard">
         <h1><i class="fas fa-book"></i> Gérer les Cours</h1>
         <?php if (isset($_SESSION['message'])): ?>
-            <p style="color: #4caf50;"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
+            <p class="success-message"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
         <?php endif; ?>
-        <a href="add_course.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter un Cours</a>
-        <table id="coursesTable" class="display">
+        <?php if (isset($_SESSION['error'])): ?>
+            <p class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <?php endif; ?>
+        <a href="add_course.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un Cours</a>
+        <table id="coursesTable" class="course-table">
             <thead>
                 <tr>
                     <th>Titre</th>
                     <th>Matière</th>
                     <th>Difficulté</th>
-                    <th>Type de Contenu</th>
+                    <th>Dossiers</th>
+                    <th>Fichiers</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -52,7 +57,8 @@ $courses_query = $db->query("
                         <td><?php echo htmlspecialchars($course['title']); ?></td>
                         <td><?php echo htmlspecialchars($course['subject_name']); ?></td>
                         <td><?php echo $course['difficulty']; ?></td>
-                        <td><?php echo $course['content_types'] ?: 'Aucun'; ?></td>
+                        <td><?php echo $course['folder_count']; ?></td>
+                        <td><?php echo $course['content_count']; ?></td>
                         <td>
                             <a href="view_course.php?id=<?php echo $course['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
                             <a href="edit_course.php?id=<?php echo $course['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
@@ -67,7 +73,11 @@ $courses_query = $db->query("
 
     <script>
         $(document).ready(function() {
-            $('#coursesTable').DataTable({ pageLength: 10, lengthChange: false });
+            $('#coursesTable').DataTable({ 
+                pageLength: 10, 
+                lengthChange: false,
+                language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json' }
+            });
         });
     </script>
 </body>

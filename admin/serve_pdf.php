@@ -12,29 +12,34 @@ if (!isset($_GET['file']) || !isset($_GET['course_id'])) {
 }
 
 $course_id = (int)$_GET['course_id'];
-$file_name = basename($_GET['file']);
-$file_path = "../uploads/pdfs/" . $file_name;
+$file_name = urldecode(basename($_GET['file']));
+$file_path = "../Uploads/pdfs/" . $file_name;
 
-// Verify course exists (admin can see all)
-$stmt = $db->prepare("SELECT content_path FROM course_contents WHERE course_id = ? AND content_type = 'PDF'");
-$stmt->bind_param("i", $course_id);
+// Verify file exists
+if (!file_exists($file_path)) {
+    error_log("File not found: $file_path");
+    http_response_code(404);
+    exit("Fichier introuvable");
+}
+
+// Verify course content in DB
+$stmt = $db->prepare("SELECT content_path FROM course_contents WHERE course_id = ? AND content_type = 'PDF' AND content_path LIKE ?");
+$like_path = "%" . $file_name;
+$stmt->bind_param("is", $course_id, $like_path);
 $stmt->execute();
 $result = $stmt->get_result();
 $course_content = $result->fetch_assoc();
-if (!$course_content || basename($course_content['content_path']) !== $file_name) {
+if (!$course_content) {
+    error_log("No matching content for course_id=$course_id, file=$file_name");
     http_response_code(403);
     exit("Accès refusé");
 }
 
-if (!file_exists($file_path)) {
-    http_response_code(404);
-    exit("Fichier introuvable: " . $file_path);
-}
-
 $file_size = filesize($file_path);
 if ($file_size === 0) {
+    error_log("Empty file: $file_path");
     http_response_code(500);
-    exit("Fichier vide sur le serveur: " . $file_path);
+    exit("Fichier vide");
 }
 
 ob_clean();
