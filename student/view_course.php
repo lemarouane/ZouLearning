@@ -59,17 +59,16 @@ $stmt->execute();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voir Cours - Zouhair E-Learning</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body oncontextmenu="return false;">
     <?php include '../includes/student_header.php'; ?>
-    <main class="container mt-4">
-        <h1 class="dashboard mb-4"><i class="fas fa-book"></i> Détails du Cours</h1>
-        <div class="detail-card shadow-sm">
+    <main class="dashboard">
+        <h1><i class="fas fa-book"></i> Détails du Cours</h1>
+        <div class="detail-card">
             <h3><i class="fas fa-info-circle"></i> Informations sur le Cours</h3>
             <p><strong>Titre :</strong> <?php echo htmlspecialchars($course['title']); ?></p>
             <p><strong>Matière :</strong> <?php echo htmlspecialchars($course['subject_name']); ?></p>
@@ -77,7 +76,7 @@ $stmt->execute();
             <p><strong>Difficulté :</strong> <?php echo $course['difficulty']; ?></p>
             <p><strong>Créé :</strong> <?php echo $course['created_at']; ?></p>
         </div>
-        <div class="content-preview detail-card shadow-sm">
+        <div class="content-preview">
             <h3><i class="fas fa-folder"></i> Dossiers du Cours</h3>
             <?php if ($folders->num_rows > 0): ?>
                 <?php while ($folder = $folders->fetch_assoc()): ?>
@@ -87,7 +86,7 @@ $stmt->execute();
                             <p><?php echo htmlspecialchars($folder['description']); ?></p>
                         <?php endif; ?>
                     </div>
-                    <div class="content-view" id="content-<?php echo $folder['id']; ?>">
+                    <div class="content-view" id="content-<?php echo $folder['id']; ?>" style="display: none;">
                         <?php
                         $contents = $db->query("SELECT id, content_type, content_name, content_path FROM course_contents WHERE folder_id = {$folder['id']}");
                         if ($contents->num_rows > 0):
@@ -126,174 +125,175 @@ $stmt->execute();
         <a href="dashboard.php" class="back-btn"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
     </main>
     <?php include '../includes/footer.php'; ?>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 
-    <script type="module">
-        import * as pdfjsLib from '../assets/js/pdf.mjs';
-        pdfjsLib.GlobalWorkerOptions.workerSrc = '../assets/js/pdf.worker.mjs';
+        $(document).ready(function() {
+            // Folder toggle
+            $('.folder-view-card').on('click', function() {
+                const folderId = $(this).data('folder-id');
+                const contentSection = $(`#content-${folderId}`);
+                contentSection.slideToggle(300);
 
-        // Folder toggle
-        $('.folder-view-card').on('click', function() {
-            const folderId = $(this).data('folder-id');
-            const contentSection = $(`#content-${folderId}`);
-            contentSection.slideToggle(300);
+                if (contentSection.is(':visible')) {
+                    contentSection.find('.pdf-viewer').each(function() {
+                        const pdfViewer = $(this);
+                        if (pdfViewer.find('.pdf-canvas').children().length > 0) return;
 
-            if (contentSection.is(':visible')) {
-                contentSection.find('.pdf-viewer').each(function() {
-                    const pdfViewer = $(this);
-                    if (pdfViewer.find('.pdf-canvas').children().length > 0) return;
+                        const url = pdfViewer.data('pdf');
+                        const canvasContainer = pdfViewer.find('.pdf-canvas');
+                        let pdfDoc = null;
+                        let scale = 1.5;
+                        let rotation = 0;
 
-                    const url = pdfViewer.data('pdf');
-                    const canvasContainer = pdfViewer.find('.pdf-canvas');
-                    let pdfDoc = null;
-                    let scale = 1.5;
-                    let rotation = 0;
+                        function renderPages(pdf, scale, rotation) {
+                            canvasContainer.empty();
+                            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                                const canvas = document.createElement('canvas');
+                                canvas.className = 'pdf-page';
+                                canvas.dataset.pageNum = pageNum;
+                                canvasContainer.append(canvas);
+                                const ctx = canvas.getContext('2d');
 
-                    function renderPages(pdf, scale, rotation) {
-                        canvasContainer.empty();
-                        const numPages = pdf.numPages;
-                        for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-                            const canvas = document.createElement('canvas');
-                            canvas.className = 'pdf-page';
-                            canvas.dataset.pageNum = pageNum;
-                            canvasContainer.append(canvas);
-                            const ctx = canvas.getContext('2d');
+                                pdf.getPage(pageNum).then(page => {
+                                    const viewport = page.getViewport({ scale: scale, rotation: rotation });
+                                    canvas.height = viewport.height;
+                                    canvas.width = viewport.width;
+                                    canvas.style.width = '100%';
+                                    canvas.style.maxWidth = `${viewport.width}px`;
+                                    canvas.style.margin = '0 auto'; // Center canvas
+                                    canvas.style.display = 'block';
 
-                            pdf.getPage(pageNum).then(page => {
-                                const viewport = page.getViewport({ scale: scale, rotation: rotation });
-                                canvas.height = viewport.height;
-                                canvas.width = viewport.width;
-                                canvas.style.width = '100%';
-                                canvas.style.maxWidth = `${viewport.width}px`;
-
-                                const renderContext = { canvasContext: ctx, viewport: viewport };
-                                page.render(renderContext);
-                            });
-                        }
-                    }
-
-                    pdfjsLib.getDocument(url).promise.then(pdf => {
-                        pdfDoc = pdf;
-                        renderPages(pdf, scale, rotation);
-                    }).catch(error => {
-                        canvasContainer.html('<p class="error-message">Erreur de chargement du PDF : ' + error.message + '</p>');
-                    });
-
-                    pdfViewer.find('.zoom-in').click(() => {
-                        if (pdfDoc) {
-                            scale += 0.25;
-                            renderPages(pdfDoc, scale, rotation);
-                        }
-                    });
-
-                    pdfViewer.find('.zoom-out').click(() => {
-                        if (pdfDoc && scale > 0.5) {
-                            scale -= 0.25;
-                            renderPages(pdfDoc, scale, rotation);
-                        }
-                    });
-
-                    pdfViewer.find('.rotate').click(() => {
-                        if (pdfDoc) {
-                            rotation = (rotation + 90) % 360;
-                            renderPages(pdfDoc, scale, rotation);
-                        }
-                    });
-
-                    let screenshotCount = parseInt(localStorage.getItem('screenshotCount') || '3');
-                    let lastReset = parseInt(localStorage.getItem('lastReset') || '0');
-                    const fifteenMins = 15 * 60 * 1000;
-
-                    function updateScreenshotInfo() {
-                        pdfViewer.find('.screenshot-info').text(`${screenshotCount} captures restantes`);
-                    }
-
-                    function resetCount() {
-                        const now = Date.now();
-                        if (now - lastReset >= fifteenMins) {
-                            screenshotCount = 3;
-                            lastReset = now;
-                            localStorage.setItem('screenshotCount', screenshotCount);
-                            localStorage.setItem('lastReset', lastReset);
-                        }
-                    }
-
-                    updateScreenshotInfo();
-                    resetCount();
-
-                    function getVisiblePageNum() {
-                        const pages = pdfViewer.find('.pdf-page');
-                        const viewerRect = canvasContainer[0].getBoundingClientRect();
-                        for (let page of pages) {
-                            const pageRect = page.getBoundingClientRect();
-                            if (pageRect.top >= viewerRect.top && pageRect.top < viewerRect.bottom) {
-                                return page.dataset.pageNum;
+                                    const renderContext = { canvasContext: ctx, viewport: viewport };
+                                    page.render(renderContext);
+                                });
                             }
                         }
-                        return 1;
-                    }
 
-                    pdfViewer.find('.screenshot').click(() => {
-                        resetCount();
-                        if (screenshotCount <= 0) {
-                            alert('Limite de captures atteinte. Veuillez attendre 15 minutes.');
-                            return;
+                        pdfjsLib.getDocument(url).promise.then(pdf => {
+                            pdfDoc = pdf;
+                            renderPages(pdf, scale, rotation);
+                        }).catch(error => {
+                            canvasContainer.html('<p class="error-message">Erreur de chargement du PDF : ' + error.message + '</p>');
+                        });
+
+                        pdfViewer.find('.zoom-in').click(() => {
+                            if (pdfDoc) {
+                                scale += 0.25;
+                                renderPages(pdfDoc, scale, rotation);
+                            }
+                        });
+
+                        pdfViewer.find('.zoom-out').click(() => {
+                            if (pdfDoc && scale > 0.5) {
+                                scale -= 0.25;
+                                renderPages(pdfDoc, scale, rotation);
+                            }
+                        });
+
+                        pdfViewer.find('.rotate').click(() => {
+                            if (pdfDoc) {
+                                rotation = (rotation + 90) % 360;
+                                renderPages(pdfDoc, scale, rotation);
+                            }
+                        });
+
+                        let screenshotCount = parseInt(localStorage.getItem('screenshotCount') || '3');
+                        let lastReset = parseInt(localStorage.getItem('lastReset') || '0');
+                        const fifteenMins = 15 * 60 * 1000;
+
+                        function updateScreenshotInfo() {
+                            pdfViewer.find('.screenshot-info').text(`${screenshotCount} captures restantes`);
                         }
 
-                        import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js').then(() => {
-                            html2canvas(canvasContainer[0], { scale: window.devicePixelRatio, useCORS: true }).then(canvas => {
-                                const imgData = canvas.toDataURL('image/png');
-                                const link = document.createElement('a');
-                                link.href = imgData;
-                                link.download = 'screenshot.png';
-                                link.click();
-
-                                screenshotCount--;
+                        function resetCount() {
+                            const now = Date.now();
+                            if (now - lastReset >= fifteenMins) {
+                                screenshotCount = 3;
+                                lastReset = now;
                                 localStorage.setItem('screenshotCount', screenshotCount);
-                                updateScreenshotInfo();
+                                localStorage.setItem('lastReset', lastReset);
+                            }
+                        }
 
-                                const xhr = new XMLHttpRequest();
-                                xhr.open('POST', '../includes/log_screenshot.php', true);
-                                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                                const userId = '<?php echo $student_id; ?>';
-                                const pageNum = getVisiblePageNum();
-                                const courseTitle = '<?php echo addslashes($course['title']); ?>';
-                                const data = `user_id=${userId}&course_id=<?php echo $course_id; ?>&page=${pageNum}&course_title=${encodeURIComponent(courseTitle)}`;
-                                xhr.send(data);
+                        updateScreenshotInfo();
+                        resetCount();
+
+                        function getVisiblePageNum() {
+                            const pages = pdfViewer.find('.pdf-page');
+                            const viewerRect = canvasContainer[0].getBoundingClientRect();
+                            for (let page of pages) {
+                                const pageRect = page.getBoundingClientRect();
+                                if (pageRect.top >= viewerRect.top && pageRect.top < viewerRect.bottom) {
+                                    return page.dataset.pageNum;
+                                }
+                            }
+                            return 1;
+                        }
+
+                        pdfViewer.find('.screenshot').click(() => {
+                            resetCount();
+                            if (screenshotCount <= 0) {
+                                alert('Limite de captures atteinte. Veuillez attendre 15 minutes.');
+                                return;
+                            }
+
+                            import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js').then(() => {
+                                html2canvas(canvasContainer[0], { scale: window.devicePixelRatio, useCORS: true }).then(canvas => {
+                                    const imgData = canvas.toDataURL('image/png');
+                                    const link = document.createElement('a');
+                                    link.href = imgData;
+                                    link.download = 'screenshot.png';
+                                    link.click();
+
+                                    screenshotCount--;
+                                    localStorage.setItem('screenshotCount', screenshotCount);
+                                    updateScreenshotInfo();
+
+                                    const xhr = new XMLHttpRequest();
+                                    xhr.open('POST', '../includes/log_screenshot.php', true);
+                                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                                    const userId = '<?php echo $student_id; ?>';
+                                    const pageNum = getVisiblePageNum();
+                                    const courseTitle = '<?php echo addslashes($course['title']); ?>';
+                                    const data = `user_id=${userId}&course_id=<?php echo $course_id; ?>&page=${pageNum}&course_title=${encodeURIComponent(courseTitle)}`;
+                                    xhr.send(data);
+                                });
                             });
                         });
                     });
-                });
-            }
-        });
-
-        // Blur on window focus loss
-        let isFocused = true;
-        function applyBlur() {
-            $('.pdf-viewer').each(function() {
-                if (!isFocused) {
-                    $(this).addClass('blurred');
-                } else {
-                    $(this).removeClass('blurred');
                 }
             });
-        }
 
-        $(window).on('focus', () => {
-            isFocused = true;
-            applyBlur();
-        });
-
-        $(window).on('blur', () => {
-            isFocused = false;
-            applyBlur();
-        });
-
-        // Prevent screenshot via PrintScreen (basic deterrence)
-        $(document).on('keydown', (e) => {
-            if (e.key === 'PrintScreen') {
-                navigator.clipboard.writeText('');
-                alert('Les captures d’écran via PrintScreen sont désactivées.');
+            // Blur on window focus loss
+            let isFocused = true;
+            function applyBlur() {
+                $('.pdf-viewer').each(function() {
+                    if (!isFocused) {
+                        $(this).addClass('blurred');
+                    } else {
+                        $(this).removeClass('blurred');
+                    }
+                });
             }
+
+            $(window).on('focus', () => {
+                isFocused = true;
+                applyBlur();
+            });
+
+            $(window).on('blur', () => {
+                isFocused = false;
+                applyBlur();
+            });
+
+            // Prevent screenshot via PrintScreen
+            $(document).on('keydown', (e) => {
+                if (e.key === 'PrintScreen') {
+                    navigator.clipboard.writeText('');
+                    alert('Les captures d’écran via PrintScreen sont désactivées.');
+                }
+            });
         });
     </script>
 </body>

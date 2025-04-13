@@ -5,7 +5,6 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-// Fetch admin username for display (optional enhancement)
 $admin_id = $_SESSION['admin_id'];
 $admin = $db->query("SELECT username FROM admins WHERE id = $admin_id")->fetch_assoc();
 $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
@@ -17,19 +16,12 @@ $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zouhair E-Learning - Admin</title>
-    <!-- Core CSS -->
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Core JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <!-- Chart.js (for dashboard) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PDF.js (for embedded PDF viewing) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
 <body>
@@ -46,6 +38,7 @@ $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
                 <li><a href="../admin/manage_subjects.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_subjects.php' ? 'class="active"' : ''; ?>><i class="fas fa-book-open"></i> <span>Manage Subjects</span></a></li>
                 <li><a href="../admin/manage_courses.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_courses.php' ? 'class="active"' : ''; ?>><i class="fas fa-book"></i> <span>Manage Courses</span></a></li>
                 <li><a href="../admin/add_course.php" <?php echo basename($_SERVER['PHP_SELF']) == 'add_course.php' ? 'class="active"' : ''; ?>><i class="fas fa-plus-circle"></i> <span>Add Course</span></a></li>
+                <li><a href="../admin/manage_quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Manage Quizzes</span></a></li>
                 <li><a href="../admin/activity_logs.php" <?php echo basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'class="active"' : ''; ?>><i class="fas fa-history"></i> <span>Activity Logs</span></a></li>
                 <li><a href="../admin/logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             </ul>

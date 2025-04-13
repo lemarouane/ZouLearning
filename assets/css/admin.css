@@ -1331,3 +1331,23 @@ body.dark-mode .empty-message {
         padding: 1rem;
     }
 }
+
+
+/* Quiz Badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+}
+
+/* Feedback Display */
+.feedback {
+    background: #f7fafc;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-top: 1rem;
+}
+
+body.dark-mode .feedback {
+    background: #2d3748;
+}

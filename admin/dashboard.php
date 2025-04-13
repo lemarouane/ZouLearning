@@ -13,7 +13,7 @@ $pending_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'pe
 $total_courses = $db->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0; // Fallback if missing
 $total_levels = $db->query("SELECT COUNT(*) FROM levels")->fetch_row()[0] ?? 0;
 $notifications = $db->query("SELECT COUNT(*) FROM activity_logs WHERE timestamp > NOW() - INTERVAL 1 DAY")->fetch_row()[0] ?? 0;
-
+$ungraded_submissions = $db->query("SELECT COUNT(*) AS count FROM quiz_submissions WHERE grade IS NULL")->fetch_assoc()['count'];
 // Recent data
 $recent_students = $db->query("SELECT * FROM students ORDER BY created_at DESC LIMIT 5");
 $recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5") ?? [];
@@ -79,9 +79,9 @@ if ($result) {
                 <p><a href="manage_levels.php"><?php echo $total_levels; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-bell"></i> New Activity</h3>
-                <p><?php echo $notifications; ?></p>
-            </div>
+                <h3><i class="fas fa-tasks"></i>A noter</h3>
+                <p><a href="grade_quizzes.php"><?php echo $ungraded_submissions; ?></a></p>
+
         </section>
 
         <!-- Charts Section -->

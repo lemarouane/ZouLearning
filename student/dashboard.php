@@ -80,6 +80,31 @@ if ($result) {
 } else {
     echo "Erreur dans la requête des sujets : " . $db->error;
 }
+
+
+
+$student_id = (int)$_SESSION['student_id'];
+$new_quizzes = $db->query("
+    SELECT COUNT(*) AS count
+    FROM quizzes q
+    JOIN subjects s ON q.subject_id = s.id
+    WHERE q.subject_id IN (
+        SELECT subject_id FROM student_subjects WHERE student_id = $student_id
+        UNION
+        SELECT subject_id FROM student_courses sc
+        JOIN courses c ON sc.course_id = c.id
+        WHERE sc.student_id = $student_id
+    )
+    AND q.id NOT IN (
+        SELECT quiz_id FROM quiz_submissions WHERE student_id = $student_id
+    )
+")->fetch_assoc()['count'];
+
+$graded_quizzes = $db->query("
+    SELECT COUNT(*) AS count
+    FROM quiz_submissions qs
+    WHERE qs.student_id = $student_id AND qs.grade IS NOT NULL
+")->fetch_assoc()['count'];
 ?>
 
 <!DOCTYPE html>
@@ -111,9 +136,15 @@ if ($result) {
                 <p><?php echo $total_subjects; ?></p>
             </div>
             <div class="stat-card">
+    <h3><i class="fas fa-question-circle"></i> Notifications Quiz</h3>
+    <p><a href="quizzes.php"><?php echo $new_quizzes; ?> nouveaux quiz</a></p>
+    <p><a href="quizzes.php"><?php echo $graded_quizzes; ?> quiz notés</a></p>
+</div>
+            <div class="stat-card">
                 <h3><i class="fas fa-layer-group"></i> Niveau</h3>
                 <p><?php echo htmlspecialchars($level); ?></p>
             </div>
+
         </section>
 
         <!-- Charts Section -->

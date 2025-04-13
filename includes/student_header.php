@@ -22,6 +22,7 @@
             <ul>
                 <li><a href="../student/dashboard.php" <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : ''; ?>><i class="fas fa-tachometer-alt"></i> <span>Tableau de Bord</span></a></li>
                 <li><a href="../student/courses.php" <?php echo basename($_SERVER['PHP_SELF']) == 'courses.php' ? 'class="active"' : ''; ?>><i class="fas fa-book"></i> <span>Mes Cours</span></a></li>
+                <li><a href="../student/quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Quiz</span></a></li>
                 <li><a href="../student/profile.php" <?php echo basename($_SERVER['PHP_SELF']) == 'profile.php' ? 'class="active"' : ''; ?>><i class="fas fa-user"></i> <span>Profil</span></a></li>
                 <li><a href="../student/logout.php"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a></li>
             </ul>
