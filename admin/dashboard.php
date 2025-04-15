@@ -41,11 +41,11 @@ if ($result) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Zouhair E-Learning</title>
+    <title>Tableau de Bord - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -56,63 +56,63 @@ if ($result) {
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+        <h1><i class="fas fa-tachometer-alt"></i> Tableau de Bord Admin</h1>
         
-        <!-- Stats Section -->
+        <!-- Section des Statistiques -->
         <section class="stats">
             <div class="stat-card">
-                <h3><i class="fas fa-users"></i> Total Students</h3>
+                <h3><i class="fas fa-users"></i> Total des Étudiants</h3>
                 <p><?php echo $total_students; ?></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-check-circle"></i> Validated</h3>
+                <h3><i class="fas fa-check-circle"></i> Validés</h3>
                 <p><?php echo $validated_students; ?></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-hourglass-half"></i> Pending</h3>
+                <h3><i class="fas fa-hourglass-half"></i> En Attente</h3>
                 <p><a href="manage_students.php"><?php echo $pending_students; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-book"></i> Total Courses</h3>
+                <h3><i class="fas fa-book"></i> Total des Cours</h3>
                 <p><a href="manage_courses.php"><?php echo $total_courses; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-layer-group"></i> Total Levels</h3>
+                <h3><i class="fas fa-layer-group"></i> Total des Niveaux</h3>
                 <p><a href="manage_levels.php"><?php echo $total_levels; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-tasks"></i> A noter</h3>
+                <h3><i class="fas fa-tasks"></i> À Noter</h3>
                 <p><a href="grade_quizzes.php"><?php echo $ungraded_submissions; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-mobile-alt"></i> Pending Devices</h3>
+                <h3><i class="fas fa-mobile-alt"></i> Appareils en Attente</h3>
                 <p><a href="device_requests.php"><?php echo $pending_devices; ?></a></p>
             </div>
         </section>
 
-        <!-- Charts Section -->
+        <!-- Section des Graphiques -->
         <section class="charts">
             <div class="chart-container">
-                <h2><i class="fas fa-users"></i> Student Status</h2>
+                <h2><i class="fas fa-users"></i> Statut des Étudiants</h2>
                 <canvas id="studentChart"></canvas>
             </div>
             <div class="chart-container">
-                <h2><i class="fas fa-book"></i> Courses by Subject</h2>
+                <h2><i class="fas fa-book"></i> Cours par Matière</h2>
                 <canvas id="subjectChart"></canvas>
             </div>
             <div class="chart-container">
-                <h2><i class="fas fa-chart-line"></i> Activity Trend</h2>
+                <h2><i class="fas fa-chart-line"></i> Tendance d'Activité</h2>
                 <canvas id="activityChart"></canvas>
             </div>
         </section>
 
-        <!-- Recent Tables -->
+        <!-- Tableaux Récents -->
         <section class="recent-tables">
             <div class="notifications">
-                <h2><i class="fas fa-user-plus"></i> Recent Students</h2>
+                <h2><i class="fas fa-user-plus"></i> Étudiants Récents</h2>
                 <table class="display">
                     <thead>
-                        <tr><th>Name</th><th>Email</th><th>Joined</th></tr>
+                        <tr><th>Nom</th><th>Email</th><th>Date d'Inscription</th></tr>
                     </thead>
                     <tbody>
                         <?php while ($student = $recent_students->fetch_assoc()): ?>
@@ -126,10 +126,10 @@ if ($result) {
                 </table>
             </div>
             <div class="notifications">
-                <h2><i class="fas fa-book-open"></i> Recent Courses</h2>
+                <h2><i class="fas fa-book-open"></i> Cours Récents</h2>
                 <table class="display">
                     <thead>
-                        <tr><th>Title</th><th>Subject</th><th>Added</th></tr>
+                        <tr><th>Titre</th><th>Matière</th><th>Date d'Ajout</th></tr>
                     </thead>
                     <tbody>
                         <?php if ($recent_courses): while ($course = $recent_courses->fetch_assoc()): ?>
@@ -143,9 +143,8 @@ if ($result) {
                 </table>
             </div>
         </section>
-
-
     </main>
+    
     <?php include '../includes/footer.php'; ?>
 
     <script>
