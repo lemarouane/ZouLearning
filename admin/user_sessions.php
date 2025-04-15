@@ -17,11 +17,11 @@ $sessions = $db->query("
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Sessions - Zouhair E-Learning</title>
+    <title>Sessions Utilisateurs - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -31,19 +31,19 @@ $sessions = $db->query("
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-clock"></i> User Sessions</h1>
+        <h1><i class="fas fa-clock"></i> Sessions Utilisateurs</h1>
         <?php if ($sessions->num_rows > 0): ?>
             <table id="sessionsTable" class="display">
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>Nom</th>
                         <th>Email</th>
-                        <th>Login Time</th>
-                        <th>Location</th>
-                        <th>Device</th>
-                        <th>IP Address</th>
-                        <th>Duration</th>
-                        <th>Status</th>
+                        <th>Heure de Connexion</th>
+                        <th>Localisation</th>
+                        <th>Appareil</th>
+                        <th>Adresse IP</th>
+                        <th>Durée</th>
+                        <th>Statut</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,19 +63,19 @@ $sessions = $db->query("
                                     $interval = $login->diff($logout);
                                     echo $interval->format('%h:%i:%s');
                                 } else {
-                                    echo 'Active';
+                                    echo 'Actif';
                                 }
                                 ?>
                             </td>
-                            <td><?php echo $session['logout_time'] ? 'Ended' : 'Active'; ?></td>
+                            <td><?php echo $session['logout_time'] ? 'Terminé' : 'Actif'; ?></td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
         <?php else: ?>
-            <p class="error">No user sessions found.</p>
+            <p class="error">Aucune session utilisateur trouvée.</p>
         <?php endif; ?>
-        <a href="dashboard.php" class="btn-action"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="dashboard.php" class="btn-action"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
     </main>
     <?php include '../includes/footer.php'; ?>
 
