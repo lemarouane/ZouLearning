@@ -34,23 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delete Level - Zouhair E-Learning</title>
+    <title>Supprimer un Niveau - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-trash-alt"></i> Delete Level</h1>
+        <h1><i class="fas fa-trash-alt"></i> Supprimer un Niveau</h1>
         <div class="confirmation">
-            <p>Are you sure you want to delete <strong><?php echo htmlspecialchars($level['name']); ?></strong>? This will also delete all associated subjects and courses.</p>
+            <p>Êtes-vous sûr de vouloir supprimer <strong><?php echo htmlspecialchars($level['name']); ?></strong> ? Cela supprimera également toutes les matières et cours associés.</p>
             <form method="POST">
-                <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i> Yes, Delete</button>
-                <a href="manage_levels.php" class="btn-action cancel"><i class="fas fa-times"></i> Cancel</a>
+                <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i> Oui, Supprimer</button>
+                <a href="manage_levels.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
             </form>
         </div>
     </main>

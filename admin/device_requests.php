@@ -38,26 +38,26 @@ $attempts = $db->query("
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Device Requests - Zouhair E-Learning</title>
+    <title>Gérer les Demandes d'Appareils - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-mobile-alt"></i> Pending Device Requests</h1>
+        <h1><i class="fas fa-mobile-alt"></i> Demandes d'Appareils en Attente</h1>
         <?php if ($attempts->num_rows > 0): ?>
             <table class="display">
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>Nom</th>
                         <th>Email</th>
-                        <th>Location</th>
-                        <th>Device</th>
+                        <th>Localisation</th>
+                        <th>Appareil</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -69,17 +69,17 @@ $attempts = $db->query("
                             <td><?php echo htmlspecialchars(getLocationName($attempt['latitude'], $attempt['longitude'])); ?></td>
                             <td><?php echo htmlspecialchars(simplifyDeviceInfo($attempt['device_info'])); ?></td>
                             <td>
-                                <a href="?action=approve&id=<?php echo $attempt['id']; ?>" class="btn-action view"><i class="fas fa-check"></i> Approve</a>
-                                <a href="?action=deny&id=<?php echo $attempt['id']; ?>" class="btn-action delete"><i class="fas fa-times"></i> Deny</a>
+                                <a href="?action=approve&id=<?php echo $attempt['id']; ?>" class="btn-action view"><i class="fas fa-check"></i> Approuver</a>
+                                <a href="?action=deny&id=<?php echo $attempt['id']; ?>" class="btn-action delete"><i class="fas fa-times"></i> Refuser</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
         <?php else: ?>
-            <p class="error">No pending device requests.</p>
+            <p class="error">Aucune demande d'appareil en attente.</p>
         <?php endif; ?>
-        <a href="dashboard.php" class="btn-action"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        <a href="dashboard.php" class="btn-action"><i class="fas fa-arrow-left"></i> Retour au Tableau de Bord</a>
     </main>
     <?php include '../includes/footer.php'; ?>
 </body>
