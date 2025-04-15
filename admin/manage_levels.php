@@ -9,11 +9,11 @@ $levels = $db->query("SELECT * FROM levels ORDER BY name ASC");
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Levels - Zouhair E-Learning</title>
+    <title>Gérer les Niveaux - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,15 +23,15 @@ $levels = $db->query("SELECT * FROM levels ORDER BY name ASC");
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-layer-group"></i> Manage Levels</h1>
-        <a href="add_level.php" class="btn-action add"><i class="fas fa-plus"></i> Add New Level</a>
+        <h1><i class="fas fa-layer-group"></i> Gérer les Niveaux</h1>
+        <a href="add_level.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter un Nouveau Niveau</a>
         <table id="levelsTable" class="display">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
+                    <th>Nom</th>
                     <th>Description</th>
-                    <th>Created</th>
+                    <th>Créé le</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,9 +43,9 @@ $levels = $db->query("SELECT * FROM levels ORDER BY name ASC");
                         <td><?php echo htmlspecialchars($level['description'] ?: 'N/A'); ?></td>
                         <td><?php echo $level['created_at']; ?></td>
                         <td>
-                            <a href="view_level.php?id=<?php echo $level['id']; ?>" class="btn-action view" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="edit_level.php?id=<?php echo $level['id']; ?>" class="btn-action edit" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="delete_level.php?id=<?php echo $level['id']; ?>" class="btn-action delete" onclick="return confirm('Are you sure?');" title="Delete"><i class="fas fa-trash"></i></a>
+                            <a href="view_level.php?id=<?php echo $level['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="edit_level.php?id=<?php echo $level['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
+                            <a href="delete_level.php?id=<?php echo $level['id']; ?>" class="btn-action delete" onclick="return confirm('Êtes-vous sûr ?');" title="Supprimer"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -59,7 +59,7 @@ $levels = $db->query("SELECT * FROM levels ORDER BY name ASC");
             $('#levelsTable').DataTable({
                 pageLength: 10,
                 lengthChange: false,
-                order: [[1, 'asc']] // Sort by name by default
+                order: [[1, 'asc']] // Trier par nom par défaut
             });
         });
     </script>

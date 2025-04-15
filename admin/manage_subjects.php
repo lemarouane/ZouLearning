@@ -9,11 +9,11 @@ $subjects = $db->query("SELECT s.*, l.name AS level_name FROM subjects s JOIN le
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Subjects - Zouhair E-Learning</title>
+    <title>Gérer les Matières - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -23,15 +23,15 @@ $subjects = $db->query("SELECT s.*, l.name AS level_name FROM subjects s JOIN le
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-book-open"></i> Manage Subjects</h1>
-        <a href="add_subject.php" class="btn-action add"><i class="fas fa-plus"></i> Add New Subject</a>
+        <h1><i class="fas fa-book-open"></i> Gérer les Matières</h1>
+        <a href="add_subject.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter une Nouvelle Matière</a>
         <table id="subjectsTable" class="display">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Name</th>
-                    <th>Level</th>
-                    <th>Created</th>
+                    <th>Nom</th>
+                    <th>Niveau</th>
+                    <th>Créé le</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -43,9 +43,9 @@ $subjects = $db->query("SELECT s.*, l.name AS level_name FROM subjects s JOIN le
                         <td><?php echo htmlspecialchars($subject['level_name']); ?></td>
                         <td><?php echo $subject['created_at']; ?></td>
                         <td>
-                            <a href="view_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action view" title="View"><i class="fas fa-eye"></i></a>
-                            <a href="edit_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action edit" title="Edit"><i class="fas fa-edit"></i></a>
-                            <a href="delete_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action delete" onclick="return confirm('Are you sure?');" title="Delete"><i class="fas fa-trash"></i></a>
+                            <a href="view_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="edit_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
+                            <a href="delete_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action delete" onclick="return confirm('Êtes-vous sûr ?');" title="Supprimer"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -59,7 +59,7 @@ $subjects = $db->query("SELECT s.*, l.name AS level_name FROM subjects s JOIN le
             $('#subjectsTable').DataTable({
                 pageLength: 10,
                 lengthChange: false,
-                order: [[1, 'asc']] // Sort by name by default
+                order: [[1, 'asc']] // Trier par nom par défaut
             });
         });
     </script>
