@@ -1,63 +1,65 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php'; // Using $db from your setup
-
-// Enable error reporting for debugging (remove in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+require_once '../includes/db_connect.php';
+require_once '../includes/device_utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = mysqli_real_escape_string($db, $_POST['email']);
-    $password = $_POST['password']; // Not escaping since we’re verifying hash
-    $device_id = mysqli_real_escape_string($db, $_POST['device_id']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+    $device_fingerprint = trim($_POST['device_fingerprint']);
+    $latitude = !empty($_POST['latitude']) ? (float)$_POST['latitude'] : null;
+    $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : null;
 
-    // Fetch student by email
-    $sql = "SELECT * FROM students WHERE email = '$email'";
-    $result = $db->query($sql);
+    if (empty($email) || empty($password)) {
+        $_SESSION['error'] = 'Please fill in all fields.';
+        header("Location: login.php");
+        exit;
+    }
 
-    if ($result && $result->num_rows > 0) {
-        $user = $result->fetch_assoc();
+    $stmt = $db->prepare("SELECT id, email, password FROM students WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $student = $result->fetch_assoc();
 
-        // Verify password
-        if (password_verify($password, $user['password'])) {
-            // Check status and device
-            if ($user['status'] == 'approved') {
-                if ($user['device_id'] === $device_id) {
-                    $_SESSION['student_id'] = $user['id'];
-                    $_SESSION['full_name'] = $user['full_name'];
-                    $_SESSION['message'] = "Login successful! Welcome, " . $user['full_name'] . "!";
-                    header("Location: dashboard.php");
-                    exit;
-                } else {
-                    $_SESSION['error'] = "Login failed: This device doesn’t match your registered device.";
-                    header("Location: login.php");
-                    exit;
-                }
-            } elseif ($user['status'] == 'pending') {
-                $_SESSION['error'] = "Your account is awaiting admin approval.";
-                header("Location: login.php");
-                exit;
-            } else {
-                $_SESSION['error'] = "Your account has been rejected by the admin.";
-                header("Location: login.php");
-                exit;
-            }
+    if ($student && password_verify($password, $student['password'])) {
+        // Check device
+        $stmt = $db->prepare("SELECT id FROM student_devices WHERE student_id = ? AND device_fingerprint = ? AND status = 'approved'");
+        $stmt->bind_param("is", $student['id'], $device_fingerprint);
+        $stmt->execute();
+        $device = $stmt->get_result()->fetch_assoc();
+
+        if ($device) {
+            // Approved device, log session
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $device_info = $_SERVER['HTTP_USER_AGENT'];
+            $stmt = $db->prepare("INSERT INTO user_sessions (student_id, login_time, latitude, longitude, device_info, ip_address) VALUES (?, NOW(), ?, ?, ?, ?)");
+            $stmt->bind_param("iddss", $student['id'], $latitude, $longitude, $device_info, $ip_address);
+            $stmt->execute();
+
+            $_SESSION['student_id'] = $student['id'];
+            $_SESSION['session_id'] = $db->insert_id; // For logout tracking
+            header("Location: dashboard.php");
+            exit;
         } else {
-            $_SESSION['error'] = "Invalid email or password.";
-            header("Location: login.php");
+            // New device, log attempt
+            $ip_address = $_SERVER['REMOTE_ADDR'];
+            $device_info = $_SERVER['HTTP_USER_AGENT'];
+            $stmt = $db->prepare("INSERT INTO device_attempts (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, attempted_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'pending')");
+            $stmt->bind_param("isssdd", $student['id'], $device_fingerprint, $device_info, $ip_address, $latitude, $longitude);
+            $stmt->execute();
+
+            $_SESSION['error'] = 'This device needs admin approval. Try again later or use your original device.';
+            header("Location: pending.php");
             exit;
         }
     } else {
-        $_SESSION['error'] = "Invalid email or password.";
+        $_SESSION['error'] = 'Invalid email or password.';
         header("Location: login.php");
         exit;
     }
 } else {
-    $_SESSION['error'] = "Invalid request method.";
     header("Location: login.php");
     exit;
 }
-
-$db->close();
 ?>

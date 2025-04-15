@@ -1,40 +1,54 @@
 <?php
 session_start();
-require_once '../includes/db_connect.php'; // Using $db from your file
-
-// Enable error reporting for debugging (remove in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+require_once '../includes/db_connect.php';
+require_once '../includes/device_utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $full_name = mysqli_real_escape_string($db, $_POST['full_name']);
-    $email = mysqli_real_escape_string($db, $_POST['email']);
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $device_id = mysqli_real_escape_string($db, $_POST['device_id']);
-    $device_name = mysqli_real_escape_string($db, $_POST['device_name']);
-    $latitude = !empty($_POST['latitude']) ? (float)$_POST['latitude'] : NULL;
-    $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : NULL;
-    $status = 'pending';
+    $full_name = trim($_POST['full_name']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
+    $device_fingerprint = trim($_POST['device_fingerprint']);
+    $device_info = trim($_POST['device_name']);
+    $latitude = !empty($_POST['latitude']) ? (float)$_POST['latitude'] : null;
+    $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : null;
 
-    $sql = "INSERT INTO students (full_name, email, password, status, device_id, device_name, latitude, longitude) 
-            VALUES ('$full_name', '$email', '$password', '$status', '$device_id', '$device_name', '$latitude', '$longitude')";
-    
-    if ($db->query($sql) === TRUE) {
-        $_SESSION['message'] = "Registration successful! Awaiting admin approval.";
+    if (empty($full_name) || empty($email) || empty($password)) {
+        $_SESSION['error'] = 'Please fill in all fields.';
+        header("Location: register.php");
+        exit;
+    }
+
+    $stmt = $db->prepare("SELECT id FROM students WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    if ($stmt->get_result()->num_rows > 0) {
+        $_SESSION['error'] = 'This email is already registered.';
+        header("Location: register.php");
+        exit;
+    }
+
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    $stmt = $db->prepare("INSERT INTO students (full_name, email, password, created_at, status) VALUES (?, ?, ?, NOW(), 'approved')");
+    $stmt->bind_param("sss", $full_name, $email, $hashed_password);
+    if ($stmt->execute()) {
+        $student_id = $db->insert_id;
+
+        // Auto-approve first device
+        $ip_address = $_SERVER['REMOTE_ADDR'];
+        $stmt = $db->prepare("INSERT INTO student_devices (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, created_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'approved')");
+        $stmt->bind_param("isssdd", $student_id, $device_fingerprint, $device_info, $ip_address, $latitude, $longitude);
+        $stmt->execute();
+
+        $_SESSION['message'] = 'Registration successful! Please log in.';
         header("Location: login.php");
         exit;
     } else {
-        $_SESSION['error'] = "Registration failed: " . $db->error;
-        error_log("Registration error: " . $db->error); // Log to C:\xampp\php\logs\php_error_log
+        $_SESSION['error'] = 'An error occurred. Please try again.';
         header("Location: register.php");
         exit;
     }
 } else {
-    $_SESSION['error'] = "Invalid request method.";
     header("Location: register.php");
     exit;
 }
-
-$db->close();
 ?>

@@ -40,6 +40,8 @@ $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
                 <li><a href="../admin/add_course.php" <?php echo basename($_SERVER['PHP_SELF']) == 'add_course.php' ? 'class="active"' : ''; ?>><i class="fas fa-plus-circle"></i> <span>Add Course</span></a></li>
                 <li><a href="../admin/manage_quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Manage Quizzes</span></a></li>
                 <li><a href="../admin/activity_logs.php" <?php echo basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'class="active"' : ''; ?>><i class="fas fa-history"></i> <span>Activity Logs</span></a></li>
+                <li><a href="../admin/device_requests.php" <?php echo basename($_SERVER['PHP_SELF']) == 'device_requests.php' ? 'class="active"' : ''; ?>><i class="fas fa-mobile-alt"></i> <span>Device Requests</span></a></li>
+                <li><a href="../admin/user_sessions.php" <?php echo basename($_SERVER['PHP_SELF']) == 'user_sessions.php' ? 'class="active"' : ''; ?>><i class="fas fa-clock"></i> <span>User Sessions</span></a></li>
                 <li><a href="../admin/logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             </ul>
         </nav>

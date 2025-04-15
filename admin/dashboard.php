@@ -10,10 +10,12 @@ if (!isset($_SESSION['admin_id'])) {
 $total_students = $db->query("SELECT COUNT(*) FROM students")->fetch_row()[0];
 $validated_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'approved'")->fetch_row()[0];
 $pending_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'pending'")->fetch_row()[0];
-$total_courses = $db->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0; // Fallback if missing
+$total_courses = $db->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0;
 $total_levels = $db->query("SELECT COUNT(*) FROM levels")->fetch_row()[0] ?? 0;
 $notifications = $db->query("SELECT COUNT(*) FROM activity_logs WHERE timestamp > NOW() - INTERVAL 1 DAY")->fetch_row()[0] ?? 0;
 $ungraded_submissions = $db->query("SELECT COUNT(*) AS count FROM quiz_submissions WHERE grade IS NULL")->fetch_assoc()['count'];
+$pending_devices = $db->query("SELECT COUNT(*) FROM device_attempts WHERE status = 'pending'")->fetch_row()[0];
+
 // Recent data
 $recent_students = $db->query("SELECT * FROM students ORDER BY created_at DESC LIMIT 5");
 $recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5") ?? [];
@@ -79,9 +81,13 @@ if ($result) {
                 <p><a href="manage_levels.php"><?php echo $total_levels; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-tasks"></i>A noter</h3>
+                <h3><i class="fas fa-tasks"></i> A noter</h3>
                 <p><a href="grade_quizzes.php"><?php echo $ungraded_submissions; ?></a></p>
-
+            </div>
+            <div class="stat-card">
+                <h3><i class="fas fa-mobile-alt"></i> Pending Devices</h3>
+                <p><a href="device_requests.php"><?php echo $pending_devices; ?></a></p>
+            </div>
         </section>
 
         <!-- Charts Section -->
@@ -138,18 +144,7 @@ if ($result) {
             </div>
         </section>
 
-        <!-- Activity Log -->
-        <section class="notifications activity-log">
-            <h2><i class="fas fa-history"></i> Recent Activity</h2>
-            <ul>
-                <?php if ($notifs): while ($notif = $notifs->fetch_assoc()): ?>
-                    <li><?php echo htmlspecialchars(($notif['action'] ?? 'Action') . ' - ' . ($notif['details'] ?? 'Details')); ?> 
-                        <span>(<?php echo $notif['timestamp'] ?? 'N/A'; ?>)</span></li>
-                <?php endwhile; else: ?>
-                    <li>No recent activity.</li>
-                <?php endif; ?>
-            </ul>
-        </section>
+
     </main>
     <?php include '../includes/footer.php'; ?>
 
