@@ -39,25 +39,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Subject - Zouhair E-Learning</title>
+    <title>Modifier une Matière - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-edit"></i> Edit Subject</h1>
+        <h1><i class="fas fa-edit"></i> Modifier une Matière</h1>
         <form method="POST" class="form-container">
             <div class="form-group">
-                <label><i class="fas fa-book-open"></i> Subject Name</label>
+                <label><i class="fas fa-book-open"></i> Nom de la Matière</label>
                 <input type="text" name="name" value="<?php echo htmlspecialchars($subject['name']); ?>" required>
             </div>
             <div class="form-group">
-                <label><i class="fas fa-layer-group"></i> Level</label>
+                <label><i class="fas fa-layer-group"></i> Niveau</label>
                 <select name="level_id" required>
                     <?php while ($level = $levels->fetch_assoc()): ?>
                         <option value="<?php echo $level['id']; ?>" <?php echo $level['id'] == $subject['level_id'] ? 'selected' : ''; ?>>
@@ -66,8 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endwhile; ?>
                 </select>
             </div>
-            <button type="submit" class="btn-action"><i class="fas fa-save"></i> Save Changes</button>
-            <a href="manage_subjects.php" class="btn-action cancel"><i class="fas fa-times"></i> Cancel</a>
+            <button type="submit" class="btn-action"><i class="fas fa-save"></i> Enregistrer les Modifications</button>
+            <a href="manage_subjects.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
         </form>
     </main>
     <?php include '../includes/footer.php'; ?>

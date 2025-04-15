@@ -37,29 +37,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Level - Zouhair E-Learning</title>
+    <title>Modifier un Niveau - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-edit"></i> Edit Level</h1>
+        <h1><i class="fas fa-edit"></i> Modifier un Niveau</h1>
         <form method="POST" class="form-container">
             <div class="form-group">
-                <label><i class="fas fa-layer-group"></i> Level Name</label>
+                <label><i class="fas fa-layer-group"></i> Nom du Niveau</label>
                 <input type="text" name="name" value="<?php echo htmlspecialchars($level['name']); ?>" required>
             </div>
             <div class="form-group">
                 <label><i class="fas fa-info-circle"></i> Description</label>
                 <textarea name="description" rows="4"><?php echo htmlspecialchars($level['description'] ?: ''); ?></textarea>
             </div>
-            <button type="submit" class="btn-action"><i class="fas fa-save"></i> Save Changes</button>
-            <a href="manage_levels.php" class="btn-action cancel"><i class="fas fa-times"></i> Cancel</a>
+            <button type="submit" class="btn-action"><i class="fas fa-save"></i> Enregistrer les Modifications</button>
+            <a href="manage_levels.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
         </form>
     </main>
     <?php include '../includes/footer.php'; ?>
