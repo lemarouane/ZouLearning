@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : null;
 
     if (empty($full_name) || empty($email) || empty($password)) {
-        $_SESSION['error'] = 'Please fill in all fields.';
+        $_SESSION['error'] = 'Veuillez remplir tous les champs.';
         header("Location: register.php");
         exit;
     }
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("s", $email);
     $stmt->execute();
     if ($stmt->get_result()->num_rows > 0) {
-        $_SESSION['error'] = 'This email is already registered.';
+        $_SESSION['error'] = 'Cet email est déjà enregistré.';
         header("Location: register.php");
         exit;
     }
@@ -39,11 +39,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("isssdd", $student_id, $device_fingerprint, $device_info, $ip_address, $latitude, $longitude);
         $stmt->execute();
 
-        $_SESSION['message'] = 'Registration successful! Please log in.';
+        // Send email via Google Apps Script
+        $script_url = 'https://script.google.com/macros/s/AKfycbxsHRHBuWr-343_MbQ-NpzD8PMz853fArEMKcVm6_FwSd0UZ8dj-Plr6ayh5qm7aLBE/exec';
+        $data = [
+            'event' => 'register',
+            'full_name' => $full_name,
+            'email' => $email
+        ];
+        $options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => json_encode($data)
+            ]
+        ];
+        $context = stream_context_create($options);
+        $result = file_get_contents($script_url, false, $context);
+
+        if ($result === false) {
+            error_log('Failed to send email via Google Apps Script');
+        } else {
+            $response = json_decode($result, true);
+            if ($response['status'] !== 'success') {
+                error_log('Google Apps Script error: ' . $response['message']);
+            }
+        }
+
+        $_SESSION['message'] = 'Inscription réussie ! Veuillez vous connecter.';
         header("Location: login.php");
         exit;
     } else {
-        $_SESSION['error'] = 'An error occurred. Please try again.';
+        $_SESSION['error'] = 'Une erreur s’est produite. Veuillez réessayer.';
         header("Location: register.php");
         exit;
     }
