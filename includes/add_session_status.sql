@@ -1,0 +1,1 @@
+ALTER TABLE students ADD COLUMN session_status VARCHAR(20) DEFAULT 'active'; 

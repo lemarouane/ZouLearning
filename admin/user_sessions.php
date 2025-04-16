@@ -44,6 +44,7 @@ $sessions = $db->query("
                         <th>Adresse IP</th>
                         <th>Durée</th>
                         <th>Statut</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,6 +69,13 @@ $sessions = $db->query("
                                 ?>
                             </td>
                             <td><?php echo $session['logout_time'] ? 'Terminé' : 'Actif'; ?></td>
+                            <td>
+                                <?php if (!$session['logout_time']): ?>
+                                    <button class="btn-action logout-btn" data-session-id="<?php echo $session['id']; ?>">
+                                        <i class="fas fa-sign-out-alt"></i> Déconnecter
+                                    </button>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -85,6 +93,36 @@ $sessions = $db->query("
                 pageLength: 10,
                 lengthChange: false,
                 order: [[2, 'desc']]
+            });
+
+            // Handle logout button click
+            $('.logout-btn').click(function() {
+                const sessionId = $(this).data('session-id');
+                const button = $(this);
+                
+                $.ajax({
+                    url: 'logout_student_session.php',
+                    method: 'POST',
+                    data: { session_id: sessionId },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.success) {
+                            // Update the row to show session is ended
+                            const row = button.closest('tr');
+                            row.find('td:eq(6)').text('Terminé');
+                            row.find('td:eq(7)').text('Terminé');
+                            button.remove();
+                            
+                            // Show success message
+                            alert('L\'utilisateur a été déconnecté avec succès.');
+                        } else {
+                            alert('Erreur lors de la déconnexion: ' + response.error);
+                        }
+                    },
+                    error: function() {
+                        alert('Une erreur est survenue lors de la déconnexion.');
+                    }
+                });
             });
         });
     </script>

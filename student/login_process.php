@@ -30,6 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $device = $stmt->get_result()->fetch_assoc();
 
         if ($device) {
+            // Reset session_status to active
+            $stmt = $db->prepare("UPDATE students SET session_status = 'active' WHERE id = ?");
+            $stmt->bind_param("i", $student['id']);
+            $stmt->execute();
+            $stmt->close();
+            
             // Approved device, log session
             $ip_address = $_SERVER['REMOTE_ADDR'];
             $device_info = $_SERVER['HTTP_USER_AGENT'];

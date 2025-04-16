@@ -1,3 +1,37 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once 'db_connect.php';
+
+// Check if student is logged in
+if (!isset($_SESSION['student_id'])) {
+    header("Location: ../student/login.php");
+    exit;
+}
+
+// Check if session_status column exists
+$result = $db->query("SHOW COLUMNS FROM students LIKE 'session_status'");
+if ($result->num_rows === 0) {
+    // Column doesn't exist, add it
+    $db->query("ALTER TABLE students ADD COLUMN session_status VARCHAR(20) DEFAULT 'active'");
+}
+
+// Check if session is still valid
+$stmt = $db->prepare("SELECT session_status FROM students WHERE id = ?");
+$stmt->bind_param("i", $_SESSION['student_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$student = $result->fetch_assoc();
+
+if ($student['session_status'] === 'logged_out') {
+    // Session was logged out by admin, destroy the session and redirect to login
+    session_destroy();
+    header("Location: ../student/login.php");
+    exit;
+}
+$stmt->close();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -11,6 +45,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        // Function to check session status
+        function checkSessionStatus() {
+            $.ajax({
+                url: '../student/check_session.php',
+                method: 'POST',
+                data: { student_id: <?php echo $_SESSION['student_id']; ?> },
+                success: function(response) {
+                    if (response.status === 'logged_out') {
+                        // Show logout message
+                        alert('Vous avez été déconnecté par un administrateur.');
+                        // Redirect to login page
+                        window.location.href = '../student/login.php';
+                    }
+                }
+            });
+        }
+
+        // Check session status every 5 seconds
+        setInterval(checkSessionStatus, 5000);
+    </script>
 </head>
 <body>
     <aside class="sidebar">
