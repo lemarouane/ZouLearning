@@ -11,7 +11,7 @@ $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,17 +32,17 @@ $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
         </div>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="../admin/dashboard.php" <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : ''; ?>><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-                <li><a href="../admin/manage_students.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_students.php' ? 'class="active"' : ''; ?>><i class="fas fa-users"></i> <span>Manage Students</span></a></li>
-                <li><a href="../admin/manage_levels.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_levels.php' ? 'class="active"' : ''; ?>><i class="fas fa-layer-group"></i> <span>Manage Levels</span></a></li>
-                <li><a href="../admin/manage_subjects.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_subjects.php' ? 'class="active"' : ''; ?>><i class="fas fa-book-open"></i> <span>Manage Subjects</span></a></li>
-                <li><a href="../admin/manage_courses.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_courses.php' ? 'class="active"' : ''; ?>><i class="fas fa-book"></i> <span>Manage Courses</span></a></li>
-                <li><a href="../admin/add_course.php" <?php echo basename($_SERVER['PHP_SELF']) == 'add_course.php' ? 'class="active"' : ''; ?>><i class="fas fa-plus-circle"></i> <span>Add Course</span></a></li>
-                <li><a href="../admin/manage_quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Manage Quizzes</span></a></li>
-                <li><a href="../admin/activity_logs.php" <?php echo basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'class="active"' : ''; ?>><i class="fas fa-history"></i> <span>Activity Logs</span></a></li>
-                <li><a href="../admin/device_requests.php" <?php echo basename($_SERVER['PHP_SELF']) == 'device_requests.php' ? 'class="active"' : ''; ?>><i class="fas fa-mobile-alt"></i> <span>Device Requests</span></a></li>
-                <li><a href="../admin/user_sessions.php" <?php echo basename($_SERVER['PHP_SELF']) == 'user_sessions.php' ? 'class="active"' : ''; ?>><i class="fas fa-clock"></i> <span>User Sessions</span></a></li>
-                <li><a href="../admin/logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+                <li><a href="../admin/dashboard.php" <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : ''; ?>><i class="fas fa-tachometer-alt"></i> <span>Tableau de bord</span></a></li>
+                <li><a href="../admin/manage_students.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_students.php' ? 'class="active"' : ''; ?>><i class="fas fa-users"></i> <span>Gérer les étudiants</span></a></li>
+                <li><a href="../admin/manage_levels.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_levels.php' ? 'class="active"' : ''; ?>><i class="fas fa-layer-group"></i> <span>Gérer les niveaux</span></a></li>
+                <li><a href="../admin/manage_subjects.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_subjects.php' ? 'class="active"' : ''; ?>><i class="fas fa-book-open"></i> <span>Gérer les matières</span></a></li>
+                <li><a href="../admin/manage_courses.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_courses.php' ? 'class="active"' : ''; ?>><i class="fas fa-book"></i> <span>Gérer les cours</span></a></li>
+                <li><a href="../admin/add_course.php" <?php echo basename($_SERVER['PHP_SELF']) == 'add_course.php' ? 'class="active"' : ''; ?>><i class="fas fa-plus-circle"></i> <span>Ajouter un cours</span></a></li>
+                <li><a href="../admin/manage_quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Gérer les quiz</span></a></li>
+                <li><a href="../admin/activity_logs.php" <?php echo basename($_SERVER['PHP_SELF']) == 'activity_logs.php' ? 'class="active"' : ''; ?>><i class="fas fa-history"></i> <span>Journaux d'activité</span></a></li>
+                <li><a href="../admin/device_requests.php" <?php echo basename($_SERVER['PHP_SELF']) == 'device_requests.php' ? 'class="active"' : ''; ?>><i class="fas fa-mobile-alt"></i> <span>Demandes d'appareils</span></a></li>
+                <li><a href="../admin/user_sessions.php" <?php echo basename($_SERVER['PHP_SELF']) == 'user_sessions.php' ? 'class="active"' : ''; ?>><i class="fas fa-clock"></i> <span>Sessions utilisateur</span></a></li>
+                <li><a href="../admin/logout.php"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a></li>
             </ul>
         </nav>
     </aside>
