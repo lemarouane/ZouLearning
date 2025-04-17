@@ -63,6 +63,83 @@ $stmt->execute();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            font-family: 'Inter', sans-serif;
+            background: #f5f8fc;
+            color: #2d3748;
+        }
+        h1 {
+            font-size: 1.5rem;
+            color: #1e3c72;
+            margin-bottom: 1.25rem;
+        }
+        .detail-card, .folder-view-card, .content-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .pdf-viewer {
+            position: relative;
+            margin: 1rem 0;
+        }
+        .pdf-canvas {
+            max-height: 80vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        .pdf-page {
+            margin-bottom: 10px;
+        }
+        .pdf-controls-fixed {
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-action {
+            background: #1e3c72;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .btn-action:hover {
+            background: #152a55;
+        }
+        .screenshot-info {
+            font-size: 0.9rem;
+            color: #e53e3e;
+        }
+        .blurred {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+        .empty-message {
+            color: #666;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .back-btn {
+            display: inline-block;
+            background: #1e3c72;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            margin-top: 1rem;
+        }
+        .back-btn:hover {
+            background: #152a55;
+        }
+    </style>
 </head>
 <body oncontextmenu="return false;">
     <?php include '../includes/student_header.php'; ?>
@@ -161,7 +238,7 @@ $stmt->execute();
                                     canvas.width = viewport.width;
                                     canvas.style.width = '100%';
                                     canvas.style.maxWidth = `${viewport.width}px`;
-                                    canvas.style.margin = '0 auto'; // Center canvas
+                                    canvas.style.margin = '0 auto';
                                     canvas.style.display = 'block';
 
                                     const renderContext = { canvasContext: ctx, viewport: viewport };
@@ -221,14 +298,23 @@ $stmt->execute();
 
                         function getVisiblePageNum() {
                             const pages = pdfViewer.find('.pdf-page');
-                            const viewerRect = canvasContainer[0].getBoundingClientRect();
-                            for (let page of pages) {
-                                const pageRect = page.getBoundingClientRect();
-                                if (pageRect.top >= viewerRect.top && pageRect.top < viewerRect.bottom) {
-                                    return page.dataset.pageNum;
+                            const containerRect = canvasContainer[0].getBoundingClientRect();
+                            let maxVisibleArea = 0;
+                            let visiblePageNum = 1;
+
+                            pages.each(function() {
+                                const page = $(this);
+                                const pageRect = this.getBoundingClientRect();
+                                const visibleHeight = Math.min(pageRect.bottom, containerRect.bottom) - Math.max(pageRect.top, containerRect.top);
+                                const visibleArea = visibleHeight > 0 ? visibleHeight * pageRect.width : 0;
+
+                                if (visibleArea > maxVisibleArea) {
+                                    maxVisibleArea = visibleArea;
+                                    visiblePageNum = parseInt(page.data('pageNum'));
                                 }
-                            }
-                            return 1;
+                            });
+
+                            return visiblePageNum;
                         }
 
                         pdfViewer.find('.screenshot').click(() => {
@@ -238,12 +324,24 @@ $stmt->execute();
                                 return;
                             }
 
+                            const pageNum = getVisiblePageNum();
+                            const visibleCanvas = pdfViewer.find(`.pdf-page[data-page-num="${pageNum}"]`)[0];
+                            if (!visibleCanvas) {
+                                alert('Erreur : Page visible non trouvée.');
+                                return;
+                            }
+
                             import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js').then(() => {
-                                html2canvas(canvasContainer[0], { scale: window.devicePixelRatio, useCORS: true }).then(canvas => {
+                                html2canvas(visibleCanvas, { 
+                                    scale: window.devicePixelRatio, 
+                                    useCORS: true,
+                                    width: visibleCanvas.width,
+                                    height: visibleCanvas.height
+                                }).then(canvas => {
                                     const imgData = canvas.toDataURL('image/png');
                                     const link = document.createElement('a');
                                     link.href = imgData;
-                                    link.download = 'screenshot.png';
+                                    link.download = `screenshot_page_${pageNum}.png`;
                                     link.click();
 
                                     screenshotCount--;
@@ -254,10 +352,12 @@ $stmt->execute();
                                     xhr.open('POST', '../includes/log_screenshot.php', true);
                                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                                     const userId = '<?php echo $student_id; ?>';
-                                    const pageNum = getVisiblePageNum();
                                     const courseTitle = '<?php echo addslashes($course['title']); ?>';
                                     const data = `user_id=${userId}&course_id=<?php echo $course_id; ?>&page=${pageNum}&course_title=${encodeURIComponent(courseTitle)}`;
                                     xhr.send(data);
+                                }).catch(error => {
+                                    console.error('Screenshot error:', error);
+                                    alert('Erreur lors de la capture : ' + error.message);
                                 });
                             });
                         });
