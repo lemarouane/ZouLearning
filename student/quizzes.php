@@ -8,9 +8,9 @@ if (!isset($_SESSION['student_id'])) {
 
 $student_id = (int)$_SESSION['student_id'];
 $quizzes = $db->query("
-    SELECT q.id, q.title, s.name AS subject_name, l.name AS level_name, 
-           qs.grade, qs.submitted_at, qs.graded_at,
-           q.created_at
+    SELECT q.id, q.title, q.description, q.start_datetime, q.duration_hours,
+           s.name AS subject_name, l.name AS level_name,
+           qs.response_path, qs.grade, qs.feedback, qs.submitted_at
     FROM quizzes q
     JOIN subjects s ON q.subject_id = s.id
     JOIN levels l ON s.level_id = l.id
@@ -22,7 +22,7 @@ $quizzes = $db->query("
         JOIN courses c ON sc.course_id = c.id
         WHERE sc.student_id = $student_id
     )
-    ORDER BY q.created_at DESC
+    ORDER BY q.start_datetime DESC
 ");
 ?>
 
@@ -31,7 +31,7 @@ $quizzes = $db->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - Zouhair E-Learning</title>
+    <title>Mes Quiz - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -48,40 +48,29 @@ $quizzes = $db->query("
                     <th>Titre</th>
                     <th>Matière</th>
                     <th>Niveau</th>
-                    <th>Statut</th>
+                    <th>Début</th>
+                    <th>Durée (h)</th>
+                    <th>Soumis</th>
                     <th>Note</th>
+                    <th>Commentaires</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($quiz = $quizzes->fetch_assoc()): ?>
-                    <?php
-                    $is_new = !$quiz['submitted_at'] && (strtotime($quiz['created_at']) > strtotime('-7 days'));
-                    ?>
                     <tr>
-                        <td>
-                            <?php echo htmlspecialchars($quiz['title']); ?>
-                            <?php if ($is_new): ?>
-                                <span class="badge new">Nouveau</span>
-                            <?php endif; ?>
-                            <?php if ($quiz['graded_at'] && $quiz['grade'] !== null): ?>
-                                <span class="badge graded">Noté</span>
-                            <?php endif; ?>
-                        </td>
+                        <td><?php echo htmlspecialchars($quiz['title']); ?></td>
                         <td><?php echo htmlspecialchars($quiz['subject_name']); ?></td>
                         <td><?php echo htmlspecialchars($quiz['level_name']); ?></td>
+                        <td><?php echo htmlspecialchars($quiz['start_datetime']); ?></td>
+                        <td><?php echo number_format($quiz['duration_hours'], 2); ?></td>
+                        <td><?php echo $quiz['submitted_at'] ? htmlspecialchars($quiz['submitted_at']) : '<span class="badge pending">Non soumis</span>'; ?></td>
                         <td>
-                            <?php
-                            if ($quiz['submitted_at']) {
-                                echo $quiz['grade'] !== null ? 'Noté' : 'Soumis';
-                            } else {
-                                echo 'Non soumis';
-                            }
-                            ?>
+                            <?php echo $quiz['grade'] !== null ? number_format($quiz['grade'], 2) . '/20' : '<span class="badge pending">Non noté</span>'; ?>
                         </td>
-                        <td><?php echo $quiz['grade'] !== null ? number_format($quiz['grade'], 2) . '/20' : '-'; ?></td>
+                        <td><?php echo $quiz['feedback'] ? htmlspecialchars(substr($quiz['feedback'], 0, 50)) . '...' : '-'; ?></td>
                         <td>
-                            <a href="view_quiz.php?id=<?php echo $quiz['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="view_quiz.php?id=<?php echo $quiz['id']; ?>" class="btn-action view" title="Voir Quiz"><i class="fas fa-eye"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>

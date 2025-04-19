@@ -7,7 +7,7 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 $quizzes = $db->query("
-    SELECT q.id, q.title, s.name AS subject_name, l.name AS level_name
+    SELECT q.id, q.title, q.start_datetime, q.duration_hours, s.name AS subject_name, l.name AS level_name
     FROM quizzes q
     JOIN subjects s ON q.subject_id = s.id
     JOIN levels l ON s.level_id = l.id
@@ -44,6 +44,8 @@ $quizzes = $db->query("
                     <th>Titre</th>
                     <th>Matière</th>
                     <th>Niveau</th>
+                    <th>Début (GMT+1)</th>
+                    <th>Durée (h)</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -53,9 +55,12 @@ $quizzes = $db->query("
                         <td><?php echo htmlspecialchars($quiz['title']); ?></td>
                         <td><?php echo htmlspecialchars($quiz['subject_name']); ?></td>
                         <td><?php echo htmlspecialchars($quiz['level_name']); ?></td>
+                        <td><?php echo htmlspecialchars($quiz['start_datetime']); ?></td>
+                        <td><?php echo number_format($quiz['duration_hours'], 2); ?></td>
                         <td>
                             <a href="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
                             <a href="edit_quiz.php?id=<?php echo $quiz['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
+                            <a href="grade_quizzes_by_quiz.php?quiz_id=<?php echo $quiz['id']; ?>" class="btn-action validate" title="Noter"><i class="fas fa-pen"></i></a>
                             <a href="delete_quiz.php?id=<?php echo $quiz['id']; ?>" class="btn-action delete" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?');"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>

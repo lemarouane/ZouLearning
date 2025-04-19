@@ -9,18 +9,29 @@ if (!isset($_SESSION['admin_id'])) {
 $levels = $db->query("SELECT id, name FROM levels ORDER BY name");
 $subjects = $db->query("SELECT id, name, level_id FROM subjects ORDER BY name");
 $errors = [];
-$success = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $title = trim($_POST['title']);
     $subject_id = (int)$_POST['subject_id'];
     $description = trim($_POST['description']);
-    
+    $start_date = trim($_POST['start_date']);
+    $start_time = trim($_POST['start_time']);
+    $duration_hours = floatval($_POST['duration_hours']);
+
     if (empty($title)) {
         $errors[] = "Le titre est requis.";
     }
     if ($subject_id <= 0) {
         $errors[] = "Veuillez sélectionner une matière.";
+    }
+    if (empty($start_date) || !preg_match("/^\d{4}-\d{2}-\d{2}$/", $start_date)) {
+        $errors[] = "Veuillez sélectionner une date valide (YYYY-MM-DD).";
+    }
+    if (empty($start_time) || !preg_match("/^\d{2}:\d{2}$/", $start_time)) {
+        $errors[] = "Veuillez sélectionner une heure valide (HH:MM).";
+    }
+    if ($duration_hours <= 0 || $duration_hours > 24) {
+        $errors[] = "La durée doit être entre 0.1 et 24 heures.";
     }
     if (!isset($_FILES['pdf_file']) || $_FILES['pdf_file']['error'] == UPLOAD_ERR_NO_FILE) {
         $errors[] = "Veuillez uploader un fichier PDF.";
@@ -33,6 +44,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    // Combine date and time (GMT+1 Morocco time)
+    $start_datetime = "$start_date $start_time:00";
+    if (!DateTime::createFromFormat('Y-m-d H:i:s', $start_datetime, new DateTimeZone('Africa/Casablanca'))) {
+        $errors[] = "Date ou heure invalide.";
+    }
+
     if (empty($errors)) {
         $upload_dir = '../uploads/quizzes/';
         if (!is_dir($upload_dir)) {
@@ -42,8 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $file_path = $upload_dir . $file_name;
 
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
-            $stmt = $db->prepare("INSERT INTO quizzes (title, subject_id, description, pdf_path) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("siss", $title, $subject_id, $description, $file_path);
+            $stmt = $db->prepare("
+                INSERT INTO quizzes (title, subject_id, description, pdf_path, start_datetime, duration_hours, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, NOW())
+            ");
+            $stmt->bind_param("sisssd", $title, $subject_id, $description, $file_path, $start_datetime, $duration_hours);
             if ($stmt->execute()) {
                 $_SESSION['message'] = "Quiz ajouté avec succès.";
                 header("Location: manage_quizzes.php");
@@ -80,11 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="title"><i class="fas fa-heading"></i> Titre</label>
-                    <input type="text" name="title" id="title" class="course-input" value="<?php echo isset($_POST['title']) ? htmlspecialchars($_POST['title']) : ''; ?>">
+                    <input type="text" name="title" id="title" class="course-input" value="<?php echo isset($_POST['title']) ? htmlspecialchars($_POST['title']) : ''; ?>" required>
                 </div>
                 <div class="form-group">
                     <label for="level_id"><i class="fas fa-layer-group"></i> Niveau</label>
-                    <select name="level_id" id="level_id" class="course-select">
+                    <select name="level_id" id="level_id" class="course-select" required>
                         <option value="">Sélectionner un niveau</option>
                         <?php while ($level = $levels->fetch_assoc()): ?>
                             <option value="<?php echo $level['id']; ?>" <?php echo isset($_POST['level_id']) && $_POST['level_id'] == $level['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($level['name']); ?></option>
@@ -93,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
                 <div class="form-group">
                     <label for="subject_id"><i class="fas fa-book-open"></i> Matière</label>
-                    <select name="subject_id" id="subject_id" class="course-select">
+                    <select name="subject_id" id="subject_id" class="course-select" required>
                         <option value="">Sélectionner une matière</option>
                     </select>
                 </div>
@@ -102,8 +122,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <textarea name="description" id="description" class="course-textarea"><?php echo isset($_POST['description']) ? htmlspecialchars($_POST['description']) : ''; ?></textarea>
                 </div>
                 <div class="form-group">
+                    <label for="start_date"><i class="fas fa-calendar-alt"></i> Date de début (GMT+1)</label>
+                    <input type="date" name="start_date" id="start_date" class="course-input" value="<?php echo isset($_POST['start_date']) ? htmlspecialchars($_POST['start_date']) : ''; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_time"><i class="fas fa-clock"></i> Heure de début (GMT+1)</label>
+                    <input type="time" name="start_time" id="start_time" class="course-input" value="<?php echo isset($_POST['start_time']) ? htmlspecialchars($_POST['start_time']) : ''; ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="duration_hours"><i class="fas fa-hourglass"></i> Durée (heures)</label>
+                    <input type="number" name="duration_hours" id="duration_hours" class="course-input" step="0.1" min="0.1" max="24" value="<?php echo isset($_POST['duration_hours']) ? htmlspecialchars($_POST['duration_hours']) : '1'; ?>" required>
+                </div>
+                <div class="form-group">
                     <label for="pdf_file"><i class="fas fa-file-pdf"></i> Fichier PDF</label>
-                    <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf">
+                    <input type="file" name="pdf_file" id="pdf_file" accept="application/pdf" required>
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="save-course-btn"><i class="fas fa-save"></i> Enregistrer</button>

@@ -6,13 +6,25 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+if (!isset($_GET['quiz_id'])) {
+    header("Location: manage_quizzes.php");
+    exit;
+}
+
+$quiz_id = (int)$_GET['quiz_id'];
+$quiz = $db->query("SELECT title FROM quizzes WHERE id = $quiz_id")->fetch_assoc();
+if (!$quiz) {
+    header("Location: manage_quizzes.php");
+    exit;
+}
+
 $submissions = $db->query("
     SELECT qs.id, qs.quiz_id, qs.student_id, qs.response_path, qs.grade, qs.feedback, qs.submitted_at,
-           q.title AS quiz_title, q.start_datetime, q.duration_hours,
-           s.full_name AS student_name
+           q.start_datetime, q.duration_hours, s.full_name AS student_name
     FROM quiz_submissions qs
     JOIN quizzes q ON qs.quiz_id = q.id
     JOIN students s ON qs.student_id = s.id
+    WHERE qs.quiz_id = $quiz_id
     ORDER BY qs.submitted_at DESC
 ");
 
@@ -41,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noter les Quiz - Zouhair E-Learning</title>
+    <title>Noter Quiz: <?php echo htmlspecialchars($quiz['title']); ?> - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -52,18 +64,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-pen"></i> Noter les Quiz</h1>
+        <h1><i class="fas fa-pen"></i> Noter Quiz: <?php echo htmlspecialchars($quiz['title']); ?></h1>
         <?php if ($success): ?>
             <p class="success-message"><?php echo $success; ?></p>
         <?php endif; ?>
         <?php foreach ($errors as $error): ?>
             <p class="error-message"><?php echo $error; ?></p>
         <?php endforeach; ?>
+        <a href="manage_quizzes.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour</a>
         <table id="submissionsTable" class="course-table">
             <thead>
                 <tr>
                     <th>Étudiant</th>
-                    <th>Quiz</th>
                     <th>Date de Soumission</th>
                     <th>Note</th>
                     <th>Commentaires</th>
@@ -73,19 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
             <tbody>
                 <?php while ($submission = $submissions->fetch_assoc()): ?>
                     <?php
-                    // Debug timestamps
                     $start_datetime = new DateTime($submission['start_datetime'], new DateTimeZone('Africa/Casablanca'));
                     $deadline = clone $start_datetime;
                     $deadline->modify("+{$submission['duration_hours']} hours");
                     $submitted_at = new DateTime($submission['submitted_at'], new DateTimeZone('Africa/Casablanca'));
                     $is_on_time = $submitted_at <= $deadline;
                     $row_class = $is_on_time ? 'submission-on-time' : 'submission-late';
-                    // Log for debugging
-                    error_log("Quiz: {$submission['quiz_title']}, Submitted: {$submitted_at->format('Y-m-d H:i:s')}, Deadline: {$deadline->format('Y-m-d H:i:s')}, On-time: " . ($is_on_time ? 'Yes' : 'No'));
+                    error_log("Quiz: {$quiz['title']}, Submitted: {$submitted_at->format('Y-m-d H:i:s')}, Deadline: {$deadline->format('Y-m-d H:i:s')}, On-time: " . ($is_on_time ? 'Yes' : 'No'));
                     ?>
                     <tr class="<?php echo $row_class; ?>">
                         <td><?php echo htmlspecialchars($submission['student_name']); ?></td>
-                        <td><?php echo htmlspecialchars($submission['quiz_title']); ?></td>
                         <td><?php echo htmlspecialchars($submission['submitted_at']); ?></td>
                         <td>
                             <?php echo $submission['grade'] !== null ? number_format($submission['grade'], 2) . '/20' : '<span class="badge pending">En attente</span>'; ?>

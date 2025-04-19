@@ -1,10 +1,12 @@
 <?php
 session_start();
 require_once '../includes/db_connect.php';
+
 if (isset($_SESSION['student_id'])) {
     header("Location: dashboard.php");
     exit;
 }
+
 $error = '';
 if (isset($_SESSION['error'])) {
     $error = $_SESSION['error'];
@@ -21,6 +23,7 @@ if (isset($_SESSION['error'])) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.1.4/fingerprint2.min.js"></script>
+
 </head>
 <body class="login-page">
     <div class="login-container">
@@ -32,7 +35,7 @@ if (isset($_SESSION['error'])) {
             <p style="color: #4caf50;"><?php echo htmlspecialchars($_SESSION['message']); ?></p>
             <?php unset($_SESSION['message']); ?>
         <?php endif; ?>
-        <form id="registerForm" method="POST" action="register_process.php" class="form-container" style="box-shadow: none;">
+        <form id="registerForm" method="POST" action="register_process.php" class="form-container">
             <div class="form-group">
                 <label for="full_name"><i class="fas fa-user"></i> Full Name</label>
                 <input type="text" id="full_name" name="full_name" required>
@@ -61,9 +64,7 @@ if (isset($_SESSION['error'])) {
             const fingerprint = Fingerprint2.x64hash128(values.join(''), 31);
             document.getElementById('device_fingerprint').value = fingerprint;
             document.getElementById('device_name').value = navigator.userAgent;
-            if (document.getElementById('latitude').value && document.getElementById('longitude').value) {
-                document.getElementById('submitBtn').disabled = false;
-            }
+            checkFormReady();
         });
 
         // Enforce location access
@@ -72,18 +73,27 @@ if (isset($_SESSION['error'])) {
                 (position) => {
                     document.getElementById('latitude').value = position.coords.latitude;
                     document.getElementById('longitude').value = position.coords.longitude;
-                    if (document.getElementById('device_fingerprint').value) {
-                        document.getElementById('submitBtn').disabled = false;
-                    }
+                    checkFormReady();
                 },
                 (error) => {
                     console.error("Geolocation error:", error);
                     alert("Location access is required to register. Please enable it and refresh the page.");
+                    document.getElementById('submitBtn').disabled = true;
                 }
             );
         } else {
             alert("Geolocation is not supported by your browser. Registration is not possible.");
             document.getElementById('submitBtn').disabled = true;
+        }
+
+        // Enable submit button when all fields are ready
+        function checkFormReady() {
+            const fingerprint = document.getElementById('device_fingerprint').value;
+            const latitude = document.getElementById('latitude').value;
+            const longitude = document.getElementById('longitude').value;
+            if (fingerprint && latitude && longitude) {
+                document.getElementById('submitBtn').disabled = false;
+            }
         }
     </script>
 </body>

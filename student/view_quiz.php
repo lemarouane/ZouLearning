@@ -15,12 +15,11 @@ $student_id = (int)$_SESSION['student_id'];
 $quiz_id = (int)$_GET['id'];
 
 $quiz = $db->query("
-    SELECT q.id, q.title, q.description, q.pdf_path, s.name AS subject_name, l.name AS level_name, 
-           qs.response_path, qs.grade, qs.feedback, qs.submitted_at
+    SELECT q.id, q.title, q.description, q.pdf_path, q.start_datetime, q.duration_hours,
+           s.name AS subject_name, l.name AS level_name
     FROM quizzes q
     JOIN subjects s ON q.subject_id = s.id
     JOIN levels l ON s.level_id = l.id
-    LEFT JOIN quiz_submissions qs ON q.id = qs.quiz_id AND qs.student_id = $student_id
     WHERE q.id = $quiz_id
     AND q.subject_id IN (
         SELECT subject_id FROM student_subjects WHERE student_id = $student_id
@@ -36,31 +35,47 @@ if (!$quiz) {
     exit;
 }
 
+$submissions = $db->query("
+    SELECT response_path, grade, feedback, submitted_at
+    FROM quiz_submissions
+    WHERE quiz_id = $quiz_id AND student_id = $student_id
+    ORDER BY submitted_at DESC
+");
+
 $errors = [];
 $success = '';
+$now = new DateTime('now', new DateTimeZone('Africa/Casablanca'));
+$start_datetime = new DateTime($quiz['start_datetime'], new DateTimeZone('Africa/Casablanca'));
+$deadline = clone $start_datetime;
+$deadline->modify("+{$quiz['duration_hours']} hours");
+$is_before_start = $now < $start_datetime;
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$quiz['submitted_at']) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$is_before_start) {
     if (!isset($_FILES['response_pdf']) || $_FILES['response_pdf']['error'] == UPLOAD_ERR_NO_FILE) {
         $errors[] = "Veuillez uploader votre réponse en PDF.";
     } else {
         $file = $_FILES['response_pdf'];
         $allowed_types = ['application/pdf'];
-        $max_size = 5 * 1024 * 1024; // 5MB
+        $max_size = 5 * 1024 * 1024;
         if (!in_array($file['type'], $allowed_types) || $file['size'] > $max_size) {
             $errors[] = "Le fichier doit être un PDF de moins de 5 Mo.";
         }
     }
 
     if (empty($errors)) {
-        $upload_dir = '../uploads/quiz_submissions/';
+        $upload_dir = '../Uploads/quiz_submissions/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0755, true);
         }
-        $file_name = uniqid() . '_' . basename($file['name']);
+        $student = $db->query("SELECT full_name FROM students WHERE id = $student_id")->fetch_assoc();
+        $safe_full_name = preg_replace('/[^A-Za-z0-9_-]/', '_', $student['full_name']);
+        $safe_quiz_title = preg_replace('/[^A-Za-z0-9_-]/', '_', $quiz['title']);
+        $submission_count = $submissions->num_rows + 1;
+        $file_name = $safe_full_name . '_' . $safe_quiz_title . '_v' . $submission_count . '_' . time() . '.pdf';
         $file_path = $upload_dir . $file_name;
 
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
-            $stmt = $db->prepare("INSERT INTO quiz_submissions (quiz_id, student_id, response_path) VALUES (?, ?, ?)");
+            $stmt = $db->prepare("INSERT INTO quiz_submissions (quiz_id, student_id, response_path, submitted_at) VALUES (?, ?, ?, NOW())");
             $stmt->bind_param("iis", $quiz_id, $student_id, $file_path);
             if ($stmt->execute()) {
                 $success = "Réponse soumise avec succès.";
@@ -75,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$quiz['submitted_at']) {
     }
 }
 
-// Log quiz view
 $stmt = $db->prepare("INSERT INTO activity_logs (user_id, user_type, action, details) VALUES (?, 'student', 'Viewed quiz', ?)");
 $details = "Viewed quiz ID $quiz_id: {$quiz['title']}";
 $stmt->bind_param("is", $student_id, $details);
@@ -90,6 +104,7 @@ $stmt->execute();
     <title>Voir Quiz - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
@@ -108,36 +123,61 @@ $stmt->execute();
             <p><strong>Titre :</strong> <?php echo htmlspecialchars($quiz['title']); ?></p>
             <p><strong>Matière :</strong> <?php echo htmlspecialchars($quiz['subject_name']); ?></p>
             <p><strong>Niveau :</strong> <?php echo htmlspecialchars($quiz['level_name']); ?></p>
+            <p><strong>Début :</strong> <?php echo htmlspecialchars($quiz['start_datetime']); ?> (GMT+1)</p>
+            <p><strong>Durée :</strong> <?php echo number_format($quiz['duration_hours'], 2); ?> heures</p>
             <?php if ($quiz['description']): ?>
                 <p><strong>Description :</strong> <?php echo htmlspecialchars($quiz['description']); ?></p>
             <?php endif; ?>
-            <p><strong>Note :</strong> <?php echo $quiz['grade'] !== null ? number_format($quiz['grade'], 2) . '/20' : 'Non noté'; ?></p>
-            <?php if ($quiz['feedback']): ?>
-                <p><strong>Commentaires :</strong> <?php echo htmlspecialchars($quiz['feedback']); ?></p>
+            <?php if ($submissions->num_rows > 0): ?>
+                <h4>Soumissions</h4>
+                <?php $submissions->data_seek(0); while ($submission = $submissions->fetch_assoc()): ?>
+                    <p>
+                        <strong>Soumis le :</strong> <?php echo htmlspecialchars($submission['submitted_at']); ?><br>
+                        <strong>Note :</strong> <?php echo $submission['grade'] !== null ? number_format($submission['grade'], 2) . '/20' : 'Non noté'; ?><br>
+                        <strong>Commentaires :</strong> <?php echo $submission['feedback'] ? htmlspecialchars($submission['feedback']) : '-'; ?>
+                    </p>
+                <?php endwhile; ?>
             <?php endif; ?>
         </div>
-        <div class="content-preview">
-            <h3><i class="fas fa-file-pdf"></i> Quiz</h3>
-            <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>">
-                <div class="pdf-controls-fixed">
-                    <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
-                    <button class="zoom-out btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
-                    <button class="rotate btn-action"><i class="fas fa-redo"></i> Rotation</button>
+        <div class="content-preview" id="quiz-content">
+            <?php if ($is_before_start): ?>
+                <div class="countdown-container start-countdown">
+                    <h3><i class="fas fa-clock fa-3x fa-spin"></i> En attente du début</h3>
+                    <p>Le quiz commencera le <?php echo htmlspecialchars($quiz['start_datetime']); ?> (GMT+1).</p>
+                    <div class="countdown-circle">
+                        <svg class="progress-ring" width="180" height="180">
+                            <defs>
+                                <linearGradient id="startGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#1e3c72" />
+                                    <stop offset="100%" style="stop-color:#9f7aea" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="14" fill="transparent" r="80" cx="90" cy="90"/>
+                            <circle class="progress-ring-circle" stroke="url(#startGradient)" stroke-width="14" fill="transparent" r="80" cx="90" cy="90"/>
+                        </svg>
+                        <span id="countdown-start" class="countdown-text"></span>
+                    </div>
                 </div>
-                <div class="pdf-canvas"></div>
-            </div>
+            <?php else: ?>
+                <h3><i class="fas fa-file-pdf"></i> Quiz</h3>
+                <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>">
+                    <div class="pdf-controls-fixed">
+                        <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
+                        <button class="zoom-out btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
+                        <button class="rotate btn-action"><i class="fas fa-redo"></i> Rotation</button>
+                    </div>
+                    <div class="pdf-canvas"></div>
+                </div>
+            <?php endif; ?>
         </div>
-        <?php if ($quiz['submitted_at']): ?>
-            <div class="content-preview">
-                <p class="success-message">Réponse soumise le <?php echo $quiz['submitted_at']; ?>.</p>
-            </div>
-        <?php else: ?>
-            <div class="form-container">
+        <?php if (!$is_before_start): ?>
+            <div class="form-container" id="upload-form">
                 <h3><i class="fas fa-upload"></i> Soumettre une Réponse</h3>
+                <p class="info-message">Vous pouvez soumettre plusieurs fois. Chaque soumission est enregistrée séparément.</p>
                 <form method="POST" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="response_pdf"><i class="fas fa-file-pdf"></i> Réponse PDF</label>
-                        <input type="file" name="response_pdf" id="response_pdf" accept="application/pdf">
+                        <input type="file" name="response_pdf" id="response_pdf" accept="application/pdf" required>
                     </div>
                     <div class="form-actions">
                         <button type="submit" class="save-course-btn"><i class="fas fa-upload"></i> Soumettre</button>
@@ -146,98 +186,221 @@ $stmt->execute();
                 </form>
             </div>
         <?php endif; ?>
+        <?php if (!$is_before_start): ?>
+            <div class="countdown-bar duration-countdown" id="countdown-message">
+                <div class="countdown-content">
+                    <i class="fas fa-hourglass-half fa-2x fa-pulse"></i>
+                    <span><strong>Temps restant pour soumettre :</strong></span>
+                    <div class="countdown-circle">
+                        <svg class="progress-ring" width="100" height="100">
+                            <defs>
+                                <linearGradient id="durationGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#38a169" />
+                                    <stop offset="100%" style="stop-color:#e53e3e" />
+                                </linearGradient>
+                            </defs>
+                            <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="10" fill="transparent" r="40" cx="50" cy="50"/>
+                            <circle class="progress-ring-circle" stroke="url(#durationGradient)" stroke-width="10" fill="transparent" r="40" cx="50" cy="50"/>
+                        </svg>
+                        <span id="countdown-duration" class="countdown-text"></span>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
     </main>
     <?php include '../includes/footer.php'; ?>
     <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
     $(document).ready(function() {
-        const pdfViewer = $('.pdf-viewer');
-        const url = pdfViewer.data('pdf');
-        const canvasContainer = pdfViewer.find('.pdf-canvas');
-        let pdfDoc = null;
-        let scale = 1.5;
-        let rotation = 0;
+        const startTime = new Date('<?php echo $quiz['start_datetime']; ?>').getTime();
+        const durationMs = <?php echo $quiz['duration_hours'] * 3600000; ?>;
+        const deadlineTime = startTime + durationMs;
+        const startCircle = document.querySelector('.start-countdown .progress-ring-circle');
+        const durationCircle = document.querySelector('.duration-countdown .progress-ring-circle');
+        const startRadius = startCircle ? startCircle.r.baseVal.value : 80;
+        const durationRadius = durationCircle ? durationCircle.r.baseVal.value : 40;
+        const startCircumference = 2 * Math.PI * startRadius;
+        const durationCircumference = 2 * Math.PI * durationRadius;
 
-        function renderPages(pdf, scale, rotation) {
-            canvasContainer.empty();
-            for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                const canvas = document.createElement('canvas');
-                canvas.className = 'pdf-page';
-                canvas.dataset.pageNum = pageNum;
-                canvasContainer.append(canvas);
-                const ctx = canvas.getContext('2d');
+        if (startCircle) startCircle.style.strokeDasharray = `${startCircumference} ${startCircumference}`;
+        if (durationCircle) durationCircle.style.strokeDasharray = `${durationCircumference} ${durationCircumference}`;
 
-                pdf.getPage(pageNum).then(page => {
-                    const viewport = page.getViewport({ scale: scale, rotation: rotation });
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
-                    canvas.style.width = '100%';
-                    canvas.style.maxWidth = `${viewport.width}px`;
-                    canvas.style.margin = '0 auto'; // Center canvas
-                    canvas.style.display = 'block'; // Ensure block display
-
-                    const renderContext = { canvasContext: ctx, viewport: viewport };
-                    page.render(renderContext);
-                });
-            }
+        function formatTime(ms) {
+            const hours = Math.floor(ms / 3600000);
+            const minutes = Math.floor((ms % 3600000) / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        pdfjsLib.getDocument(url).promise.then(pdf => {
-            pdfDoc = pdf;
-            renderPages(pdf, scale, rotation);
-        }).catch(error => {
-            canvasContainer.html('<p class="error-message">Erreur de chargement du PDF : ' + error.message + '</p>');
-        });
+        function setProgress(circle, percent, circumference) {
+            const offset = circumference - (percent / 100) * circumference;
+            if (circle) circle.style.strokeDashoffset = offset;
+        }
 
-        pdfViewer.find('.zoom-in').click(() => {
-            if (pdfDoc) {
-                scale += 0.25;
-                renderPages(pdfDoc, scale, rotation);
+        function loadPDF() {
+            const pdfViewer = $('#pdf-viewer-<?php echo $quiz['id']; ?>');
+            const url = pdfViewer.data('pdf');
+            const canvasContainer = pdfViewer.find('.pdf-canvas');
+            let pdfDoc = null;
+            let scale = 1.5;
+            let rotation = 0;
+
+            function renderPages(pdf, scale, rotation) {
+                canvasContainer.empty();
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page';
+                    canvas.dataset.pageNum = pageNum;
+                    canvasContainer.append(canvas);
+                    const ctx = canvas.getContext('2d');
+
+                    pdf.getPage(pageNum).then(page => {
+                        const viewport = page.getViewport({ scale: scale, rotation: rotation });
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        canvas.style.width = '100%';
+                        canvas.style.maxWidth = `${viewport.width}px`;
+                        canvas.style.margin = '0 auto';
+                        canvas.style.display = 'block';
+
+                        const renderContext = { canvasContext: ctx, viewport: viewport };
+                        page.render(renderContext);
+                    });
+                }
             }
-        });
 
-        pdfViewer.find('.zoom-out').click(() => {
-            if (pdfDoc && scale > 0.5) {
-                scale -= 0.25;
-                renderPages(pdfDoc, scale, rotation);
+            pdfjsLib.getDocument(url).promise.then(pdf => {
+                pdfDoc = pdf;
+                renderPages(pdf, scale, rotation);
+            }).catch(error => {
+                canvasContainer.html('<p class="error-message">Erreur de chargement du PDF : ' + error.message + '</p>');
+            });
+
+            pdfViewer.find('.zoom-in').click(() => {
+                if (pdfDoc) {
+                    scale += 0.25;
+                    renderPages(pdfDoc, scale, rotation);
+                }
+            });
+
+            pdfViewer.find('.zoom-out').click(() => {
+                if (pdfDoc && scale > 0.5) {
+                    scale -= 0.25;
+                    renderPages(pdfDoc, scale, rotation);
+                }
+            });
+
+            pdfViewer.find('.rotate').click(() => {
+                if (pdfDoc) {
+                    rotation = (rotation + 90) % 360;
+                    renderPages(pdfDoc, scale, rotation);
+                }
+            });
+
+            let isFocused = true;
+            function applyBlur() {
+                if (!isFocused) {
+                    pdfViewer.addClass('blurred');
+                } else {
+                    pdfViewer.removeClass('blurred');
+                }
             }
-        });
 
-        pdfViewer.find('.rotate').click(() => {
-            if (pdfDoc) {
-                rotation = (rotation + 90) % 360;
-                renderPages(pdfDoc, scale, rotation);
-            }
-        });
+            $(window).on('focus', () => {
+                isFocused = true;
+                applyBlur();
+            });
 
-        // Blur handling
-        let isFocused = true;
-        function applyBlur() {
-            if (!isFocused) {
-                pdfViewer.addClass('blurred');
+            $(window).on('blur', () => {
+                isFocused = false;
+                applyBlur();
+            });
+
+            $(document).on('keydown', (e) => {
+                if (e.key === 'PrintScreen') {
+                    navigator.clipboard.writeText('');
+                    alert('Les captures d’écran via PrintScreen sont désactivées.');
+                }
+            });
+        }
+
+        function updateCountdown() {
+            const currentTime = new Date().getTime();
+            const quizContent = $('#quiz-content');
+            const uploadForm = $('#upload-form');
+
+            if (currentTime < startTime) {
+                const timeLeft = startTime - currentTime;
+                const totalTime = startTime - (new Date().getTime() - timeLeft);
+                const percent = (timeLeft / totalTime) * 100;
+                $('#countdown-start').text(formatTime(timeLeft));
+                setProgress(startCircle, percent, startCircumference);
+                if (timeLeft <= 0) {
+                    quizContent.html(`
+                        <h3><i class="fas fa-file-pdf"></i> Quiz</h3>
+                        <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>">
+                            <div class="pdf-controls-fixed">
+                                <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
+                                <button class="zoom-out btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
+                                <button class="rotate btn-action"><i class="fas fa-redo"></i> Rotation</button>
+                            </div>
+                            <div class="pdf-canvas"></div>
+                        </div>
+                    `);
+                    if (!uploadForm.length) {
+                        $('main.dashboard').append(`
+                            <div class="form-container" id="upload-form">
+                                <h3><i class="fas fa-upload"></i> Soumettre une Réponse</h3>
+                                <p class="info-message">Vous pouvez soumettre plusieurs fois. Chaque soumission est enregistrée séparément.</p>
+                                <form method="POST" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="response_pdf"><i class="fas fa-file-pdf"></i> Réponse PDF</label>
+                                        <input type="file" name="response_pdf" id="response_pdf" accept="application/pdf" required>
+                                    </div>
+                                    <div class="form-actions">
+                                        <button type="submit" class="save-course-btn"><i class="fas fa-upload"></i> Soumettre</button>
+                                        <a href="quizzes.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
+                                    </div>
+                                </form>
+                            </div>
+                        `);
+                    }
+                    loadPDF();
+                }
+            } else if (currentTime < deadlineTime) {
+                const timeLeft = deadlineTime - currentTime;
+                const totalTime = durationMs;
+                const percent = (timeLeft / totalTime) * 100;
+                $('#countdown-duration').text(formatTime(timeLeft));
+                $('#countdown-message').show();
+                setProgress(durationCircle, percent, durationCircumference);
+                if (timeLeft <= 0) {
+                    $('#countdown-message').hide();
+                    quizContent.append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
+                }
             } else {
-                pdfViewer.removeClass('blurred');
+                $('#countdown-message').hide();
+                if (!quizContent.find('.warning-message').length) {
+                    quizContent.append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
+                }
             }
         }
 
-        $(window).on('focus', () => {
-            isFocused = true;
-            applyBlur();
-        });
-
-        $(window).on('blur', () => {
-            isFocused = false;
-            applyBlur();
-        });
-
-        // Prevent screenshot via PrintScreen
-        $(document).on('keydown', (e) => {
-            if (e.key === 'PrintScreen') {
-                navigator.clipboard.writeText('');
-                alert('Les captures d’écran via PrintScreen sont désactivées.');
+        if (startTime <= new Date().getTime()) {
+            loadPDF();
+            if (deadlineTime <= new Date().getTime()) {
+                $('#countdown-message').hide();
+                if (!$('#quiz-content').find('.warning-message').length) {
+                    $('#quiz-content').append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
+                }
             }
-        });
+        }
+
+        if (startTime > new Date().getTime() || (startTime <= new Date().getTime() && new Date().getTime() <= deadlineTime)) {
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+        }
     });
-</script>
+    </script>
 </body>
 </html>
