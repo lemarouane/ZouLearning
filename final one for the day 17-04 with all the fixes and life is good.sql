@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 17 avr. 2025 à 00:59
+-- Généré le : jeu. 17 avr. 2025 à 16:24
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -176,7 +176,42 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `user_type`, `action`, `details`, 
 (140, 1, 'admin', 'Added level', 'Added level: Bac+1', '2025-04-15 23:29:34'),
 (141, 1, 'admin', 'Added subject', 'Added subject: fitlife for level ID 3', '2025-04-15 23:39:34'),
 (142, 1, 'admin', 'Added course', 'Added course: x for subject ID 6', '2025-04-16 00:54:17'),
-(143, 1, 'admin', 'Logged out student', 'Admin ID 1 logged out student ID 24', '2025-04-16 22:20:53');
+(143, 1, 'admin', 'Logged out student', 'Admin ID 1 logged out student ID 24', '2025-04-16 22:20:53'),
+(144, 1, 'admin', 'Added course', 'Added course: axerty for subject ID 6', '2025-04-17 12:58:39'),
+(145, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 12:59:35'),
+(146, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 12:59:54'),
+(147, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 13:03:25'),
+(148, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 13:04:36'),
+(149, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 13:04:52'),
+(150, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 13:07:27'),
+(151, 26, 'student', 'Viewed course', 'Viewed course ID 23: x', '2025-04-17 13:07:29'),
+(152, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 13:10:24'),
+(153, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 13:10:30'),
+(154, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 13:10:34'),
+(155, 26, 'admin', 'Screenshot taken', 'Captured page 0 of course \'axerty\' (ID: 24)', '2025-04-17 13:10:41'),
+(156, 26, 'admin', 'Screenshot taken', 'Captured page 0 of course \'axerty\' (ID: 24)', '2025-04-17 13:10:46'),
+(157, 26, 'admin', 'Screenshot taken', 'Captured page 0 of course \'axerty\' (ID: 24)', '2025-04-17 13:10:48'),
+(158, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 13:11:27'),
+(159, 1, 'admin', 'Edited course', 'Edited course ID 24: axerty', '2025-04-17 13:11:55'),
+(160, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 13:12:00'),
+(161, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 13:30:57'),
+(162, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 13:31:02'),
+(163, 26, 'admin', 'Screenshot taken', 'Captured page 0 of course \'axerty\' (ID: 24)', '2025-04-17 13:31:08'),
+(164, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 13:32:08'),
+(165, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 13:38:57'),
+(166, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 13:39:04'),
+(167, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 13:47:41'),
+(168, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 13:54:33'),
+(169, 26, 'admin', 'Screenshot taken', 'Captured page 0 of course \'Algebra\' (ID: 18)', '2025-04-17 13:54:55'),
+(170, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 13:55:06'),
+(171, 20, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-17 14:13:22'),
+(172, 20, 'student', 'Viewed course', 'Viewed course ID 21: x', '2025-04-17 14:13:30'),
+(173, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 14:14:49'),
+(174, 26, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 14:15:04'),
+(175, 1, 'admin', 'Logged out', 'Admin logged out', '2025-04-17 15:19:13'),
+(176, 27, 'student', 'Viewed course', 'Viewed course ID 19: Thermodynamics', '2025-04-17 15:22:06'),
+(177, 29, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 15:23:31'),
+(178, 29, 'student', 'Viewed course', 'Viewed course ID 24: axerty', '2025-04-17 15:23:37');
 
 -- --------------------------------------------------------
 
@@ -222,7 +257,8 @@ INSERT INTO `courses` (`id`, `title`, `subject_id`, `difficulty`, `created_at`) 
 (20, 'algebre2', 4, 'Easy', '2025-04-12 19:07:29'),
 (21, 'x', 5, 'Easy', '2025-04-12 19:07:55'),
 (22, 'Base de données', 3, 'Easy', '2025-04-13 15:09:56'),
-(23, 'x', 6, 'Medium', '2025-04-16 00:54:17');
+(23, 'x', 6, 'Medium', '2025-04-16 00:54:17'),
+(24, 'axerty', 6, 'Easy', '2025-04-17 12:58:39');
 
 -- --------------------------------------------------------
 
@@ -261,7 +297,10 @@ INSERT INTO `course_contents` (`id`, `course_id`, `folder_id`, `content_type`, `
 (38, 22, 39, 'PDF', 'History', '../Uploads/pdfs/1744553464_Marouane_Haddad_-_CV_-_Final.pdf', '2025-04-13 15:11:04'),
 (39, 22, 40, 'PDF', 'Les tables', '../Uploads/pdfs/1744553464_Loi-cadre_06.22_Ar.pdf', '2025-04-13 15:11:04'),
 (40, 22, 40, 'PDF', 'Les relations entre les tables', '../Uploads/pdfs/1744554666_DIPLOME_MAROUANE_HADDAD..pdf', '2025-04-13 15:31:06'),
-(41, 22, 41, 'PDF', 'Mysql + Apache', '../Uploads/pdfs/1744554746_الملخص.pdf', '2025-04-13 15:32:26');
+(41, 22, 41, 'PDF', 'Mysql + Apache', '../Uploads/pdfs/1744554746_الملخص.pdf', '2025-04-13 15:32:26'),
+(42, 24, 44, 'PDF', 'a', '../Uploads/pdfs/1744891824_قرار_فتح_المباراة_(1).pdf', '2025-04-17 13:10:24'),
+(43, 24, 45, 'PDF', 'aze', '../Uploads/pdfs/1744891887_PV__AO_N_1-FST-GAR-2022_FSTT_SEANCE_N_1.pdf', '2025-04-17 13:11:27'),
+(44, 24, 46, 'PDF', 'aze', '../Uploads/pdfs/1744891915_BL_LENSA_TANGER_-_Copie.pdf', '2025-04-17 13:11:55');
 
 -- --------------------------------------------------------
 
@@ -294,7 +333,10 @@ INSERT INTO `course_folders` (`id`, `course_id`, `name`, `description`, `created
 (40, 22, 'Les tables', NULL, '2025-04-13 15:09:56'),
 (41, 22, 'Mysql', NULL, '2025-04-13 15:32:02'),
 (42, 23, 'c', NULL, '2025-04-16 00:54:17'),
-(43, 23, 'v', NULL, '2025-04-16 00:54:17');
+(43, 23, 'v', NULL, '2025-04-16 00:54:17'),
+(44, 24, 'les matrices', NULL, '2025-04-17 12:58:39'),
+(45, 24, 'les matrices2', NULL, '2025-04-17 12:58:39'),
+(46, 24, 'aze', NULL, '2025-04-17 13:11:27');
 
 -- --------------------------------------------------------
 
@@ -321,7 +363,9 @@ CREATE TABLE `device_attempts` (
 INSERT INTO `device_attempts` (`id`, `student_id`, `device_fingerprint`, `device_info`, `ip_address`, `latitude`, `longitude`, `attempted_at`, `status`) VALUES
 (1, 24, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:14:49', 'pending'),
 (2, 24, '09da2cd039ab4f7b2d6f3a44ac94275e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:35:10', 'denied'),
-(3, 24, '09da2cd039ab4f7b2d6f3a44ac94275e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:35:42', 'pending');
+(3, 24, '09da2cd039ab4f7b2d6f3a44ac94275e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:35:42', 'pending'),
+(4, 20, 'efd0b963bcd740c2d339046c55cbce77', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.736997, -5.895445, '2025-04-17 14:12:55', 'approved'),
+(5, 27, '1c71aca27f7948b0bdaa722b6c4fb6b3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.7386883, -5.8881645, '2025-04-17 15:19:44', 'approved');
 
 -- --------------------------------------------------------
 
@@ -401,46 +445,56 @@ INSERT INTO `quiz_submissions` (`id`, `quiz_id`, `student_id`, `response_path`, 
 
 CREATE TABLE `students` (
   `id` int(11) NOT NULL,
-  `full_name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `status` enum('pending','approved','rejected') DEFAULT 'pending',
-  `device_id` varchar(36) NOT NULL,
-  `device_name` varchar(255) DEFAULT NULL,
+  `full_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `status` enum('pending','approved','rejected') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `device_id` varchar(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `device_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
   `level_id` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `session_status` varchar(20) DEFAULT 'active'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `session_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'active',
+  `education_level` varchar(100) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `current_institution` varchar(255) DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `gender` enum('Male','Female','Other') DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `students`
 --
 
-INSERT INTO `students` (`id`, `full_name`, `email`, `password`, `status`, `device_id`, `device_name`, `latitude`, `longitude`, `level_id`, `created_at`, `session_status`) VALUES
-(1, 'Ali BenAhmed', 'ali@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 1, '2025-04-09 14:11:33', 'active'),
-(2, 'Sara ElHadi', 'sara@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 1, '2025-04-09 14:11:33', 'active'),
-(3, 'Omar Kadir', 'omar@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 2, '2025-04-09 14:11:33', 'active'),
-(4, 'Ali BenAhmedxxx', 'zouhair@t.fr', '$2y$10$4AYc9NFNR3deOwvIEpYZqe2I8Z3bHTYILhP1gcGhe7OEalA2EU3be', 'approved', '753d70d7-1d60-4aa7-a64f-db834d474fa0', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:08:27', 'active'),
-(5, 'maro', 'm@m.com', '$2y$10$fWAtt.ey7Lebi/vDVmPhvesvutEmWn40MAdVguROQJbbp45HgnWky', 'approved', 'd612b836-50be-4d3e-8155-7cb178bce63e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:15:17', 'active'),
-(6, 'maro', 'xm@m.com', '$2y$10$9s48UTZqtfkIE1AK0a97heODFgtoDbHCvmJLgNhmfdot399E6DcXO', 'approved', '2f62cc96-e5ca-4314-b209-391c944461cd', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:34:13', 'active'),
-(8, 'mar1', 't@t.com', '$2y$10$suWT96YsjQS.ENT5z75HN.cR7.QfcmrVshwHIW/Je09LiiFAM9rue', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:41:31', 'active'),
-(9, 'mar2', 'a@a.com', '$2y$10$5hhGEDqga3S/PfDvVz5F2e3iRNbLM.2lfAUZyUAvn.JS6cSRa5PcS', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:42:35', 'active'),
-(10, 'michu', 'z@z.com', '$2y$10$HBJnNVfs6vNruoFcu6gmHuoGyIZwusNLuIsJc0BHx7mK1RG1MDCQC', 'pending', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 0.00000000, 0.00000000, NULL, '2025-04-11 00:43:22', 'active'),
-(11, 'michu2xx', 'e@e.com', '$2y$10$NzO7gmj1eHz9V4jlswQJAemhtgglpJtQw3HUu5pHvAsJxMqAWHXqq', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:44:09', 'active'),
-(12, 'mar3', 'r@r.com', '$2y$10$R.2RWfwqEwbvQQalHgHpGO98VFQxQaN6Oqsy2c5MRwHc2kK09WK8a', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, NULL, '2025-04-11 01:03:58', 'active'),
-(15, 'MAROUANE HADDAD', 'marouanehaddad08@gmail.com', '$2y$10$7s70Iv31utajASfMtSBf0u0XuKFMkjF.3WL8S1Mj2Y7d5WlWYRSdG', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73548510, -5.88934810, 1, '2025-04-11 02:45:16', 'active'),
-(16, 'MAROUANE HADDAD', 'marouanehaddad09@gmail.com', '$2y$10$IcJNMIXlXllII1p90A9mcesWVNTgtlzTCuG9x/mcpyIUN1gQ34Vvq', 'approved', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73549920, -5.88935180, 1, '2025-04-11 03:23:54', 'active'),
-(17, 'Marouane Sami', 'm@m.fr', '$2y$10$lEXoCLx8NTxkTPfuTJA/0.hoFXDSNuBq27mRxdqjpEhPjvO6rlPMS', 'approved', '275f8639-96f8-4db7-b9db-4d61d10d95e2', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73270000, -5.89160000, 1, '2025-04-11 11:27:49', 'active'),
-(18, 'Wiame Rachade', 'w@w.com', '$2y$10$obIdwu7T9uwB4v0KGWDwLOfaMvMR0ijM2PSV63Jey90QF6NRhFxNq', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73747000, -5.89478800, 2, '2025-04-11 15:48:48', 'active'),
-(19, 'michu haddad', 'x@x.x', '$2y$10$zZaeqYT4xf6u1xNEbRwA2.4cQFRe2tIwWmfaf0cE.dq3SDxp92hS.', 'approved', '9bb8c812-974b-4ca7-b6d4-f420700508c3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.75644160, -5.77044480, 2, '2025-04-12 16:05:04', 'active'),
-(20, 'Wiame Rachade', 'v@v.v', '$2y$10$L77ck8f2bargustfnCjJGeWW9.Q7z4BcU649c5oQChQjSeKLJQvba', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73408900, -5.88688100, 2, '2025-04-12 18:31:53', 'active'),
-(21, 'michu weldi', 'michu@michu.com', '$2y$10$jYM9ybvteIwjDOiPFfaZVe/6L01C7Mb3/cM7oXJDs2GFZ5mCywNq6', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73552950, -5.88930730, 1, '2025-04-13 15:13:11', 'active'),
-(22, 'ghazali', 'g@g.g', '$2y$10$EU6vZTFMTbt4M17Y8lBjNOAIoi5Vd2zYIRcm3nF5u6drn/KoBKN8y', 'approved', '', NULL, NULL, NULL, 2, '2025-04-14 23:49:17', 'active'),
-(23, 'mar mar', '1@1.1', '$2y$10$WPn0GLRViHHNbZc/JNHDLurutwx6KxwHvGZu5YQklJ71AxaTcUHhK', 'approved', '', NULL, NULL, NULL, NULL, '2025-04-15 00:11:29', 'active'),
-(24, 'mar mar 55', 'm@m.mx', '$2y$10$dbZHI2AjwotZHAxbMrB7L.zLgyooKwppBIRyYbYaWGr.Sf6WNXxWq', 'approved', '', NULL, NULL, NULL, 1, '2025-04-15 00:12:13', 'active'),
-(25, 'MAROUANE HADDAD', 'marouanehaddad08+1@gmail.com', '$2y$10$5fqFcsiJzOuwgPOoxdlbgOtQ7UBUosL4cZCTvTOsm4z3BVzLT5kIa', 'approved', '', NULL, NULL, NULL, NULL, '2025-04-15 01:48:37', 'active');
+INSERT INTO `students` (`id`, `full_name`, `email`, `password`, `status`, `device_id`, `device_name`, `latitude`, `longitude`, `level_id`, `created_at`, `session_status`, `education_level`, `phone`, `city`, `current_institution`, `date_of_birth`, `gender`) VALUES
+(1, 'Ali BenAhmed', 'ali@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 1, '2025-04-09 14:11:33', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 'Sara ElHadi', 'sara@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 1, '2025-04-09 14:11:33', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 'Omar Kadir', 'omar@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 2, '2025-04-09 14:11:33', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 'Ali BenAhmedxxx', 'zouhair@t.fr', '$2y$10$4AYc9NFNR3deOwvIEpYZqe2I8Z3bHTYILhP1gcGhe7OEalA2EU3be', 'approved', '753d70d7-1d60-4aa7-a64f-db834d474fa0', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:08:27', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 'maro', 'm@m.com', '$2y$10$fWAtt.ey7Lebi/vDVmPhvesvutEmWn40MAdVguROQJbbp45HgnWky', 'approved', 'd612b836-50be-4d3e-8155-7cb178bce63e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:15:17', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 'maro', 'xm@m.com', '$2y$10$9s48UTZqtfkIE1AK0a97heODFgtoDbHCvmJLgNhmfdot399E6DcXO', 'approved', '2f62cc96-e5ca-4314-b209-391c944461cd', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:34:13', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(8, 'mar1', 't@t.com', '$2y$10$suWT96YsjQS.ENT5z75HN.cR7.QfcmrVshwHIW/Je09LiiFAM9rue', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:41:31', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(9, 'mar2', 'a@a.com', '$2y$10$5hhGEDqga3S/PfDvVz5F2e3iRNbLM.2lfAUZyUAvn.JS6cSRa5PcS', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:42:35', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(10, 'michu', 'z@z.com', '$2y$10$HBJnNVfs6vNruoFcu6gmHuoGyIZwusNLuIsJc0BHx7mK1RG1MDCQC', 'pending', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 0.00000000, 0.00000000, NULL, '2025-04-11 00:43:22', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 'michu2xx', 'e@e.com', '$2y$10$NzO7gmj1eHz9V4jlswQJAemhtgglpJtQw3HUu5pHvAsJxMqAWHXqq', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:44:09', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(12, 'mar3', 'r@r.com', '$2y$10$R.2RWfwqEwbvQQalHgHpGO98VFQxQaN6Oqsy2c5MRwHc2kK09WK8a', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, NULL, '2025-04-11 01:03:58', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(15, 'MAROUANE HADDAD', 'marouanehaddad08@gmail.com', '$2y$10$7s70Iv31utajASfMtSBf0u0XuKFMkjF.3WL8S1Mj2Y7d5WlWYRSdG', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73548510, -5.88934810, 1, '2025-04-11 02:45:16', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(16, 'MAROUANE HADDAD', 'marouanehaddad09@gmail.com', '$2y$10$IcJNMIXlXllII1p90A9mcesWVNTgtlzTCuG9x/mcpyIUN1gQ34Vvq', 'approved', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73549920, -5.88935180, 1, '2025-04-11 03:23:54', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(17, 'Marouane Sami', 'm@m.fr', '$2y$10$lEXoCLx8NTxkTPfuTJA/0.hoFXDSNuBq27mRxdqjpEhPjvO6rlPMS', 'approved', '275f8639-96f8-4db7-b9db-4d61d10d95e2', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73270000, -5.89160000, 1, '2025-04-11 11:27:49', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(18, 'Wiame Rachade', 'w@w.com', '$2y$10$obIdwu7T9uwB4v0KGWDwLOfaMvMR0ijM2PSV63Jey90QF6NRhFxNq', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73747000, -5.89478800, 2, '2025-04-11 15:48:48', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(19, 'michu haddad', 'x@x.x', '$2y$10$zZaeqYT4xf6u1xNEbRwA2.4cQFRe2tIwWmfaf0cE.dq3SDxp92hS.', 'approved', '9bb8c812-974b-4ca7-b6d4-f420700508c3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.75644160, -5.77044480, 2, '2025-04-12 16:05:04', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(20, 'Wiame Rachade', 'v@v.v', '$2y$10$L77ck8f2bargustfnCjJGeWW9.Q7z4BcU649c5oQChQjSeKLJQvba', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73408900, -5.88688100, 3, '2025-04-12 18:31:53', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(21, 'michu weldi', 'michu@michu.com', '$2y$10$jYM9ybvteIwjDOiPFfaZVe/6L01C7Mb3/cM7oXJDs2GFZ5mCywNq6', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73552950, -5.88930730, 1, '2025-04-13 15:13:11', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(22, 'ghazali', 'g@g.g', '$2y$10$EU6vZTFMTbt4M17Y8lBjNOAIoi5Vd2zYIRcm3nF5u6drn/KoBKN8y', 'approved', '', NULL, NULL, NULL, 2, '2025-04-14 23:49:17', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(23, 'mar mar', '1@1.1', '$2y$10$WPn0GLRViHHNbZc/JNHDLurutwx6KxwHvGZu5YQklJ71AxaTcUHhK', 'approved', '', NULL, NULL, NULL, NULL, '2025-04-15 00:11:29', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(24, 'mar mar 55', 'm@m.mx', '$2y$10$dbZHI2AjwotZHAxbMrB7L.zLgyooKwppBIRyYbYaWGr.Sf6WNXxWq', 'approved', '', NULL, NULL, NULL, 1, '2025-04-15 00:12:13', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(25, 'MAROUANE HADDAD', 'marouanehaddad08+1@gmail.com', '$2y$10$5fqFcsiJzOuwgPOoxdlbgOtQ7UBUosL4cZCTvTOsm4z3BVzLT5kIa', 'approved', '', NULL, NULL, NULL, NULL, '2025-04-15 01:48:37', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(26, 'michu haddad', 'x@x.xx', '$2y$10$wqEwr1tYOEoayyWV4l84Oer/zWjPO0pqjnAKijT7map92vAzgWiQK', 'approved', '', NULL, NULL, NULL, 2, '2025-04-17 13:06:42', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(27, 'Marouane Haddad', '9@9.9', '$2y$10$8e26M.pTNuTXk.9IEJrDZuRMlNQuZ1YpwrajuZVSNwJfo7k.Xmzkm', 'approved', '', NULL, NULL, NULL, 2, '2025-04-17 15:04:09', 'active', NULL, NULL, NULL, NULL, NULL, NULL),
+(28, 'Marouane Haddad', 'aminxa@example.com', '$2y$10$aDx4/Z.CcWLe0JpPJTiYpO.RzCQQMSeeiI60fmebUiYe2bTy.hm3G', 'approved', 'efd0b963bcd740c2d339046c55cbce77', '0', 35.73360000, -5.89210000, 3, '2025-04-17 15:16:58', 'active', 'Bac+2', '0613508702', 'Kénitra', 'Ibn tofail', '2025-04-17', 'Male'),
+(29, 'malak', 'test@test.com', '$2y$10$XErsXOYq5VP9tFyVi9k66OHvIVjkEdDIVzmZ8NE07b7bdL5b53lRy', 'approved', '', NULL, NULL, NULL, 3, '2025-04-17 15:22:46', 'active', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -466,7 +520,13 @@ INSERT INTO `student_courses` (`id`, `student_id`, `course_id`, `assigned_at`) V
 (8, 22, 20, '2025-04-14 23:51:14'),
 (10, 24, 18, '2025-04-15 00:36:31'),
 (11, 24, 20, '2025-04-15 00:36:31'),
-(13, 24, 22, '2025-04-15 00:36:43');
+(13, 24, 22, '2025-04-15 00:36:43'),
+(14, 26, 23, '2025-04-17 13:07:21'),
+(15, 26, 24, '2025-04-17 13:07:21'),
+(17, 26, 18, '2025-04-17 13:31:59'),
+(18, 20, 24, '2025-04-17 14:14:25'),
+(19, 27, 19, '2025-04-17 15:19:07'),
+(20, 29, 24, '2025-04-17 15:23:19');
 
 -- --------------------------------------------------------
 
@@ -494,7 +554,12 @@ INSERT INTO `student_devices` (`id`, `student_id`, `device_fingerprint`, `device
 (1, 23, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 00:11:29', 'approved'),
 (2, 24, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 00:12:13', 'approved'),
 (3, 24, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:15:05', 'approved'),
-(4, 25, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 01:48:37', 'approved');
+(4, 25, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 01:48:37', 'approved'),
+(5, 26, '1c71aca27f7948b0bdaa722b6c4fb6b3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.736972, -5.8955627, '2025-04-17 13:06:42', 'approved'),
+(6, 20, 'efd0b963bcd740c2d339046c55cbce77', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.736997, -5.895445, '2025-04-17 14:13:04', 'approved'),
+(7, 27, 'efd0b963bcd740c2d339046c55cbce77', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.736997, -5.895445, '2025-04-17 15:04:09', 'approved'),
+(8, 27, '1c71aca27f7948b0bdaa722b6c4fb6b3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.7386883, -5.8881645, '2025-04-17 15:19:55', 'approved'),
+(9, 29, 'efd0b963bcd740c2d339046c55cbce77', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.736997, -5.895445, '2025-04-17 15:22:46', 'approved');
 
 -- --------------------------------------------------------
 
@@ -541,7 +606,12 @@ INSERT INTO `student_subjects` (`id`, `student_id`, `subject_id`, `assigned_at`,
 (30, 21, 3, '2025-04-13 15:19:47', 1),
 (31, 22, 4, '2025-04-14 23:51:14', 1),
 (32, 24, 4, '2025-04-15 00:36:31', 1),
-(33, 24, 3, '2025-04-15 00:36:43', 0);
+(33, 24, 3, '2025-04-15 00:36:43', 0),
+(34, 26, 6, '2025-04-17 13:07:21', 1),
+(35, 26, 4, '2025-04-17 13:31:59', 0),
+(36, 20, 6, '2025-04-17 14:14:25', 0),
+(37, 27, 5, '2025-04-17 15:19:07', 0),
+(38, 29, 6, '2025-04-17 15:23:19', 0);
 
 -- --------------------------------------------------------
 
@@ -607,7 +677,14 @@ INSERT INTO `user_sessions` (`id`, `student_id`, `login_time`, `logout_time`, `l
 (15, 24, '2025-04-16 23:51:13', '2025-04-16 23:54:50', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
 (16, 24, '2025-04-16 23:54:28', '2025-04-16 23:54:50', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
 (17, 24, '2025-04-16 23:55:06', '2025-04-16 23:56:28', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(18, 24, '2025-04-16 23:58:34', NULL, 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1');
+(18, 24, '2025-04-16 23:58:34', NULL, 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(19, 26, '2025-04-17 13:07:14', '2025-04-17 15:19:29', 35.736972, -5.8955627, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1'),
+(20, 20, '2025-04-17 14:13:11', '2025-04-17 14:23:31', 35.736997, -5.895445, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(21, 27, '2025-04-17 15:04:26', '2025-04-17 15:10:38', 35.7336, -5.8921, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(22, 27, '2025-04-17 15:18:26', NULL, 35.7336, -5.8921, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(23, 27, '2025-04-17 15:20:02', NULL, 35.7386883, -5.8881645, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1'),
+(24, 27, '2025-04-17 15:22:04', '2025-04-17 15:22:30', 35.7336, -5.8921, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(25, 29, '2025-04-17 15:23:27', NULL, 35.736997, -5.895445, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1');
 
 --
 -- Index pour les tables déchargées
@@ -731,7 +808,7 @@ ALTER TABLE `user_sessions`
 -- AUTO_INCREMENT pour la table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=179;
 
 --
 -- AUTO_INCREMENT pour la table `admins`
@@ -743,25 +820,25 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT pour la table `course_contents`
 --
 ALTER TABLE `course_contents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=45;
 
 --
 -- AUTO_INCREMENT pour la table `course_folders`
 --
 ALTER TABLE `course_folders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT pour la table `device_attempts`
 --
 ALTER TABLE `device_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `levels`
@@ -785,25 +862,25 @@ ALTER TABLE `quiz_submissions`
 -- AUTO_INCREMENT pour la table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT pour la table `student_courses`
 --
 ALTER TABLE `student_courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT pour la table `student_devices`
 --
 ALTER TABLE `student_devices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT pour la table `student_subjects`
 --
 ALTER TABLE `student_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT pour la table `subjects`
@@ -815,7 +892,7 @@ ALTER TABLE `subjects`
 -- AUTO_INCREMENT pour la table `user_sessions`
 --
 ALTER TABLE `user_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Contraintes pour les tables déchargées

@@ -21,6 +21,23 @@ if (!$course) {
 $subjects = $db->query("SELECT s.id, s.name, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id ORDER BY s.name ASC");
 $folders = $db->query("SELECT id, name, description FROM course_folders WHERE course_id = $course_id");
 
+// Ensure upload directory exists
+$upload_dir = "../Uploads/pdfs/";
+if (!is_dir($upload_dir)) {
+    if (!mkdir($upload_dir, 0777, true)) {
+        error_log("Failed to create directory: $upload_dir");
+        $_SESSION['error'] = "Erreur serveur : Impossible de créer le dossier des uploads.";
+        header("Location: edit_course.php?id=$course_id");
+        exit;
+    }
+}
+if (!is_writable($upload_dir)) {
+    error_log("Directory not writable: $upload_dir");
+    $_SESSION['error'] = "Erreur serveur : Le dossier des uploads n'est pas accessible en écriture.";
+    header("Location: edit_course.php?id=$course_id");
+    exit;
+}
+
 // Handle AJAX delete content
 if (isset($_POST['action']) && $_POST['action'] === 'delete_content') {
     $content_id = (int)$_POST['content_id'];
@@ -35,7 +52,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete_content') {
         $stmt = $db->prepare("DELETE FROM course_contents WHERE id = ?");
         $stmt->bind_param("i", $content_id);
         if ($stmt->execute()) {
-            // Log deletion
             $stmt = $db->prepare("INSERT INTO activity_logs (user_id, user_type, action, details) VALUES (?, 'admin', 'Deleted content', ?)");
             $details = "Deleted {$content['content_type']} '{$content['content_name']}' from course ID $course_id";
             $stmt->bind_param("is", $_SESSION['admin_id'], $details);
@@ -88,7 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
             $stmt = $db->prepare("DELETE FROM course_folders WHERE id = ?");
             $stmt->bind_param("i", $folder_id);
             $stmt->execute();
-            // Log deletion
             $stmt = $db->prepare("INSERT INTO activity_logs (user_id, user_type, action, details) VALUES (?, 'admin', 'Deleted folder', ?)");
             $details = "Deleted folder ID $folder_id from course ID $course_id";
             $stmt->bind_param("is", $_SESSION['admin_id'], $details);
@@ -107,24 +122,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         // Existing folder PDFs
         if (!empty($_FILES['pdf_files']['name'][$folder_id])) {
             foreach ($_FILES['pdf_files']['name'][$folder_id] as $j => $pdf_name) {
-                if ($_FILES['pdf_files']['error'][$folder_id][$j] !== UPLOAD_ERR_OK || empty($pdf_name)) continue;
+                if ($_FILES['pdf_files']['error'][$folder_id][$j] !== UPLOAD_ERR_OK) {
+                    $error_codes = [
+                        UPLOAD_ERR_INI_SIZE => "Le fichier '$pdf_name' dépasse la taille maximale autorisée.",
+                        UPLOAD_ERR_FORM_SIZE => "Le fichier '$pdf_name' dépasse la taille du formulaire.",
+                        UPLOAD_ERR_PARTIAL => "Le fichier '$pdf_name' n'a pas été entièrement téléchargé.",
+                        UPLOAD_ERR_NO_FILE => "Aucun fichier sélectionné pour '$pdf_name'.",
+                        UPLOAD_ERR_NO_TMP_DIR => "Dossier temporaire manquant pour '$pdf_name'.",
+                        UPLOAD_ERR_CANT_WRITE => "Impossible d'écrire le fichier '$pdf_name' sur le disque.",
+                        UPLOAD_ERR_EXTENSION => "Une extension PHP a bloqué le téléchargement de '$pdf_name'."
+                    ];
+                    $_SESSION['error'] = $error_codes[$_FILES['pdf_files']['error'][$folder_id][$j]] ?? "Erreur inconnue lors du téléchargement de '$pdf_name'.";
+                    error_log("Upload error for '$pdf_name': " . $_FILES['pdf_files']['error'][$folder_id][$j]);
+                    continue;
+                }
 
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mime = finfo_file($finfo, $_FILES['pdf_files']['tmp_name'][$folder_id][$j]);
                 finfo_close($finfo);
                 if ($mime !== 'application/pdf') {
                     $_SESSION['error'] = "Le fichier '$pdf_name' n'est pas un PDF valide.";
+                    error_log("Invalid MIME type for '$pdf_name': $mime");
                     continue;
                 }
 
-                $pdf_file_name = time() . '_' . str_replace(' ', '_', basename($pdf_name));
-                $pdf_path = "../Uploads/pdfs/" . $pdf_file_name;
+                // Sanitize filename (preserve Arabic, replace spaces/special chars)
+                $clean_name = preg_replace('/[^\p{L}\p{N}\-.() ]/u', '', basename($pdf_name));
+                $clean_name = str_replace(' ', '_', $clean_name);
+                $pdf_file_name = time() . '_' . $clean_name;
+                $pdf_path = $upload_dir . $pdf_file_name;
+
                 if (!move_uploaded_file($_FILES['pdf_files']['tmp_name'][$folder_id][$j], $pdf_path)) {
-                    $_SESSION['error'] = "Erreur lors du téléchargement du PDF : $pdf_name";
+                    $_SESSION['error'] = "Erreur lors du déplacement du PDF '$pdf_name'. Vérifiez les permissions du dossier.";
+                    error_log("Failed to move file '$pdf_name' to '$pdf_path'");
                     continue;
                 }
 
-                $content_name = !empty($pdf_names[$folder_id][$j]) ? $db->real_escape_string(trim($pdf_names[$folder_id][$j])) : $pdf_file_name;
+                $content_name = !empty($pdf_names[$folder_id][$j]) ? $db->real_escape_string(trim($pdf_names[$folder_id][$j])) : $clean_name;
                 $stmt = $db->prepare("INSERT INTO course_contents (course_id, folder_id, content_type, content_name, content_path) VALUES (?, ?, 'PDF', ?, ?)");
                 $stmt->bind_param("iiss", $course_id, $folder_id, $content_name, $pdf_path);
                 $stmt->execute();
@@ -137,7 +171,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $video_url = trim($video_url);
                 if (empty($video_url)) continue;
 
-                // Validate and normalize YouTube URL
                 if (preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/', $video_url, $matches)) {
                     $video_id = $matches[4];
                     $video_url = "https://www.youtube.com/embed/$video_id";
@@ -176,24 +209,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         // New folder PDFs
         if (!empty($_FILES['new_pdf_files']['name'][$i])) {
             foreach ($_FILES['new_pdf_files']['name'][$i] as $j => $pdf_name) {
-                if ($_FILES['new_pdf_files']['error'][$i][$j] !== UPLOAD_ERR_OK || empty($pdf_name)) continue;
+                if ($_FILES['new_pdf_files']['error'][$i][$j] !== UPLOAD_ERR_OK) {
+                    $error_codes = [
+                        UPLOAD_ERR_INI_SIZE => "Le fichier '$pdf_name' dépasse la taille maximale autorisée.",
+                        UPLOAD_ERR_FORM_SIZE => "Le fichier '$pdf_name' dépasse la taille du formulaire.",
+                        UPLOAD_ERR_PARTIAL => "Le fichier '$pdf_name' n'a pas été entièrement téléchargé.",
+                        UPLOAD_ERR_NO_FILE => "Aucun fichier sélectionné pour '$pdf_name'.",
+                        UPLOAD_ERR_NO_TMP_DIR => "Dossier temporaire manquant pour '$pdf_name'.",
+                        UPLOAD_ERR_CANT_WRITE => "Impossible d'écrire le fichier '$pdf_name' sur le disque.",
+                        UPLOAD_ERR_EXTENSION => "Une extension PHP a bloqué le téléchargement de '$pdf_name'."
+                    ];
+                    $_SESSION['error'] = $error_codes[$_FILES['new_pdf_files']['error'][$i][$j]] ?? "Erreur inconnue lors du téléchargement de '$pdf_name'.";
+                    error_log("Upload error for '$pdf_name': " . $_FILES['new_pdf_files']['error'][$i][$j]);
+                    continue;
+                }
 
                 $finfo = finfo_open(FILEINFO_MIME_TYPE);
                 $mime = finfo_file($finfo, $_FILES['new_pdf_files']['tmp_name'][$i][$j]);
                 finfo_close($finfo);
                 if ($mime !== 'application/pdf') {
                     $_SESSION['error'] = "Le fichier '$pdf_name' n'est pas un PDF valide.";
+                    error_log("Invalid MIME type for '$pdf_name': $mime");
                     continue;
                 }
 
-                $pdf_file_name = time() . '_' . str_replace(' ', '_', basename($pdf_name));
-                $pdf_path = "../Uploads/pdfs/" . $pdf_file_name;
+                // Sanitize filename
+                $clean_name = preg_replace('/[^\p{L}\p{N}\-.() ]/u', '', basename($pdf_name));
+                $clean_name = str_replace(' ', '_', $clean_name);
+                $pdf_file_name = time() . '_' . $clean_name;
+                $pdf_path = $upload_dir . $pdf_file_name;
+
                 if (!move_uploaded_file($_FILES['new_pdf_files']['tmp_name'][$i][$j], $pdf_path)) {
-                    $_SESSION['error'] = "Erreur lors du téléchargement du PDF : $pdf_name";
+                    $_SESSION['error'] = "Erreur lors du déplacement du PDF '$pdf_name'. Vérifiez les permissions du dossier.";
+                    error_log("Failed to move file '$pdf_name' to '$pdf_path'");
                     continue;
                 }
 
-                $content_name = !empty($new_pdf_names[$i][$j]) ? $db->real_escape_string(trim($new_pdf_names[$i][$j])) : $pdf_file_name;
+                $content_name = !empty($new_pdf_names[$i][$j]) ? $db->real_escape_string(trim($new_pdf_names[$i][$j])) : $clean_name;
                 $stmt = $db->prepare("INSERT INTO course_contents (course_id, folder_id, content_type, content_name, content_path) VALUES (?, ?, 'PDF', ?, ?)");
                 $stmt->bind_param("iiss", $course_id, $folder_id, $content_name, $pdf_path);
                 $stmt->execute();
@@ -206,7 +258,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $video_url = trim($video_url);
                 if (empty($video_url)) continue;
 
-                // Validate and normalize YouTube URL
                 if (preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/', $video_url, $matches)) {
                     $video_id = $matches[4];
                     $video_url = "https://www.youtube.com/embed/$video_id";
@@ -224,7 +275,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         }
     }
 
-    // Log action
     $stmt = $db->prepare("INSERT INTO activity_logs (user_id, user_type, action, details) VALUES (?, 'admin', 'Edited course', ?)");
     $details = "Edited course ID $course_id: $title";
     $stmt->bind_param("is", $_SESSION['admin_id'], $details);
@@ -249,13 +299,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .course-form .card-header {
+            background-color: #1e3c72;
+        }
+        .btn-danger {
+            background-color: #e53e3e;
+            border-color: #e53e3e;
+        }
+        .btn-danger:hover {
+            background-color: #c53030;
+            border-color: #c53030;
+        }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="container mt-4">
-        <h1 class="mb-4"><i class="fas fa-edit"></i> Modifier Cours</h1>
+        <h1 class="mb-4 text-primary"><i class="fas fa-edit"></i> Modifier Cours</h1>
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
         <?php endif; ?>
         <form method="POST" enctype="multipart/form-data" class="course-form">
             <div class="card mb-4 shadow-sm">
@@ -424,7 +487,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         </form>
     </main>
 
-    <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteContentModal" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -449,7 +511,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
         $(document).ready(function() {
             let folderCount = 0;
 
-            // Add new folder
             function addFolder() {
                 folderCount++;
                 const folderHtml = `
@@ -491,7 +552,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
 
             $('#addFolder').click(addFolder);
 
-            // Add PDF
             $(document).on('click', '.add-pdf-btn', function() {
                 const folderId = $(this).data('folder');
                 const namePrefix = $(this).closest('.subfolder-card').length ? 'new_pdf_names' : 'pdf_names';
@@ -515,7 +575,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $(this).siblings('.pdf-list').append(pdfHtml);
             });
 
-            // Add Video
             $(document).on('click', '.add-video-btn', function() {
                 const folderId = $(this).data('folder');
                 const namePrefix = $(this).closest('.subfolder-card').length ? 'new_video_names' : 'video_names';
@@ -539,12 +598,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $(this).siblings('.video-list').append(videoHtml);
             });
 
-            // Remove folder or content
             $(document).on('click', '.remove-folder-btn, .remove-content-btn', function() {
                 $(this).closest('.subfolder-card, .content-item').remove();
             });
 
-            // Delete existing content
             let deleteContentId = null;
             $(document).on('click', '.delete-content-btn', function() {
                 deleteContentId = $(this).data('content-id');
