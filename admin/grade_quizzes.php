@@ -6,6 +6,9 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+// Set timezone for consistency
+date_default_timezone_set('Africa/Casablanca');
+
 $submissions = $db->query("
     SELECT qs.id, qs.quiz_id, qs.student_id, qs.response_path, qs.grade, qs.feedback, qs.submitted_at,
            q.title AS quiz_title, q.start_datetime, q.duration_hours,
@@ -45,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 </head>
@@ -65,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
                     <th>Étudiant</th>
                     <th>Quiz</th>
                     <th>Date de Soumission</th>
+                    <th>Statut</th>
                     <th>Note</th>
                     <th>Commentaires</th>
                     <th>Actions</th>
@@ -73,20 +77,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
             <tbody>
                 <?php while ($submission = $submissions->fetch_assoc()): ?>
                     <?php
-                    // Debug timestamps
-                    $start_datetime = new DateTime($submission['start_datetime'], new DateTimeZone('Africa/Casablanca'));
-                    $deadline = clone $start_datetime;
-                    $deadline->modify("+{$submission['duration_hours']} hours");
-                    $submitted_at = new DateTime($submission['submitted_at'], new DateTimeZone('Africa/Casablanca'));
-                    $is_on_time = $submitted_at <= $deadline;
-                    $row_class = $is_on_time ? 'submission-on-time' : 'submission-late';
-                    // Log for debugging
-                    error_log("Quiz: {$submission['quiz_title']}, Submitted: {$submitted_at->format('Y-m-d H:i:s')}, Deadline: {$deadline->format('Y-m-d H:i:s')}, On-time: " . ($is_on_time ? 'Yes' : 'No'));
+                    try {
+                        $start_datetime = new DateTime($submission['start_datetime'], new DateTimeZone('Africa/Casablanca'));
+                        $deadline = clone $start_datetime;
+                        // Convert duration_hours to seconds for precision
+                        $duration_seconds = $submission['duration_hours'] * 3600;
+                        $deadline->modify("+{$duration_seconds} seconds");
+                        $submitted_at = new DateTime($submission['submitted_at'], new DateTimeZone('Africa/Casablanca'));
+                        $is_on_time = $submitted_at <= $deadline;
+                        $row_class = $is_on_time ? 'submission-on-time' : 'submission-late';
+                        $status_icon = $is_on_time ? '<i class="fas fa-check-circle status-on-time" title="Soumis à temps"></i>' : '<i class="fas fa-times-circle status-late" title="Soumis en retard"></i>';
+                        error_log("Quiz: {$submission['quiz_title']}, Student: {$submission['student_name']}, " .
+                            "Submitted: {$submitted_at->format('Y-m-d H:i:s')}, " .
+                            "Start: {$start_datetime->format('Y-m-d H:i:s')}, " .
+                            "Duration: {$submission['duration_hours']} hours, " .
+                            "Deadline: {$deadline->format('Y-m-d H:i:s')}, " .
+                            "On-time: " . ($is_on_time ? 'Yes' : 'No'));
+                    } catch (Exception $e) {
+                        error_log("Error processing submission ID {$submission['id']}: {$e->getMessage()}");
+                        $row_class = 'submission-late';
+                        $status_icon = '<i class="fas fa-times-circle status-late" title="Erreur de calcul"></i>';
+                    }
                     ?>
                     <tr class="<?php echo $row_class; ?>">
                         <td><?php echo htmlspecialchars($submission['student_name']); ?></td>
                         <td><?php echo htmlspecialchars($submission['quiz_title']); ?></td>
                         <td><?php echo htmlspecialchars($submission['submitted_at']); ?></td>
+                        <td><?php echo $status_icon; ?></td>
                         <td>
                             <?php echo $submission['grade'] !== null ? number_format($submission['grade'], 2) . '/20' : '<span class="badge pending">En attente</span>'; ?>
                         </td>

@@ -68,10 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !$is_before_start) {
             mkdir($upload_dir, 0755, true);
         }
         $student = $db->query("SELECT full_name FROM students WHERE id = $student_id")->fetch_assoc();
-        $safe_full_name = preg_replace('/[^A-Za-z0-9_-]/', '_', $student['full_name']);
-        $safe_quiz_title = preg_replace('/[^A-Za-z0-9_-]/', '_', $quiz['title']);
+        $safe_full_name = preg_replace('/[^A-Za-z0-9 ]/', '', $student['full_name']);
+        $safe_quiz_title = preg_replace('/[^A-Za-z0-9 ]/', '', $quiz['title']);
         $submission_count = $submissions->num_rows + 1;
-        $file_name = $safe_full_name . '_' . $safe_quiz_title . '_v' . $submission_count . '_' . time() . '.pdf';
+        $file_name = $safe_full_name . ' - ' . $safe_quiz_title . ' v' . $submission_count . '.pdf';
         $file_path = $upload_dir . $file_name;
 
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
@@ -104,7 +104,7 @@ $stmt->execute();
     <title>Voir Quiz - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 </head>
@@ -142,19 +142,9 @@ $stmt->execute();
         <div class="content-preview" id="quiz-content">
             <?php if ($is_before_start): ?>
                 <div class="countdown-container start-countdown">
-                    <h3><i class="fas fa-clock fa-3x fa-spin"></i> En attente du début</h3>
+                    <h3><i class="fas fa-clock"></i> En attente du début</h3>
                     <p>Le quiz commencera le <?php echo htmlspecialchars($quiz['start_datetime']); ?> (GMT+1).</p>
-                    <div class="countdown-circle">
-                        <svg class="progress-ring" width="180" height="180">
-                            <defs>
-                                <linearGradient id="startGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#1e3c72" />
-                                    <stop offset="100%" style="stop-color:#9f7aea" />
-                                </linearGradient>
-                            </defs>
-                            <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="14" fill="transparent" r="80" cx="90" cy="90"/>
-                            <circle class="progress-ring-circle" stroke="url(#startGradient)" stroke-width="14" fill="transparent" r="80" cx="90" cy="90"/>
-                        </svg>
+                    <div class="countdown-timer">
                         <span id="countdown-start" class="countdown-text"></span>
                     </div>
                 </div>
@@ -185,27 +175,18 @@ $stmt->execute();
                     </div>
                 </form>
             </div>
-        <?php endif; ?>
-        <?php if (!$is_before_start): ?>
-            <div class="countdown-bar duration-countdown" id="countdown-message">
-                <div class="countdown-content">
-                    <i class="fas fa-hourglass-half fa-2x fa-pulse"></i>
-                    <span><strong>Temps restant pour soumettre :</strong></span>
-                    <div class="countdown-circle">
-                        <svg class="progress-ring" width="100" height="100">
-                            <defs>
-                                <linearGradient id="durationGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#38a169" />
-                                    <stop offset="100%" style="stop-color:#e53e3e" />
-                                </linearGradient>
-                            </defs>
-                            <circle class="progress-ring-bg" stroke="#e2e8f0" stroke-width="10" fill="transparent" r="40" cx="50" cy="50"/>
-                            <circle class="progress-ring-circle" stroke="url(#durationGradient)" stroke-width="10" fill="transparent" r="40" cx="50" cy="50"/>
-                        </svg>
-                        <span id="countdown-duration" class="countdown-text"></span>
+        </div>
+            <?php if (!$is_before_start): ?>
+                <div class="countdown-bar duration-countdown" id="countdown-message">
+                    <div class="countdown-content">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span><strong>Temps restant :</strong></span>
+                        <div class="countdown-timer">
+                            <span id="countdown-duration" class="countdown-text"></span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
         <?php endif; ?>
     </main>
     <?php include '../includes/footer.php'; ?>
@@ -215,26 +196,12 @@ $stmt->execute();
         const startTime = new Date('<?php echo $quiz['start_datetime']; ?>').getTime();
         const durationMs = <?php echo $quiz['duration_hours'] * 3600000; ?>;
         const deadlineTime = startTime + durationMs;
-        const startCircle = document.querySelector('.start-countdown .progress-ring-circle');
-        const durationCircle = document.querySelector('.duration-countdown .progress-ring-circle');
-        const startRadius = startCircle ? startCircle.r.baseVal.value : 80;
-        const durationRadius = durationCircle ? durationCircle.r.baseVal.value : 40;
-        const startCircumference = 2 * Math.PI * startRadius;
-        const durationCircumference = 2 * Math.PI * durationRadius;
-
-        if (startCircle) startCircle.style.strokeDasharray = `${startCircumference} ${startCircumference}`;
-        if (durationCircle) durationCircle.style.strokeDasharray = `${durationCircumference} ${durationCircumference}`;
 
         function formatTime(ms) {
             const hours = Math.floor(ms / 3600000);
             const minutes = Math.floor((ms % 3600000) / 60000);
             const seconds = Math.floor((ms % 60000) / 1000);
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function setProgress(circle, percent, circumference) {
-            const offset = circumference - (percent / 100) * circumference;
-            if (circle) circle.style.strokeDashoffset = offset;
         }
 
         function loadPDF() {
@@ -331,10 +298,7 @@ $stmt->execute();
 
             if (currentTime < startTime) {
                 const timeLeft = startTime - currentTime;
-                const totalTime = startTime - (new Date().getTime() - timeLeft);
-                const percent = (timeLeft / totalTime) * 100;
                 $('#countdown-start').text(formatTime(timeLeft));
-                setProgress(startCircle, percent, startCircumference);
                 if (timeLeft <= 0) {
                     quizContent.html(`
                         <h3><i class="fas fa-file-pdf"></i> Quiz</h3>
@@ -369,11 +333,8 @@ $stmt->execute();
                 }
             } else if (currentTime < deadlineTime) {
                 const timeLeft = deadlineTime - currentTime;
-                const totalTime = durationMs;
-                const percent = (timeLeft / totalTime) * 100;
                 $('#countdown-duration').text(formatTime(timeLeft));
                 $('#countdown-message').show();
-                setProgress(durationCircle, percent, durationCircumference);
                 if (timeLeft <= 0) {
                     $('#countdown-message').hide();
                     quizContent.append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');

@@ -1529,6 +1529,14 @@ body.dark-mode .feedback {
 .submission-late {
     background: #fff5f5 !important;
 }
+.status-on-time {
+    color: #38a169;
+    font-size: 1.2em;
+}
+.status-late {
+    color: #e53e3e;
+    font-size: 1.2em;
+}
 .warning-message {
     color: #d69e2e;
     background: #fefcbf;
@@ -1571,80 +1579,72 @@ body.dark-mode .feedback {
 }
 .countdown-container {
     text-align: center;
-    margin: 30px 0;
-    padding: 25px;
-    background: #f5f8fc;
-    border-radius: 12px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    animation: glow 1.5s ease-in-out infinite alternate;
+    margin: 20px 0;
+    padding: 15px;
+    background: #e6f3ff;
+    border: 1px solid #1e3c72;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .countdown-container h3 {
     color: #1e3c72;
-    font-size: 2em;
-    margin-bottom: 15px;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+    font-family: 'Roboto', sans-serif;
 }
 .countdown-container p {
-    font-size: 1.5em;
+    font-size: 1.2em;
     color: #2d3748;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
-.countdown-circle {
-    position: relative;
+.countdown-timer {
     display: inline-block;
-    width: 180px;
-    height: 180px;
+    padding: 10px 20px;
+    background: #fff;
+    border: 2px solid #1e3c72;
+    border-radius: 6px;
 }
 .countdown-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2em;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.8em;
     font-weight: 700;
     color: #1e3c72;
-    text-shadow: 0 0 10px rgba(159, 122, 234, 0.7);
-}
-.progress-ring-circle {
-    transition: stroke-dashoffset 1s linear;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
-}
-.progress-ring-bg {
-    stroke: #e2e8f0;
 }
 .countdown-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background: rgba(245, 248, 252, 0.9);
+    background: #fff;
     padding: 10px 0;
-    box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    animation: slide-up 0.5s ease-out;
 }
 .countdown-content {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 10px;
 }
-.countdown-bar .countdown-circle {
-    width: 100px;
-    height: 100px;
+.countdown-bar .countdown-timer {
+    padding: 10px 20px;
+    background: #e6f3ff;
+    border: 2px solid #1e3c72;
+    border-radius: 6px;
 }
 .countdown-bar .countdown-text {
-    font-size: 1.4em;
-    text-shadow: 0 0 8px rgba(229, 62, 62, 0.7);
+    font-size: 1.6em;
+    font-weight: 700;
+    color: #1e3c72;
 }
 .countdown-bar i {
-    color: #38a169;
+    color: #1e3c72;
+    font-size: 1.4em;
 }
 .countdown-bar span {
     font-size: 1.2em;
     color: #2d3748;
+    font-family: 'Roboto', sans-serif;
 }
 .info-message {
     color: #2b6cb0;
@@ -1653,53 +1653,28 @@ body.dark-mode .feedback {
     border-radius: 4px;
     margin-bottom: 10px;
 }
-@keyframes glow {
-    from { box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); }
-    to { box-shadow: 0 10px 30px rgba(159, 122, 234, 0.5); }
-}
-@keyframes slide-up {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
 @media (max-width: 600px) {
     .countdown-container {
-        padding: 15px;
-        margin: 20px 0;
+        padding: 10px;
+        margin: 15px 0;
     }
-    .countdown-circle {
-        width: 140px;
-        height: 140px;
+    .countdown-timer {
+        padding: 8px 15px;
     }
     .countdown-text {
-        font-size: 1.6em;
+        font-size: 1.4em;
     }
-    .progress-ring {
-        width: 140px;
-        height: 140px;
+    .countdown-bar {
+        padding: 8px 0;
     }
-    .progress-ring-circle, .progress-ring-bg {
-        r: 60;
-        cx: 70;
-        cy: 70;
-    }
-    .countdown-bar .countdown-circle {
-        width: 80px;
-        height: 80px;
+    .countdown-bar .countdown-timer {
+        padding: 8px 15px;
     }
     .countdown-bar .countdown-text {
-        font-size: 1.1em;
-    }
-    .countdown-bar .progress-ring {
-        width: 80px;
-        height: 80px;
-    }
-    .countdown-bar .progress-ring-circle, .countdown-bar .progress-ring-bg {
-        r: 32;
-        cx: 40;
-        cy: 40;
+        font-size: 1.4em;
     }
     .countdown-content {
-        gap: 10px;
+        gap: 8px;
         padding: 0 10px;
     }
 }
