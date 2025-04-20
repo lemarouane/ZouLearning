@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 19 avr. 2025 à 19:39
+-- Généré le : lun. 21 avr. 2025 à 01:50
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -222,7 +222,79 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `user_type`, `action`, `details`, 
 (186, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 3: mathos', '2025-04-19 18:38:01'),
 (187, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 3: mathos', '2025-04-19 18:38:12'),
 (188, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 3: mathos', '2025-04-19 18:38:12'),
-(189, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 3: mathos', '2025-04-19 18:38:39');
+(189, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 3: mathos', '2025-04-19 18:38:39'),
+(190, 26, 'student', 'Viewed course', 'Viewed course ID 18: Algebra', '2025-04-19 18:41:05'),
+(191, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 13: testing25', '2025-04-19 23:33:57'),
+(192, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 13: testing25', '2025-04-19 23:34:03'),
+(193, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 8: Dernier Exam', '2025-04-19 23:34:10'),
+(194, 26, 'student', 'Viewed quiz', 'Viewed quiz ID 6: Exam Analyse', '2025-04-19 23:34:19'),
+(195, 27, 'student', 'Registered', 'Student Marouane Haddad (ID 27) registered with email marouane@marouane.com', '2025-04-20 00:05:00'),
+(196, 1, 'admin', 'Added level', 'Added level: Bac+2', '2025-04-20 00:25:37'),
+(197, 1, 'admin', 'Added level', 'Added level: Bac+3', '2025-04-20 00:25:47'),
+(198, 1, 'admin', 'Added subject', 'Added subject: Mathématiques for level ID 4', '2025-04-20 00:26:03'),
+(199, 1, 'admin', 'Added subject', 'Added subject: Physiques for level ID 4', '2025-04-20 00:26:10'),
+(200, 1, 'admin', 'Added subject', 'Added subject: Informatiques for level ID 4', '2025-04-20 00:26:17'),
+(201, 1, 'admin', 'Added course', 'Added course: Analyse Mathématique for subject ID 7', '2025-04-20 00:29:35'),
+(202, 1, 'admin', 'Added course', 'Added course: Probabilités et Statistiques for subject ID 7', '2025-04-20 00:31:01'),
+(203, 1, 'admin', 'Added course', 'Added course: Mécanique Classique for subject ID 8', '2025-04-20 00:31:43'),
+(204, 1, 'admin', 'Added course', 'Added course: Thermodynamique for subject ID 8', '2025-04-20 00:37:43'),
+(205, 1, 'admin', 'Added course', 'Added course: Algorithmique et Structures de Données for subject ID 9', '2025-04-20 00:38:45'),
+(206, 1, 'admin', 'Added course', 'Added course: Bases de Données for subject ID 9', '2025-04-20 00:39:20'),
+(207, 1, 'admin', 'Edited course', 'Edited course ID 24: Analyse Mathématique', '2025-04-20 01:27:57'),
+(208, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:35:36'),
+(209, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:45:16'),
+(210, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:45:36'),
+(211, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:45:36'),
+(212, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:46:07'),
+(213, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:46:07'),
+(214, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:46:55'),
+(215, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 01:47:16'),
+(216, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 02:13:54'),
+(217, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:14:55'),
+(218, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:23:15'),
+(219, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:23:26'),
+(220, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:23:27'),
+(221, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:27:03'),
+(222, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:27:09'),
+(223, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:27:09'),
+(224, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:28:02'),
+(225, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:28:02'),
+(226, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:59:39'),
+(227, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:59:44'),
+(228, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 02:59:56'),
+(229, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 03:17:25'),
+(230, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 03:17:31'),
+(231, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 03:17:31'),
+(232, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:20:19'),
+(233, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:20:24'),
+(234, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:20:25'),
+(235, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:20:33'),
+(236, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 03:20:38'),
+(237, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 03:20:43'),
+(238, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 15: Examen Probabilités et Statistiques 2', '2025-04-20 03:20:43'),
+(239, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:21:36'),
+(240, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:28:41'),
+(241, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:28:47'),
+(242, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:28:47'),
+(243, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:30:19'),
+(244, 27, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 03:30:19'),
+(245, 28, 'student', 'Registered', 'Student Sami Haddad (ID 28) registered with email marouanehaddad08@gmail.com', '2025-04-20 03:43:49'),
+(246, 29, 'student', 'Registered', 'Student Sami Haddad (ID 29) registered with email marouanehaddad08@gmail.com', '2025-04-20 03:45:02'),
+(247, 30, 'student', 'Registered', 'Student Sami Haddad (ID 30) registered with email marouanehaddad08@gmail.com', '2025-04-20 03:46:17'),
+(248, 31, 'student', 'Registered', 'Student Sami Haddad (ID 31) registered with email marouanehaddad08@gmail.com', '2025-04-20 03:46:59'),
+(249, 32, 'student', 'Registered', 'Student Sami Haddad (ID 32) registered with email marouanehaddad08@gmail.com', '2025-04-20 03:56:36'),
+(250, 33, 'student', 'Registered', 'Student Sami Haddad (ID 33) registered with email marouanehaddad08@gmail.com', '2025-04-20 21:29:24'),
+(251, 34, 'student', 'Registered', 'Étudiant Malak Haddad (ID 34) inscrit avec email marouanehaddad08+@gmail.com', '2025-04-20 22:01:48'),
+(252, 35, 'student', 'Registered', 'Étudiant Michu Sghir (ID 35) inscrit avec email marouanehaddad08++@gmail.com', '2025-04-20 23:17:32'),
+(253, 35, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 23:48:48'),
+(254, 35, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 23:48:57'),
+(255, 35, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 23:48:57'),
+(256, 35, 'student', 'Viewed quiz', 'Viewed quiz ID 14: Examen Probabilités et Statistiques', '2025-04-20 23:49:59'),
+(257, 36, 'student', 'Registered', 'Étudiant Michu lbasel (ID 36) inscrit avec email marouanehaddad08+++@gmail.com', '2025-04-21 00:20:21'),
+(258, 37, 'student', 'Registered', 'Étudiant Maro Haddad (ID 37) inscrit avec email marouanehaddad08++++@gmail.com', '2025-04-21 00:22:43'),
+(259, 38, 'student', 'Registered', 'Étudiant Marouanee Haddad (ID 38) inscrit avec email marouanehaddad+08@gmail.com', '2025-04-21 00:24:48'),
+(260, 39, 'student', 'Registered', 'Étudiant Marouanee Haddad x (ID 39) inscrit avec email marouanehaddad08+1@gmail.com', '2025-04-21 00:26:03'),
+(261, 40, 'student', 'Registered', 'Étudiant Marouanee Haddad x (ID 40) inscrit avec email marouanehaddad08++++++@gmail.com', '2025-04-21 00:26:44');
 
 -- --------------------------------------------------------
 
@@ -263,12 +335,12 @@ CREATE TABLE `courses` (
 --
 
 INSERT INTO `courses` (`id`, `title`, `subject_id`, `difficulty`, `created_at`) VALUES
-(18, 'Algebra', 4, 'Easy', '2025-04-12 17:59:57'),
-(19, 'Thermodynamics', 5, 'Easy', '2025-04-12 18:34:32'),
-(20, 'algebre2', 4, 'Easy', '2025-04-12 19:07:29'),
-(21, 'x', 5, 'Easy', '2025-04-12 19:07:55'),
-(22, 'Base de données', 3, 'Easy', '2025-04-13 15:09:56'),
-(23, 'x', 6, 'Medium', '2025-04-16 00:54:17');
+(24, 'Analyse Mathématique', 7, 'Easy', '2025-04-20 00:29:35'),
+(25, 'Probabilités et Statistiques', 7, 'Medium', '2025-04-20 00:31:01'),
+(26, 'Mécanique Classique', 8, 'Easy', '2025-04-20 00:31:43'),
+(27, 'Thermodynamique', 8, 'Medium', '2025-04-20 00:37:43'),
+(28, 'Algorithmique et Structures de Données', 9, 'Easy', '2025-04-20 00:38:45'),
+(29, 'Bases de Données', 9, 'Medium', '2025-04-20 00:39:20');
 
 -- --------------------------------------------------------
 
@@ -291,23 +363,14 @@ CREATE TABLE `course_contents` (
 --
 
 INSERT INTO `course_contents` (`id`, `course_id`, `folder_id`, `content_type`, `content_name`, `content_path`, `created_at`) VALUES
-(25, 18, 31, 'PDF', 'Wiame', '../Uploads/pdfs/1744477678_قرار فتح المباراة (1).pdf', '2025-04-12 18:07:58'),
-(26, 18, 31, 'Video', 'intro vid', 'https://www.youtube.com/watch?v=kVpGEuLg5SM&list=RDipRPNPei3z4&index=27', '2025-04-12 18:08:42'),
-(27, 18, 31, 'Video', 'intro vid', 'https://www.youtube.com/embed/kVpGEuLg5SM', '2025-04-12 18:17:22'),
-(28, 18, 31, 'PDF', 'Wiame22', '../Uploads/pdfs/1744479059_SKM_C364e24091012400.pdf', '2025-04-12 18:30:59'),
-(29, 18, 32, 'PDF', 'Wiame Rachade', '../Uploads/pdfs/1744479059_Indemnite_F.C._2024_-_ZBITOU_JAMAL.pdf', '2025-04-12 18:30:59'),
-(30, 19, 33, 'PDF', 'Introduction', '../Uploads/pdfs/1744479437_1743297513_قرار_فتح_المباراة.pdf', '2025-04-12 18:37:17'),
-(31, 19, 33, 'Video', 'Intro video', 'https://www.youtube.com/embed/1lwkDoremGI', '2025-04-12 18:37:17'),
-(32, 19, 34, 'PDF', 'Exemples', '../Uploads/pdfs/1744479437_Calendrier_F.C._2024_-_ZBITOU_JAMAL.pdf', '2025-04-12 18:37:17'),
-(33, 19, 34, 'PDF', 'Biographie', '../Uploads/pdfs/1744479437_لائحة_المترشحين_المقبولين_لاجتياز_الاختبار_الكتابي.pdf', '2025-04-12 18:37:17'),
-(34, 18, 31, 'PDF', 'Exemples', '../Uploads/pdfs/1744481214_Indemnite_F.C._2024_-_ZBITOU_JAMAL.pdf', '2025-04-12 19:06:54'),
-(35, 21, 36, 'PDF', 'n', '../Uploads/pdfs/1744481385_Indemnite_F.C._2024_-_ZBITOU_JAMAL.pdf', '2025-04-12 19:09:45'),
-(36, 22, 37, 'PDF', 'Intro', '../Uploads/pdfs/1744553464_oncf-voyages-ismail_haddad.pdf', '2025-04-13 15:11:04'),
-(37, 22, 38, 'PDF', 'exemples', '../Uploads/pdfs/1744553464_LISTEDEF_PUB_IE1G.pdf', '2025-04-13 15:11:04'),
-(38, 22, 39, 'PDF', 'History', '../Uploads/pdfs/1744553464_Marouane_Haddad_-_CV_-_Final.pdf', '2025-04-13 15:11:04'),
-(39, 22, 40, 'PDF', 'Les tables', '../Uploads/pdfs/1744553464_Loi-cadre_06.22_Ar.pdf', '2025-04-13 15:11:04'),
-(40, 22, 40, 'PDF', 'Les relations entre les tables', '../Uploads/pdfs/1744554666_DIPLOME_MAROUANE_HADDAD..pdf', '2025-04-13 15:31:06'),
-(41, 22, 41, 'PDF', 'Mysql + Apache', '../Uploads/pdfs/1744554746_الملخص.pdf', '2025-04-13 15:32:26');
+(42, 24, 44, 'PDF', 'Introduction', '../Uploads/pdfs/1745108876_860f4edc-eba0-4d5d-bf4b-40e6cb2975402.pdf', '2025-04-20 01:27:56'),
+(43, 24, 44, 'PDF', 'Introduction2', '../Uploads/pdfs/1745108876_17439544931.pdf', '2025-04-20 01:27:56'),
+(44, 24, 45, 'PDF', 'Taylor', '../Uploads/pdfs/1745108876_1743955932الملخص.pdf', '2025-04-20 01:27:56'),
+(45, 24, 45, 'PDF', 'applications', '../Uploads/pdfs/1745108877_1743990099oncf-voyages-ismail_haddad.pdf', '2025-04-20 01:27:57'),
+(46, 24, 46, 'Video', 'Intégration', 'https://www.youtube.com/embed/1wBvuZVE7FI', '2025-04-20 01:27:57'),
+(47, 24, 46, 'Video', 'fonctions rationnelles.', 'https://www.youtube.com/embed/fcf5yoF_HEE', '2025-04-20 01:27:57'),
+(48, 24, 47, 'PDF', 'Application des séries de Fourier', '../Uploads/pdfs/1745108877_recu2.pdf', '2025-04-20 01:27:57'),
+(49, 24, 47, 'PDF', 'résolution des équations différentielles.', '../Uploads/pdfs/1745108877_AG_FITNESS_DESIGNS2.pdf', '2025-04-20 01:27:57');
 
 -- --------------------------------------------------------
 
@@ -328,19 +391,30 @@ CREATE TABLE `course_folders` (
 --
 
 INSERT INTO `course_folders` (`id`, `course_id`, `name`, `description`, `created_at`) VALUES
-(31, 18, 'les matrices', NULL, '2025-04-12 17:59:57'),
-(32, 18, 'les vecteurs', NULL, '2025-04-12 17:59:57'),
-(33, 19, 'Introduction', 'il faut bien savoir les basiques', '2025-04-12 18:34:32'),
-(34, 19, 'Exemples + Bibliographie', NULL, '2025-04-12 18:34:32'),
-(35, 20, 'test', NULL, '2025-04-12 19:07:29'),
-(36, 21, 'test', NULL, '2025-04-12 19:07:55'),
-(37, 22, 'Intro', NULL, '2025-04-13 15:09:56'),
-(38, 22, 'Exemples', NULL, '2025-04-13 15:09:56'),
-(39, 22, 'Histoire', NULL, '2025-04-13 15:09:56'),
-(40, 22, 'Les tables', NULL, '2025-04-13 15:09:56'),
-(41, 22, 'Mysql', NULL, '2025-04-13 15:32:02'),
-(42, 23, 'c', NULL, '2025-04-16 00:54:17'),
-(43, 23, 'v', NULL, '2025-04-16 00:54:17');
+(44, 24, 'Calcul des dérivées et des intégrales.', NULL, '2025-04-20 00:29:35'),
+(45, 24, 'Théorème de Taylor et applications.', NULL, '2025-04-20 00:29:35'),
+(46, 24, 'Intégration des fonctions rationnelles.', NULL, '2025-04-20 00:29:35'),
+(47, 24, 'Application des séries de Fourier dans la résolution des équations différentielles.', NULL, '2025-04-20 00:29:35'),
+(48, 25, 'Calcul des probabilités conditionnelles.', NULL, '2025-04-20 00:31:01'),
+(49, 25, 'Lois de probabilité (binomiale, normale, Poisson).', NULL, '2025-04-20 00:31:01'),
+(50, 25, 'Estimation statistique (moyenne, variance).', NULL, '2025-04-20 00:31:01'),
+(51, 25, 'Application des tests d’hypothèses.', NULL, '2025-04-20 00:31:01'),
+(52, 26, 'Étude des lois de Newton et applications pratiques.', NULL, '2025-04-20 00:31:43'),
+(53, 26, 'Mécanique des particules et des corps rigides.', NULL, '2025-04-20 00:31:43'),
+(54, 26, 'Travail et énergie, théorème de travail et énergie cinétique.', NULL, '2025-04-20 00:31:43'),
+(55, 26, 'Mouvement circulaire et gravitation universelle.', NULL, '2025-04-20 00:31:43'),
+(56, 27, 'Équations d\\\'état des gaz parfaits.', NULL, '2025-04-20 00:37:43'),
+(57, 27, 'Cycle de Carnot et rendement des moteurs thermiques.', NULL, '2025-04-20 00:37:43'),
+(58, 27, 'Entropie et transformations irréversibles.', NULL, '2025-04-20 00:37:43'),
+(59, 27, 'Applications industrielles de la thermodynamique.', NULL, '2025-04-20 00:37:43'),
+(60, 28, 'Analyse de la complexité des algorithmes.', NULL, '2025-04-20 00:38:45'),
+(61, 28, 'Algorithmes de tri (par insertion, par sélection, rapide).', NULL, '2025-04-20 00:38:45'),
+(62, 28, 'Structures de données (tableaux, listes, piles, files, arbres binaires).', NULL, '2025-04-20 00:38:45'),
+(63, 28, 'Recherche dans des bases de données.', NULL, '2025-04-20 00:38:45'),
+(64, 29, 'Création et gestion de bases de données relationnelles.', NULL, '2025-04-20 00:39:20'),
+(65, 29, 'Requêtes SQL (SELECT, INSERT, UPDATE, DELETE).', NULL, '2025-04-20 00:39:20'),
+(66, 29, 'Normalisation des bases de données.', NULL, '2025-04-20 00:39:20'),
+(67, 29, 'Relations et jointures.', NULL, '2025-04-20 00:39:20');
 
 -- --------------------------------------------------------
 
@@ -365,9 +439,8 @@ CREATE TABLE `device_attempts` (
 --
 
 INSERT INTO `device_attempts` (`id`, `student_id`, `device_fingerprint`, `device_info`, `ip_address`, `latitude`, `longitude`, `attempted_at`, `status`) VALUES
-(1, 24, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:14:49', 'pending'),
-(2, 24, '09da2cd039ab4f7b2d6f3a44ac94275e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:35:10', 'denied'),
-(3, 24, '09da2cd039ab4f7b2d6f3a44ac94275e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:35:42', 'pending');
+(4, 27, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.7354693, -5.8893217, '2025-04-20 03:31:17', 'approved'),
+(5, 35, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.7354116, -5.889319, '2025-04-20 23:43:32', 'approved');
 
 -- --------------------------------------------------------
 
@@ -387,9 +460,8 @@ CREATE TABLE `levels` (
 --
 
 INSERT INTO `levels` (`id`, `name`, `description`, `created_at`) VALUES
-(1, 'Bac+25', 'Second year post-baccalaureate', '2025-04-09 14:11:33'),
-(2, 'Bac+3', 'Third year post-baccalaureate', '2025-04-09 14:11:33'),
-(3, 'Bac+1', '', '2025-04-15 23:29:34');
+(4, 'Bac+2', 'Niveau Bac+2', '2025-04-20 00:25:37'),
+(5, 'Bac+3', 'Niveau Bac+3', '2025-04-20 00:25:47');
 
 -- --------------------------------------------------------
 
@@ -414,19 +486,8 @@ CREATE TABLE `quizzes` (
 --
 
 INSERT INTO `quizzes` (`id`, `title`, `subject_id`, `description`, `pdf_path`, `created_at`, `updated_at`, `start_datetime`, `duration_hours`) VALUES
-(1, 'Exam base de données', 1, 'Exam base de données', '../uploads/quizzes/67fc19304dd32_Resultat-final-Ingenieur-dEtat.pdf', '2025-04-13 21:06:08', '2025-04-13 21:06:08', '2025-01-01 00:00:00', 1.00),
-(2, 'test', 3, 'aze', '../uploads/quizzes/67fc1998d5308_oncf-voyages-ismail haddad.pdf', '2025-04-13 21:07:52', '2025-04-13 21:07:52', '2025-01-01 00:00:00', 1.00),
-(3, 'mathos', 4, '', '../uploads/quizzes/6803caa27d6dd_protected.pdf', '2025-04-19 17:09:06', '2025-04-19 17:09:06', '2025-04-19 17:12:00', 1.00),
-(4, 'last', 4, '', '../uploads/quizzes/6803cc907e380_1743954493_1.pdf', '2025-04-19 17:17:20', '2025-04-19 17:17:53', '0000-00-00 00:00:00', 1.00),
-(5, 'PP', 5, '', '../uploads/quizzes/6803cccdb1a37_1743954493_1.pdf', '2025-04-19 17:18:21', '2025-04-19 17:18:21', '2025-04-19 17:20:00', 1.00),
-(6, 'Exam Analyse', 4, '', '../uploads/quizzes/6803cf6eeed3c_Resume-Marouane-Haddad.pdf', '2025-04-19 17:29:34', '2025-04-19 17:29:34', '2025-04-19 17:33:00', 1.00),
-(7, 'solokat', 4, '', '../uploads/quizzes/6803d218b6f91_recu_2.pdf', '2025-04-19 17:40:56', '2025-04-19 17:40:56', '2025-04-19 17:42:00', 1.00),
-(8, 'Dernier Exam', 4, '', '../uploads/quizzes/6803d4d775be7_INGDEVINFO_2.pdf', '2025-04-19 17:52:39', '2025-04-19 17:52:52', '0000-00-00 00:00:00', 1.00),
-(9, 'last exam to be', 4, '', '../uploads/quizzes/6803d5101b450_Ingi1011.pdf', '2025-04-19 17:53:36', '2025-04-19 17:53:36', '2025-04-19 17:55:00', 1.00),
-(10, 'plz last one !!', 5, '', '../uploads/quizzes/6803d6d3dc93b_1743955932_الملخص.pdf', '2025-04-19 18:01:07', '2025-04-19 18:01:20', '0000-00-00 00:00:00', 1.00),
-(11, 'mathosx', 4, '', '../uploads/quizzes/6803d706d440e_recu_2.pdf', '2025-04-19 18:01:58', '2025-04-19 18:01:58', '2025-04-19 18:03:00', 3.00),
-(12, 'aaaa', 5, '', '../uploads/quizzes/6803da5cf28b2_1743954493_1.pdf', '2025-04-19 18:16:12', '2025-04-19 18:16:12', '2025-04-19 18:18:00', 5.00),
-(13, 'testing25', 4, '', '../uploads/quizzes/6803dcbb08623_Resume-Marouane-Haddad.pdf', '2025-04-19 18:26:19', '2025-04-19 18:26:19', '2025-04-19 18:28:00', 6.00);
+(14, 'Examen Probabilités et Statistiques', 7, '', '../uploads/quizzes/6804414f24ca9_Epreuve e.crite2_ 2023_Cour des comptes.pdf', '2025-04-20 01:35:27', '2025-04-20 01:35:27', '2025-04-20 01:37:00', 2.00),
+(15, 'Examen Probabilités et Statistiques 2', 7, '', '../uploads/quizzes/68044a8b85d76_INGDEVINFO_2.pdf', '2025-04-20 02:14:51', '2025-04-20 02:14:51', '2025-04-20 02:16:00', 1.00);
 
 -- --------------------------------------------------------
 
@@ -450,14 +511,17 @@ CREATE TABLE `quiz_submissions` (
 --
 
 INSERT INTO `quiz_submissions` (`id`, `quiz_id`, `student_id`, `response_path`, `grade`, `feedback`, `submitted_at`, `graded_at`) VALUES
-(1, 2, 21, '../uploads/quiz_submissions/67fc19a7637a3_Resultat-final-Ingenieur-dEtat.pdf', 18, 'bien', '2025-04-13 21:08:07', '2025-04-13 21:21:22'),
-(2, 6, 26, '../Uploads/quiz_submissions/Etudiant_1_Exam_Analyse.pdf', NULL, NULL, '2025-04-19 17:30:00', NULL),
-(3, 7, 26, '../Uploads/quiz_submissions/Etudiant_1_solokat.pdf', 18, 'Perfect', '2025-04-19 17:43:31', '2025-04-19 17:52:01'),
-(4, 9, 26, '../Uploads/quiz_submissions/Etudiant_1_last_exam_to_be.pdf', 19, 'Good', '2025-04-19 17:58:26', '2025-04-19 17:59:04'),
-(5, 11, 26, '../Uploads/quiz_submissions/Etudiant_1_mathosx_1745082300.pdf', NULL, NULL, '2025-04-19 18:05:00', NULL),
-(6, 12, 26, '../Uploads/quiz_submissions/Etudiant_1_aaaa_v1_1745083099.pdf', NULL, NULL, '2025-04-19 18:18:19', NULL),
-(7, 13, 26, '../Uploads/quiz_submissions/Etudiant_1_testing25_v1_1745084174.pdf', 15, 'nice', '2025-04-19 18:36:14', '2025-04-19 18:37:09'),
-(8, 3, 26, '../Uploads/quiz_submissions/Etudiant_1_mathos_v1_1745084292.pdf', 12, 'bad', '2025-04-19 18:38:12', '2025-04-19 18:38:37');
+(9, 14, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_v1_1745109936.pdf', 12, 'du mal', '2025-04-20 01:45:36', '2025-04-20 01:47:02'),
+(10, 14, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_v2_1745109967.pdf', 18, 'daba mezian', '2025-04-20 01:46:07', '2025-04-20 01:47:14'),
+(11, 15, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_2_v1_1745112206.pdf', NULL, NULL, '2025-04-20 02:23:26', NULL),
+(12, 15, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_2_v2_1745112429.pdf', NULL, NULL, '2025-04-20 02:27:09', NULL),
+(13, 15, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_2_v3_1745112482.pdf', NULL, NULL, '2025-04-20 02:28:02', NULL),
+(14, 15, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_2_v4_1745115451.pdf', NULL, NULL, '2025-04-20 03:17:31', NULL),
+(15, 14, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_v3_1745115624.pdf', NULL, NULL, '2025-04-20 03:20:24', NULL),
+(16, 15, 27, '../Uploads/quiz_submissions/Marouane_Haddad_Examen_Probabilit__s_et_Statistiques_2_v5_1745115643.pdf', NULL, NULL, '2025-04-20 03:20:43', NULL),
+(17, 14, 27, '../Uploads/quiz_submissions/Marouane_HaddadExamen_Probabilit__s_et_Statistiquesv4.pdf', NULL, NULL, '2025-04-20 03:28:47', NULL),
+(18, 14, 27, '../Uploads/quiz_submissions/Marouane Haddad - Examen Probabilits et Statistiques v5.pdf', NULL, NULL, '2025-04-20 03:30:19', NULL),
+(19, 14, 35, '../Uploads/quiz_submissions/Michu Sghir - Examen Probabilits et Statistiques v1.pdf', 18, 'Very good', '2025-04-20 23:48:57', '2025-04-20 23:49:23');
 
 -- --------------------------------------------------------
 
@@ -469,6 +533,8 @@ CREATE TABLE `students` (
   `id` int(11) NOT NULL,
   `full_name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `dob` date DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `status` enum('pending','approved','rejected') DEFAULT 'pending',
   `device_id` varchar(36) NOT NULL,
@@ -476,6 +542,8 @@ CREATE TABLE `students` (
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
   `level_id` int(11) DEFAULT NULL,
+  `gender` enum('Male','Female','Other') DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `session_status` varchar(20) DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -484,30 +552,16 @@ CREATE TABLE `students` (
 -- Déchargement des données de la table `students`
 --
 
-INSERT INTO `students` (`id`, `full_name`, `email`, `password`, `status`, `device_id`, `device_name`, `latitude`, `longitude`, `level_id`, `created_at`, `session_status`) VALUES
-(1, 'Ali BenAhmed', 'ali@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 1, '2025-04-09 14:11:33', 'active'),
-(2, 'Sara ElHadi', 'sara@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 1, '2025-04-09 14:11:33', 'active'),
-(3, 'Omar Kadir', 'omar@example.com', 'student123', 'pending', '', NULL, NULL, NULL, 2, '2025-04-09 14:11:33', 'active'),
-(4, 'Ali BenAhmedxxx', 'zouhair@t.fr', '$2y$10$4AYc9NFNR3deOwvIEpYZqe2I8Z3bHTYILhP1gcGhe7OEalA2EU3be', 'approved', '753d70d7-1d60-4aa7-a64f-db834d474fa0', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:08:27', 'active'),
-(5, 'maro', 'm@m.com', '$2y$10$fWAtt.ey7Lebi/vDVmPhvesvutEmWn40MAdVguROQJbbp45HgnWky', 'approved', 'd612b836-50be-4d3e-8155-7cb178bce63e', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:15:17', 'active'),
-(6, 'maro', 'xm@m.com', '$2y$10$9s48UTZqtfkIE1AK0a97heODFgtoDbHCvmJLgNhmfdot399E6DcXO', 'approved', '2f62cc96-e5ca-4314-b209-391c944461cd', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:34:13', 'active'),
-(8, 'mar1', 't@t.com', '$2y$10$suWT96YsjQS.ENT5z75HN.cR7.QfcmrVshwHIW/Je09LiiFAM9rue', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:41:31', 'active'),
-(9, 'mar2', 'a@a.com', '$2y$10$5hhGEDqga3S/PfDvVz5F2e3iRNbLM.2lfAUZyUAvn.JS6cSRa5PcS', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:42:35', 'active'),
-(10, 'michu', 'z@z.com', '$2y$10$HBJnNVfs6vNruoFcu6gmHuoGyIZwusNLuIsJc0BHx7mK1RG1MDCQC', 'pending', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 0.00000000, 0.00000000, NULL, '2025-04-11 00:43:22', 'active'),
-(11, 'michu2xx', 'e@e.com', '$2y$10$NzO7gmj1eHz9V4jlswQJAemhtgglpJtQw3HUu5pHvAsJxMqAWHXqq', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, 1, '2025-04-11 00:44:09', 'active'),
-(12, 'mar3', 'r@r.com', '$2y$10$R.2RWfwqEwbvQQalHgHpGO98VFQxQaN6Oqsy2c5MRwHc2kK09WK8a', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73547220, -5.88933500, NULL, '2025-04-11 01:03:58', 'active'),
-(15, 'MAROUANE HADDAD', 'marouanehaddad08@gmail.com', '$2y$10$7s70Iv31utajASfMtSBf0u0XuKFMkjF.3WL8S1Mj2Y7d5WlWYRSdG', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73548510, -5.88934810, 1, '2025-04-11 02:45:16', 'active'),
-(16, 'MAROUANE HADDAD', 'marouanehaddad09@gmail.com', '$2y$10$IcJNMIXlXllII1p90A9mcesWVNTgtlzTCuG9x/mcpyIUN1gQ34Vvq', 'approved', '604f2ea3-7488-4c2e-ad6b-4b541e0d56e9', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73549920, -5.88935180, 1, '2025-04-11 03:23:54', 'active'),
-(17, 'Marouane Sami', 'm@m.fr', '$2y$10$lEXoCLx8NTxkTPfuTJA/0.hoFXDSNuBq27mRxdqjpEhPjvO6rlPMS', 'approved', '275f8639-96f8-4db7-b9db-4d61d10d95e2', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73270000, -5.89160000, 1, '2025-04-11 11:27:49', 'active'),
-(18, 'Wiame Rachade', 'w@w.com', '$2y$10$obIdwu7T9uwB4v0KGWDwLOfaMvMR0ijM2PSV63Jey90QF6NRhFxNq', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73747000, -5.89478800, 2, '2025-04-11 15:48:48', 'active'),
-(19, 'michu haddad', 'x@x.x', '$2y$10$zZaeqYT4xf6u1xNEbRwA2.4cQFRe2tIwWmfaf0cE.dq3SDxp92hS.', 'approved', '9bb8c812-974b-4ca7-b6d4-f420700508c3', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.75644160, -5.77044480, 2, '2025-04-12 16:05:04', 'active'),
-(20, 'Wiame Rachade', 'v@v.v', '$2y$10$L77ck8f2bargustfnCjJGeWW9.Q7z4BcU649c5oQChQjSeKLJQvba', 'approved', 'd1c73fa8-f52c-4f8a-b182-4045853c9ccb', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73408900, -5.88688100, 2, '2025-04-12 18:31:53', 'active'),
-(21, 'michu weldi', 'michu@michu.com', '$2y$10$jYM9ybvteIwjDOiPFfaZVe/6L01C7Mb3/cM7oXJDs2GFZ5mCywNq6', 'approved', 'd3921bd3-7ebc-4f84-ac2b-9cd8f2b8c4d1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', 35.73552950, -5.88930730, 1, '2025-04-13 15:13:11', 'active'),
-(22, 'ghazali', 'g@g.g', '$2y$10$EU6vZTFMTbt4M17Y8lBjNOAIoi5Vd2zYIRcm3nF5u6drn/KoBKN8y', 'approved', '', NULL, NULL, NULL, 2, '2025-04-14 23:49:17', 'active'),
-(23, 'mar mar', '1@1.1', '$2y$10$WPn0GLRViHHNbZc/JNHDLurutwx6KxwHvGZu5YQklJ71AxaTcUHhK', 'approved', '', NULL, NULL, NULL, NULL, '2025-04-15 00:11:29', 'active'),
-(24, 'mar mar 55', 'm@m.mx', '$2y$10$dbZHI2AjwotZHAxbMrB7L.zLgyooKwppBIRyYbYaWGr.Sf6WNXxWq', 'approved', '', NULL, NULL, NULL, 1, '2025-04-15 00:12:13', 'active'),
-(25, 'MAROUANE HADDAD', 'marouanehaddad08+1@gmail.com', '$2y$10$5fqFcsiJzOuwgPOoxdlbgOtQ7UBUosL4cZCTvTOsm4z3BVzLT5kIa', 'approved', '', NULL, NULL, NULL, NULL, '2025-04-15 01:48:37', 'active'),
-(26, 'Etudiant 1', 'b@b.b', '$2y$10$WbULRnHmoF2x7etLlI7zqOFcKaKp/LOtwNHiMg0lx5xE2g4V1/cye', 'approved', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 34.70000000, -1.90000000, 2, '2025-04-19 17:15:29', 'active');
+INSERT INTO `students` (`id`, `full_name`, `email`, `phone`, `dob`, `password`, `status`, `device_id`, `device_name`, `latitude`, `longitude`, `level_id`, `gender`, `city`, `created_at`, `session_status`) VALUES
+(27, 'Marouane Haddad', 'marouane@marouane.com', NULL, NULL, '$2y$10$xGi/jzOfhwDo35J7pwHFV.EBcUYKXyRxXs1kMNKZmvWcaV4JEriNC', 'approved', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73553800, -5.88974100, 4, NULL, NULL, '2025-04-20 00:04:59', 'active'),
+(33, 'Sami Haddad', 'marouanehaddad08@gmail.com', NULL, NULL, '$2y$10$cbVJciCK5Xocgts/UCIZLuQWP7ZrX.F81ynatgLpXHLk9hncljibC', 'approved', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73498500, -5.88968800, NULL, NULL, NULL, '2025-04-20 21:29:24', 'active'),
+(34, 'Malak Haddad', 'marouanehaddad08+@gmail.com', '0613508702', '2009-04-20', '$2y$10$cSr4YqZYvDHOqwifmLLoxeKQ3u.IYVi1I6tqOMcfHGCg0YHJ85hai', 'approved', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73525600, -5.88975000, 4, 'Male', 'Tanger', '2025-04-20 22:01:47', 'active'),
+(35, 'Michu Sghir', 'marouanehaddad08++@gmail.com', '0613508702', '2002-02-12', '$2y$10$InRLzwZNi02P1nBq/PpljO8APQ5lKk5ZEGKQZenDP4Pl6Qa.clZTa', 'approved', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73523700, -5.88974900, 4, 'Male', 'Kenitra', '2025-04-20 23:17:32', 'active'),
+(36, 'Michu lbasel', 'marouanehaddad08+++@gmail.com', '0613508702', '2000-04-21', '$2y$10$.g29lhoB4WZkurkWKp4jjO0Gxb3vaE0TCV/P/q12HOeN57ru5HIqa', 'pending', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73552300, -5.88974400, NULL, 'Male', 'Kenitra', '2025-04-21 00:20:21', 'active'),
+(37, 'Maro Haddad', 'marouanehaddad08++++@gmail.com', '0613508702', '2001-04-21', '$2y$10$ykTb328zYZ0ZucxhY0NrY.e5pU2KvFzcLiglZTU6gtsDJepILLy1K', 'pending', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73520700, -5.88976500, NULL, 'Female', 'Kenitra', '2025-04-21 00:22:43', 'active'),
+(38, 'Marouanee Haddad', 'marouanehaddad+08@gmail.com', '0613508702', '2001-04-21', '$2y$10$xiNepa0GciNkCEeboU4WhOPldji9zCxtZQJHaOFW8oXMAtd6J8Vp.', 'pending', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73523300, -5.88974400, NULL, 'Male', 'Kenitra', '2025-04-21 00:24:48', 'active'),
+(39, 'Marouanee Haddad x', 'marouanehaddad08+1@gmail.com', '0613508702', '2001-04-21', '$2y$10$L9ugu9Q0AnFggrgpbntkCekusEn96e8iAlQsIQN4vmCOCHLRlkzi6', 'pending', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73521800, -5.88976700, NULL, 'Female', 'Kenitra', '2025-04-21 00:26:03', 'active'),
+(40, 'Marouanee Haddad x', 'marouanehaddad08++++++@gmail.com', '0613508702', '2000-04-21', '$2y$10$APfcW8COKs1ZhbzrvV4UDu7TsyttMbiGe0Qp9UaNhCQf8FH/7Trei', 'pending', '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', 35.73522600, -5.88975000, NULL, 'Male', 'Kenitra', '2025-04-21 00:26:44', 'active');
 
 -- --------------------------------------------------------
 
@@ -527,17 +581,18 @@ CREATE TABLE `student_courses` (
 --
 
 INSERT INTO `student_courses` (`id`, `student_id`, `course_id`, `assigned_at`) VALUES
-(5, 20, 18, '2025-04-12 19:05:45'),
-(6, 21, 22, '2025-04-13 15:19:47'),
-(7, 22, 18, '2025-04-14 23:51:14'),
-(8, 22, 20, '2025-04-14 23:51:14'),
-(10, 24, 18, '2025-04-15 00:36:31'),
-(11, 24, 20, '2025-04-15 00:36:31'),
-(13, 24, 22, '2025-04-15 00:36:43'),
-(14, 26, 18, '2025-04-19 17:16:20'),
-(15, 26, 20, '2025-04-19 17:16:20'),
-(17, 26, 19, '2025-04-19 17:16:20'),
-(18, 26, 21, '2025-04-19 17:16:20');
+(20, 27, 24, '2025-04-20 01:34:14'),
+(21, 27, 25, '2025-04-20 01:34:14'),
+(23, 27, 26, '2025-04-20 01:34:14'),
+(24, 27, 27, '2025-04-20 01:34:14'),
+(26, 27, 28, '2025-04-20 01:34:26'),
+(31, 34, 24, '2025-04-20 22:58:04'),
+(32, 34, 25, '2025-04-20 22:58:04'),
+(46, 35, 24, '2025-04-21 00:00:12'),
+(47, 35, 28, '2025-04-21 00:00:27'),
+(48, 35, 29, '2025-04-21 00:00:27'),
+(49, 35, 26, '2025-04-21 00:01:08'),
+(50, 35, 27, '2025-04-21 00:01:08');
 
 -- --------------------------------------------------------
 
@@ -562,11 +617,17 @@ CREATE TABLE `student_devices` (
 --
 
 INSERT INTO `student_devices` (`id`, `student_id`, `device_fingerprint`, `device_info`, `ip_address`, `latitude`, `longitude`, `created_at`, `status`) VALUES
-(1, 23, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 00:11:29', 'approved'),
-(2, 24, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 00:12:13', 'approved'),
-(3, 24, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.735304, -5.8893164, '2025-04-15 00:15:05', 'approved'),
-(4, 25, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735371, -5.889729, '2025-04-15 01:48:37', 'approved'),
-(5, 26, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 34.7, -1.9, '2025-04-19 17:15:29', 'approved');
+(6, 27, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735538, -5.889741, '2025-04-20 00:05:00', 'approved'),
+(7, 27, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.7354693, -5.8893217, '2025-04-20 03:31:31', 'approved'),
+(13, 33, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.734985, -5.889688, '2025-04-20 21:29:24', 'approved'),
+(14, 34, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735256, -5.88975, '2025-04-20 22:01:48', 'approved'),
+(15, 35, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735237, -5.889749, '2025-04-20 23:17:32', 'approved'),
+(16, 35, '16c093bd15fdb2fe0e095ce2c780b3aa', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1', 35.7354116, -5.889319, '2025-04-20 23:43:42', 'approved'),
+(17, 36, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735523, -5.889744, '2025-04-21 00:20:21', 'approved'),
+(18, 37, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735207, -5.889765, '2025-04-21 00:22:43', 'approved'),
+(19, 38, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735233, -5.889744, '2025-04-21 00:24:48', 'approved'),
+(20, 39, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735218, -5.889767, '2025-04-21 00:26:03', 'approved'),
+(21, 40, '9e471bbddb32cf5bc453ea260583c215', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1', 35.735226, -5.88975, '2025-04-21 00:26:44', 'approved');
 
 -- --------------------------------------------------------
 
@@ -587,35 +648,13 @@ CREATE TABLE `student_subjects` (
 --
 
 INSERT INTO `student_subjects` (`id`, `student_id`, `subject_id`, `assigned_at`, `all_courses`) VALUES
-(1, 2, 1, '2025-04-09 14:11:33', 0),
-(2, 2, 2, '2025-04-09 14:11:33', 0),
-(3, 3, 4, '2025-04-09 14:11:33', 0),
-(4, 1, 4, '2025-04-09 16:08:36', 0),
-(5, 1, 5, '2025-04-09 16:08:36', 0),
-(6, 5, 3, '2025-04-11 00:29:23', 0),
-(7, 6, 3, '2025-04-11 00:40:36', 0),
-(8, 4, 3, '2025-04-11 01:39:13', 0),
-(9, 8, 3, '2025-04-11 01:39:55', 0),
-(10, 9, 3, '2025-04-11 02:19:07', 0),
-(11, 9, 1, '2025-04-11 02:19:07', 0),
-(12, 11, 3, '2025-04-11 02:22:21', 0),
-(13, 11, 1, '2025-04-11 02:22:21', 0),
-(14, 15, 3, '2025-04-11 02:46:06', 1),
-(15, 15, 1, '2025-04-11 02:46:06', 0),
-(16, 16, 3, '2025-04-11 03:25:07', 0),
-(21, 17, 1, '2025-04-11 12:05:37', 0),
-(22, 17, 3, '2025-04-11 12:13:49', 1),
-(24, 18, 4, '2025-04-11 15:49:25', 1),
-(25, 18, 5, '2025-04-11 15:50:02', 0),
-(26, 19, 4, '2025-04-12 16:07:27', 0),
-(28, 20, 5, '2025-04-12 18:33:28', 1),
-(29, 20, 4, '2025-04-12 19:05:45', 0),
-(30, 21, 3, '2025-04-13 15:19:47', 1),
-(31, 22, 4, '2025-04-14 23:51:14', 1),
-(32, 24, 4, '2025-04-15 00:36:31', 1),
-(33, 24, 3, '2025-04-15 00:36:43', 0),
-(34, 26, 4, '2025-04-19 17:16:20', 1),
-(35, 26, 5, '2025-04-19 17:16:20', 1);
+(36, 27, 7, '2025-04-20 01:34:14', 1),
+(37, 27, 8, '2025-04-20 01:34:14', 1),
+(38, 27, 9, '2025-04-20 01:34:26', 0),
+(43, 34, 7, '2025-04-20 22:58:04', 1),
+(50, 35, 7, '2025-04-21 00:00:12', 0),
+(51, 35, 9, '2025-04-21 00:00:27', 0),
+(52, 35, 8, '2025-04-21 00:01:08', 1);
 
 -- --------------------------------------------------------
 
@@ -635,12 +674,9 @@ CREATE TABLE `subjects` (
 --
 
 INSERT INTO `subjects` (`id`, `name`, `level_id`, `created_at`) VALUES
-(1, 'Maths', 1, '2025-04-09 14:11:33'),
-(2, 'Physics', 1, '2025-04-09 14:11:33'),
-(3, 'Informatics', 1, '2025-04-09 14:11:33'),
-(4, 'Maths', 2, '2025-04-09 14:11:33'),
-(5, 'Physics', 2, '2025-04-09 14:11:33'),
-(6, 'fitlife', 3, '2025-04-15 23:39:34');
+(7, 'Mathématiques', 4, '2025-04-20 00:26:03'),
+(8, 'Physiques', 4, '2025-04-20 00:26:10'),
+(9, 'Informatiques', 4, '2025-04-20 00:26:17');
 
 -- --------------------------------------------------------
 
@@ -664,25 +700,19 @@ CREATE TABLE `user_sessions` (
 --
 
 INSERT INTO `user_sessions` (`id`, `student_id`, `login_time`, `logout_time`, `latitude`, `longitude`, `device_info`, `ip_address`) VALUES
-(1, 24, '2025-04-15 00:29:39', '2025-04-15 00:30:14', 35.735371, -5.889729, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(2, 24, '2025-04-15 00:34:56', '2025-04-15 01:47:56', 35.735371, -5.889729, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(3, 24, '2025-04-16 01:08:42', '2025-04-16 21:42:02', 35.735371, -5.889729, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(4, 24, '2025-04-16 21:53:49', '2025-04-16 21:53:57', 35.734463, -5.889782, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(5, 24, '2025-04-16 21:56:45', '2025-04-16 23:47:19', 35.734463, -5.889782, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(6, 24, '2025-04-16 21:56:49', '2025-04-16 23:47:19', 35.734463, -5.889782, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(7, 24, '2025-04-16 21:56:53', '2025-04-16 23:47:19', 35.734463, -5.889782, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(8, 24, '2025-04-16 21:57:02', '2025-04-16 22:20:32', 35.734463, -5.889782, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(9, 24, '2025-04-16 22:20:42', '2025-04-16 23:44:40', 35.734463, -5.889782, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(10, 24, '2025-04-16 23:44:45', '2025-04-16 23:46:58', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(11, 24, '2025-04-16 23:47:02', '2025-04-16 23:50:39', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(12, 24, '2025-04-16 23:50:42', '2025-04-16 23:50:58', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(13, 24, '2025-04-16 23:51:05', '2025-04-16 23:54:50', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(14, 24, '2025-04-16 23:51:09', '2025-04-16 23:54:50', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(15, 24, '2025-04-16 23:51:13', '2025-04-16 23:54:50', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(16, 24, '2025-04-16 23:54:28', '2025-04-16 23:54:50', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(17, 24, '2025-04-16 23:55:06', '2025-04-16 23:56:28', 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(18, 24, '2025-04-16 23:58:34', NULL, 35.73526, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
-(19, 26, '2025-04-19 17:15:39', NULL, 34.7, -1.9, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1');
+(20, 27, '2025-04-20 00:05:13', '2025-04-20 00:24:51', 35.735538, -5.889741, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(21, 27, '2025-04-20 00:25:00', '2025-04-20 03:16:22', 35.735538, -5.889741, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(22, 27, '2025-04-20 03:17:13', '2025-04-20 03:43:21', 35.735538, -5.889741, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(23, 27, '2025-04-20 03:31:51', '2025-04-20 21:30:26', 35.7354693, -5.8893217, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36', '::1'),
+(24, 33, '2025-04-20 21:29:28', '2025-04-20 21:29:57', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(25, 34, '2025-04-20 22:02:33', '2025-04-20 22:09:03', 35.735256, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(26, 34, '2025-04-20 22:09:11', NULL, 35.735256, -5.88975, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(27, 34, '2025-04-20 22:09:31', '2025-04-20 22:24:12', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(28, 34, '2025-04-20 22:30:11', '2025-04-20 22:30:33', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(29, 34, '2025-04-20 22:30:39', '2025-04-20 23:16:17', NULL, NULL, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(30, 35, '2025-04-20 23:17:48', '2025-04-20 23:28:05', 35.735237, -5.889749, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(31, 35, '2025-04-20 23:28:18', '2025-04-20 23:28:20', 35.735237, -5.889749, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1'),
+(32, 35, '2025-04-20 23:30:25', '2025-04-21 00:19:42', 35.735237, -5.889749, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0', '::1');
 
 --
 -- Index pour les tables déchargées
@@ -806,7 +836,7 @@ ALTER TABLE `user_sessions`
 -- AUTO_INCREMENT pour la table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=190;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=262;
 
 --
 -- AUTO_INCREMENT pour la table `admins`
@@ -818,79 +848,79 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT pour la table `courses`
 --
 ALTER TABLE `courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT pour la table `course_contents`
 --
 ALTER TABLE `course_contents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT pour la table `course_folders`
 --
 ALTER TABLE `course_folders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT pour la table `device_attempts`
 --
 ALTER TABLE `device_attempts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `levels`
 --
 ALTER TABLE `levels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT pour la table `quizzes`
 --
 ALTER TABLE `quizzes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT pour la table `quiz_submissions`
 --
 ALTER TABLE `quiz_submissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT pour la table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT pour la table `student_courses`
 --
 ALTER TABLE `student_courses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT pour la table `student_devices`
 --
 ALTER TABLE `student_devices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `student_subjects`
 --
 ALTER TABLE `student_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT pour la table `subjects`
 --
 ALTER TABLE `subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT pour la table `user_sessions`
 --
 ALTER TABLE `user_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- Contraintes pour les tables déchargées
