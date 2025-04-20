@@ -11,15 +11,44 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
     $attempt_id = (int)$_GET['id'];
     $action = $_GET['action'];
 
-    $attempt = $db->query("SELECT student_id, device_fingerprint, device_info, ip_address, latitude, longitude FROM device_attempts WHERE id = $attempt_id AND status = 'pending'")->fetch_assoc();
+    $attempt = $db->query("SELECT da.student_id, da.device_fingerprint, da.device_info, da.ip_address, da.latitude, da.longitude, s.full_name, s.email
+                           FROM device_attempts da
+                           JOIN students s ON da.student_id = s.id
+                           WHERE da.id = $attempt_id AND da.status = 'pending'")->fetch_assoc();
 
     if ($attempt) {
         if ($action === 'approve') {
-            $stmt = $db->prepare("INSERT INTO student_devices (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, created_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'approved')");
-            $stmt->bind_param("isssdd", $attempt['student_id'], $attempt['device_fingerprint'], $attempt['device_info'], $attempt['ip_address'], $attempt['latitude'], $attempt['longitude']);
+            $stmt = $db->prepare("INSERT INTO student_devices (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, created_at, status) 
+                                  VALUES (?, ?, ?, ?, ?, ?, NOW(), 'approved')");
+            $stmt->bind_param("isssdd", $attempt['student_id'], $attempt['device_fingerprint'], $attempt['device_info'], 
+                             $attempt['ip_address'], $attempt['latitude'], $attempt['longitude']);
             $stmt->execute();
 
             $db->query("UPDATE device_attempts SET status = 'approved' WHERE id = $attempt_id");
+
+            // Send approval email
+            $webhook_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+            $post_data = json_encode([
+                'event' => 'approval',
+                'full_name' => $attempt['full_name'],
+                'email' => $attempt['email'],
+                'details' => ['deviceId' => $attempt['device_fingerprint']]
+            ]);
+
+            $ch = curl_init($webhook_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($http_code != 200) {
+                error_log("Failed to send approval email: HTTP $http_code, Response: $response");
+            } else {
+                error_log("Approval email sent successfully for device: " . $attempt['device_fingerprint']);
+            }
         } elseif ($action === 'deny') {
             $db->query("UPDATE device_attempts SET status = 'denied' WHERE id = $attempt_id");
         }

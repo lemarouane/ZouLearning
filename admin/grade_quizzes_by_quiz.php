@@ -23,7 +23,7 @@ if (!$quiz) {
 
 $submissions = $db->query("
     SELECT qs.id, qs.quiz_id, qs.student_id, qs.response_path, qs.grade, qs.feedback, qs.submitted_at,
-           q.start_datetime, q.duration_hours, s.full_name AS student_name
+           q.start_datetime, q.duration_hours, s.full_name AS student_name, s.email
     FROM quiz_submissions qs
     JOIN quizzes q ON qs.quiz_id = q.id
     JOIN students s ON qs.student_id = s.id
@@ -44,6 +44,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
         $stmt->bind_param("dsi", $grade, $feedback, $submission_id);
         if ($stmt->execute()) {
             $success = "Note et commentaire enregistrés avec succès.";
+
+            // Send grade_given email
+            $student = $db->query("SELECT s.full_name, s.email FROM quiz_submissions qs 
+                                   JOIN students s ON qs.student_id = s.id 
+                                   WHERE qs.id = $submission_id")->fetch_assoc();
+            $webhook_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+            $post_data = json_encode([
+                'event' => 'grade_given',
+                'full_name' => $student['full_name'],
+                'email' => $student['email'],
+                'details' => [
+                    'quiz' => $quiz['title'],
+                    'grade' => number_format($grade, 2) . '/20',
+                    'comment' => $feedback ?: 'Aucun'
+                ]
+            ]);
+
+            $ch = curl_init($webhook_url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+            $response = curl_exec($ch);
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($http_code != 200) {
+                error_log("Failed to send grade_given email: HTTP $http_code, Response: $response");
+            } else {
+                error_log("Grade_given email sent successfully for quiz: " . $quiz['title']);
+            }
         } else {
             $errors[] = "Erreur lors de l'enregistrement.";
         }
@@ -92,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
                     try {
                         $start_datetime = new DateTime($submission['start_datetime'], new DateTimeZone('Africa/Casablanca'));
                         $deadline = clone $start_datetime;
-                        // Convert duration_hours to seconds for precision
                         $duration_seconds = $submission['duration_hours'] * 3600;
                         $deadline->modify("+{$duration_seconds} seconds");
                         $submitted_at = new DateTime($submission['submitted_at'], new DateTimeZone('Africa/Casablanca'));

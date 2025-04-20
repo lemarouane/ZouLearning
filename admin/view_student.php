@@ -74,7 +74,7 @@ function getLocationName($lat, $lon) {
         elseif ($city) return $city;
         elseif ($address['country']) return $address['country'];
     }
-    return 'Unknown Location';
+    return 'Inconnu';
 }
 unset($subject);
 ?>
@@ -87,6 +87,18 @@ unset($subject);
     <title>Voir Étudiant - Zouhair E-Learning</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .dashboard { max-width: 1400px; margin: 0 auto; padding: 1.5rem; font-family: 'Inter', sans-serif; background: #f5f8fc; color: #2d3748; }
+        h1 { font-size: 1.5rem; color: #1e3c72; margin-bottom: 1.25rem; }
+        .detail-card { background: #fff; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .detail-card h3 { font-size: 1.25rem; color: #1e3c72; margin-bottom: 1rem; }
+        .detail-card p { margin: 0.5rem 0; font-size: 0.9rem; }
+        .form-actions { margin-top: 1.5rem; }
+        .btn-action { background: #1e3c72; color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; text-decoration: none; margin-right: 1rem; }
+        .btn-action:hover { background: #152a55; }
+        .btn-action.back { background: #6b7280; }
+        .btn-action.back:hover { background: #4b5563; }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -96,6 +108,10 @@ unset($subject);
             <h3><i class="fas fa-info-circle"></i> Informations</h3>
             <p><strong>Nom :</strong> <?php echo htmlspecialchars($student['full_name']); ?></p>
             <p><strong>Email :</strong> <?php echo htmlspecialchars($student['email']); ?></p>
+            <p><strong>Téléphone :</strong> <?php echo htmlspecialchars($student['phone'] ?? 'N/A'); ?></p>
+            <p><strong>Date de Naissance :</strong> <?php echo htmlspecialchars($student['dob'] ?? 'N/A'); ?></p>
+            <p><strong>Genre :</strong> <?php echo htmlspecialchars($student['gender'] ? ($student['gender'] === 'Male' ? 'Homme' : ($student['gender'] === 'Female' ? 'Femme' : 'Autre')) : 'N/A'); ?></p>
+            <p><strong>Ville :</strong> <?php echo htmlspecialchars($student['city'] ?? 'N/A'); ?></p>
             <p><strong>Validé :</strong> <?php echo $student['status'] == 'approved' ? 'Oui' : 'Non'; ?></p>
             <p><strong>Créé :</strong> <?php echo $student['created_at']; ?></p>
             <p><strong>ID Appareil :</strong> <?php echo htmlspecialchars($student['device_id']); ?></p>

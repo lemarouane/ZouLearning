@@ -25,6 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = isset($_POST['status']) && $_POST['status'] == 'approved' ? 'approved' : 'pending';
     $level_id = (int)$_POST['level_id'];
 
+    // Check if level_id changed
+    $level_changed = $student['level_id'] != $level_id;
+    $new_level_name = '';
+    if ($level_changed) {
+        $level_result = $db->query("SELECT name FROM levels WHERE id = $level_id");
+        $new_level_name = $level_result->fetch_assoc()['name'] ?? 'Nouveau Niveau';
+    }
+
     $stmt = $db->prepare("UPDATE students SET full_name = ?, email = ?, status = ?, level_id = ? WHERE id = ?");
     $stmt->bind_param("sssii", $full_name, $email, $status, $level_id, $student_id);
     $stmt->execute();
@@ -36,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Handle new assignments
+    $new_courses = [];
     if (isset($_POST['subject_ids'])) {
         $subject_ids = array_map('intval', $_POST['subject_ids']);
         
@@ -58,6 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       SELECT ?, id FROM courses WHERE subject_id = ?");
                 $stmt->bind_param("ii", $student_id, $subject_id);
                 $stmt->execute();
+
+                // Get subject name for email
+                $subject_result = $db->query("SELECT name FROM subjects WHERE id = $subject_id");
+                $new_courses[] = $subject_result->fetch_assoc()['name'] ?? 'Matière';
             }
         } 
         // "Specific Courses" mode
@@ -73,7 +86,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
                 $stmt->bind_param("ii", $student_id, $course_id);
                 $stmt->execute();
+
+                // Get course title for email
+                $course_result = $db->query("SELECT title FROM courses WHERE id = $course_id");
+                $new_courses[] = $course_result->fetch_assoc()['title'] ?? 'Cours';
             }
+        }
+    }
+
+    // Send course_added or level_added email if applicable
+    if (!empty($new_courses) || $level_changed) {
+        $webhook_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+        $course_text = !empty($new_courses) ? implode(', ', $new_courses) : $new_level_name;
+        $post_data = json_encode([
+            'event' => 'course_added',
+            'full_name' => $full_name,
+            'email' => $email,
+            'details' => ['course' => $course_text]
+        ]);
+
+        $ch = curl_init($webhook_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+        $response = curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($http_code != 200) {
+            error_log("Failed to send course_added email: HTTP $http_code, Response: $response");
+        } else {
+            error_log("Course_added email sent successfully: $course_text");
         }
     }
 
@@ -183,7 +227,7 @@ while ($row = $course_result->fetch_assoc()) {
                 <div class="form-group">
                     <label><i class="fas fa-book"></i> Cours</label>
                     <select name="course_ids[]" id="courseIds" multiple>
-                        <option value="">Choisir des matières d'abord</option>
+                        <option value="">Choisir féminin d'abord</option>
                     </select>
                     <div class="checkbox-group">
                         <input type="checkbox" name="all_courses" id="allCourses" value="1">
