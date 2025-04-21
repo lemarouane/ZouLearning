@@ -138,9 +138,9 @@ $graded_quizzes = $db->query("
                 <p><?php echo $total_subjects; ?></p>
             </div>
             <div class="stat-card">
-    <h3><i class="fas fa-question-circle"></i> Notifications Quiz</h3>
-    <p><a href="quizzes.php"><?php echo $new_quizzes; ?> nouveaux quiz</a></p>
-    <p><a href="quizzes.php"><?php echo $graded_quizzes; ?> quiz notés</a></p>
+    <h3><i class="fas fa-question-circle"></i> Notifications Examens</h3>
+    <p><a href="quizzes.php"><?php echo $new_quizzes; ?> nouveaux Examens</a></p>
+    <p><a href="quizzes.php"><?php echo $graded_quizzes; ?> Examens notés</a></p>
 </div>
             <div class="stat-card">
                 <h3><i class="fas fa-layer-group"></i> Niveau</h3>
