@@ -46,6 +46,8 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gérer les Étudiants - Zouhair E-Learning</title>
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
