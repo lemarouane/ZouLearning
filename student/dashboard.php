@@ -113,6 +113,8 @@ $graded_quizzes = $db->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord - Zouhair E-Learning</title>
+    <link rel="icon" type="image/png" href="../assets/img/logo.png">
+
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
