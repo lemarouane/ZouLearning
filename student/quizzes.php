@@ -31,7 +31,7 @@ $quizzes = $db->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Quiz - Zouhair E-Learning</title>
+    <title>Mes Examens - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
     <link rel="stylesheet" href="../assets/css/admin.css">
@@ -43,7 +43,7 @@ $quizzes = $db->query("
 <body>
     <?php include '../includes/student_header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-question-circle"></i> Mes Quiz</h1>
+        <h1><i class="fas fa-question-circle"></i> Mes Examens</h1>
         <table id="quizzesTable" class="course-table">
             <thead>
                 <tr>

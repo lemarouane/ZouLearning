@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-edit"></i> Modifier un Quiz</h1>
+        <h1><i class="fas fa-edit"></i> Modifier un Examen</h1>
         <?php foreach ($errors as $error): ?>
             <p class="error-message"><?php echo $error; ?></p>
         <?php endforeach; ?>

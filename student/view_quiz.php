@@ -101,7 +101,7 @@ $stmt->execute();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voir Quiz - Zouhair E-Learning</title>
+    <title>Voir Examen - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
     <link rel="stylesheet" href="../assets/css/admin.css">
@@ -113,7 +113,7 @@ $stmt->execute();
 <body oncontextmenu="return false;">
     <?php include '../includes/student_header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-question-circle"></i> Détails du Quiz</h1>
+        <h1><i class="fas fa-question-circle"></i> Détails d'Examen</h1>
         <?php if ($success): ?>
             <p class="success-message"><?php echo $success; ?></p>
         <?php endif; ?>
@@ -121,7 +121,7 @@ $stmt->execute();
             <p class="error-message"><?php echo $error; ?></p>
         <?php endforeach; ?>
         <div class="detail-card">
-            <h3><i class="fas fa-info-circle"></i> Informations sur le Quiz</h3>
+            <h3><i class="fas fa-info-circle"></i> Informations sur l'Examen</h3>
             <p><strong>Titre :</strong> <?php echo htmlspecialchars($quiz['title']); ?></p>
             <p><strong>Matière :</strong> <?php echo htmlspecialchars($quiz['subject_name']); ?></p>
             <p><strong>Niveau :</strong> <?php echo htmlspecialchars($quiz['level_name']); ?></p>
@@ -145,13 +145,13 @@ $stmt->execute();
             <?php if ($is_before_start): ?>
                 <div class="countdown-container start-countdown">
                     <h3><i class="fas fa-clock"></i> En attente du début</h3>
-                    <p>Le quiz commencera le <?php echo htmlspecialchars($quiz['start_datetime']); ?> (GMT+1).</p>
+                    <p>L'Examen commencera le <?php echo htmlspecialchars($quiz['start_datetime']); ?> (GMT+1).</p>
                     <div class="countdown-timer">
                         <span id="countdown-start" class="countdown-text"></span>
                     </div>
                 </div>
             <?php else: ?>
-                <h3><i class="fas fa-file-pdf"></i> Quiz</h3>
+                <h3><i class="fas fa-file-pdf"></i> Examen</h3>
                 <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>">
                     <div class="pdf-controls-fixed">
                         <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>

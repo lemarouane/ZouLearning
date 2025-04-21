@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noter les Quiz - Zouhair E-Learning</title>
+    <title>Noter les Examens - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
     <link rel="stylesheet" href="../assets/css/admin.css">
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
             <thead>
                 <tr>
                     <th>Étudiant</th>
-                    <th>Quiz</th>
+                    <th>Examen</th>
                     <th>Date de Soumission</th>
                     <th>Statut</th>
                     <th>Note</th>

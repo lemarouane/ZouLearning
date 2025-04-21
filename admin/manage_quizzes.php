@@ -32,14 +32,14 @@ $quizzes = $db->query("
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-question-circle"></i> Gérer les Quiz</h1>
+        <h1><i class="fas fa-question-circle"></i> Gérer les Examens</h1>
         <?php if (isset($_SESSION['message'])): ?>
             <p class="success-message"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
         <?php endif; ?>
         <?php if (isset($_SESSION['error'])): ?>
             <p class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
         <?php endif; ?>
-        <a href="add_quiz.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un Quiz</a>
+        <a href="add_quiz.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un Examen</a>
         <table id="quizzesTable" class="course-table">
             <thead>
                 <tr>

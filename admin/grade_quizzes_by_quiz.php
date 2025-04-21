@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noter Quiz: <?php echo htmlspecialchars($quiz['title']); ?> - Zouhair E-Learning</title>
+    <title>Noter Examen: <?php echo htmlspecialchars($quiz['title']); ?> - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
     <link rel="stylesheet" href="../assets/css/admin.css">
