@@ -6,26 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-function getLocationName($lat, $lon) {
-    if (!$lat || !$lon) return 'N/A';
-    $url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=16&addressdetails=1";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'ZouhairElearning/1.0');
-    $response = curl_exec($ch);
-    curl_close($ch);
-    $data = json_decode($response, true);
-    if (isset($data['address'])) {
-        $address = $data['address'];
-        $neighborhood = $address['suburb'] ?? $address['neighbourhood'] ?? '';
-        $city = $address['city'] ?? $address['town'] ?? $address['village'] ?? '';
-        if ($neighborhood && $city) return "$neighborhood, $city";
-        elseif ($city) return $city;
-        elseif ($address['country']) return $address['country'];
-    }
-    return 'Unknown Location';
-}
+
 
 $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JOIN levels l ON s.level_id = l.id ORDER BY s.created_at DESC");
 
@@ -72,7 +53,6 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
                     <th>Email</th>
                     <th>Statut</th>
                     <th>Niveau</th>
-                     <th>Localisation</th>
                     <th>Inscrit</th>
                     <th>Actions</th>
                 </tr>
@@ -85,7 +65,6 @@ if (isset($_GET['delete']) && isset($_GET['id'])) {
                         <td><?php echo htmlspecialchars($student['email']); ?></td>
                         <td><?php echo ucfirst($student['status']); ?></td>
                         <td><?php echo $student['level_name'] ? htmlspecialchars($student['level_name']) : 'N/A'; ?></td>
-                         <td><?php echo htmlspecialchars(getLocationName($student['latitude'], $student['longitude'])); ?></td>
                         <td><?php echo $student['created_at']; ?></td>
                         <td>
                             <a href="view_student.php?id=<?php echo $student['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
