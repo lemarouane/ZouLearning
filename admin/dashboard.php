@@ -16,6 +16,56 @@ $notifications = $db->query("SELECT COUNT(*) FROM activity_logs WHERE timestamp 
 $ungraded_submissions = $db->query("SELECT COUNT(*) AS count FROM quiz_submissions WHERE grade IS NULL")->fetch_assoc()['count'];
 $pending_devices = $db->query("SELECT COUNT(*) FROM device_attempts WHERE status = 'pending'")->fetch_row()[0];
 
+// Gender distribution
+$gender_chart = [];
+$result = $db->query("SELECT gender, COUNT(*) as count FROM students WHERE gender IS NOT NULL GROUP BY gender");
+while ($row = $result->fetch_assoc()) {
+    $gender_chart[$row['gender']] = $row['count'];
+}
+
+// University distribution (top 5 + Other)
+$university_chart = [];
+$other_university_count = 0;
+$predefined_universities = [
+    'Abdelmalek Essaadi University', 'Al Akhawayn University', 'Cadi Ayyad University', 'Chouaib Doukkali University',
+    'Euro-Mediterranean University of Fes', 'Hassan I University', 'Hassan II University of Casablanca', 'Ibn Tofail University',
+    'Ibn Zohr University', 'International University of Casablanca', 'International University of Rabat', 'Mohammed V University',
+    'Mohammed VI Polytechnic University', 'Moulay Ismail University', 'Sidi Mohamed Ben Abdellah University', 'University of Al Quaraouiyyin',
+    'ENSIAS', 'EHTP', 'ENSEM', 'INSEA', 'EMI', 'ISCAE', 'ENCG', 'ENSA', 'EST'
+];
+$result = $db->query("SELECT university, COUNT(*) as count FROM students WHERE university IS NOT NULL GROUP BY university ORDER BY count DESC");
+while ($row = $result->fetch_assoc()) {
+    if (count($university_chart) < 5 && in_array($row['university'], $predefined_universities)) {
+        $university_chart[$row['university']] = $row['count'];
+    } else {
+        $other_university_count += $row['count'];
+    }
+}
+if ($other_university_count > 0) {
+    $university_chart['Other'] = $other_university_count;
+}
+
+// Filiere distribution (top 5 + Other)
+$filiere_chart = [];
+$other_filiere_count = 0;
+$predefined_filieres = [
+    'Informatique', 'Génie Civil', 'Génie Électrique', 'Génie Mécanique', 'Génie Industriel', 'Médecine', 'Pharmacie',
+    'Sciences Économiques', 'Gestion', 'Commerce International', 'Droit', 'Sciences Politiques', 'Mathématiques', 'Physique',
+    'Chimie', 'Biologie', 'Géologie', 'Architecture', 'Agriculture', 'Sciences de l’Éducation', 'Langues et Littératures',
+    'Études Islamiques', 'Psychologie', 'Sociologie', 'Tourisme et Hôtellerie'
+];
+$result = $db->query("SELECT filiere, COUNT(*) as count FROM students WHERE filiere IS NOT NULL GROUP BY filiere ORDER BY count DESC");
+while ($row = $result->fetch_assoc()) {
+    if (count($filiere_chart) < 5 && in_array($row['filiere'], $predefined_filieres)) {
+        $filiere_chart[$row['filiere']] = $row['count'];
+    } else {
+        $other_filiere_count += $row['count'];
+    }
+}
+if ($other_filiere_count > 0) {
+    $filiere_chart['Other'] = $other_filiere_count;
+}
+
 // Recent data
 $recent_students = $db->query("SELECT * FROM students ORDER BY created_at DESC LIMIT 5");
 $recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5") ?? [];
@@ -98,6 +148,18 @@ if ($result) {
                 <canvas id="studentChart"></canvas>
             </div>
             <div class="chart-container">
+                <h2><i class="fas fa-venus-mars"></i> Distribution par Genre</h2>
+                <canvas id="genderChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-university"></i> Universités/Écoles</h2>
+                <canvas id="universityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-graduation-cap"></i> Filières</h2>
+                <canvas id="filiereChart"></canvas>
+            </div>
+            <div class="chart-container">
                 <h2><i class="fas fa-book"></i> Cours par Matière</h2>
                 <canvas id="subjectChart"></canvas>
             </div>
@@ -158,6 +220,61 @@ if ($result) {
                     data: [<?php echo $validated_students; ?>, <?php echo $pending_students; ?>],
                     backgroundColor: ['#4CAF50', '#FF9800'],
                     borderColor: ['#388E3C', '#F57C00'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, ticks: { color: '#666' } }, x: { ticks: { color: '#666' } } },
+                animation: { duration: 1000, easing: 'easeInOutQuad' },
+                plugins: { legend: { labels: { color: '#666' } } }
+            }
+        });
+
+        new Chart(document.getElementById('genderChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: [<?php echo "'" . implode("','", array_keys($gender_chart)) . "'"; ?>],
+                datasets: [{
+                    data: [<?php echo implode(',', array_values($gender_chart)); ?>],
+                    backgroundColor: ['#2196F3', '#FF5722', '#9C27B0'],
+                    borderColor: ['#1976D2', '#E64A19', '#7B1FA2'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: { legend: { position: 'right', labels: { color: '#666' } } },
+                animation: { animateRotate: true, animateScale: true, duration: 1500 }
+            }
+        });
+
+        new Chart(document.getElementById('universityChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [<?php echo "'" . implode("','", array_keys($university_chart)) . "'"; ?>],
+                datasets: [{
+                    label: 'Étudiants',
+                    data: [<?php echo implode(',', array_values($university_chart)); ?>],
+                    backgroundColor: '#4CAF50',
+                    borderColor: '#388E3C',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, ticks: { color: '#666' } }, x: { ticks: { color: '#666' } } },
+                animation: { duration: 1000, easing: 'easeInOutQuad' },
+                plugins: { legend: { labels: { color: '#666' } } }
+            }
+        });
+
+        new Chart(document.getElementById('filiereChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [<?php echo "'" . implode("','", array_keys($filiere_chart)) . "'"; ?>],
+                datasets: [{
+                    label: 'Étudiants',
+                    data: [<?php echo implode(',', array_values($filiere_chart)); ?>],
+                    backgroundColor: '#FF9800',
+                    borderColor: '#F57C00',
                     borderWidth: 1
                 }]
             },

@@ -27,7 +27,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             $db->query("UPDATE device_attempts SET status = 'approved' WHERE id = $attempt_id");
 
             // Send approval email
-            $webhook_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+            $webhook_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
             $post_data = json_encode([
                 'event' => 'approval',
                 'full_name' => $attempt['full_name'],

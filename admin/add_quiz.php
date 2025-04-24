@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter un Quiz - Zouhair E-Learning</title>
+    <title>Ajouter un Examen - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
 
     <link rel="stylesheet" href="../assets/css/admin.css">
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-plus-circle"></i> Ajouter un Quiz</h1>
+        <h1><i class="fas fa-plus-circle"></i> Ajouter un Examen</h1>
         <?php foreach ($errors as $error): ?>
             <p class="error-message"><?php echo $error; ?></p>
         <?php endforeach; ?>

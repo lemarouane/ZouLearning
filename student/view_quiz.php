@@ -103,7 +103,6 @@ $stmt->execute();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voir Examen - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -142,6 +141,7 @@ $stmt->execute();
             <?php endif; ?>
         </div>
         <div class="content-preview" id="quiz-content">
+            <h3><i class="fas fa-file-pdf"></i> Examen</h3>
             <?php if ($is_before_start): ?>
                 <div class="countdown-container start-countdown">
                     <h3><i class="fas fa-clock"></i> En attente du début</h3>
@@ -150,17 +150,16 @@ $stmt->execute();
                         <span id="countdown-start" class="countdown-text"></span>
                     </div>
                 </div>
-            <?php else: ?>
-                <h3><i class="fas fa-file-pdf"></i> Examen</h3>
-                <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>">
-                    <div class="pdf-controls-fixed">
-                        <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
-                        <button class="zoom-out btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
-                        <button class="rotate btn-action"><i class="fas fa-redo"></i> Rotation</button>
-                    </div>
-                    <div class="pdf-canvas"></div>
-                </div>
             <?php endif; ?>
+            <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>" <?php if ($is_before_start): ?>style="display: none;"<?php endif; ?>>
+                <div class="pdf-controls-fixed">
+                    <button class="fullscreen-toggle btn-action"><i class="fas fa-expand"></i> Plein écran</button>
+                    <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
+                    <button class="zoom-out btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
+                    <button class="rotate btn-action"><i class="fas fa-redo"></i> Rotation</button>
+                </div>
+                <div class="pdf-canvas"></div>
+            </div>
         </div>
         <?php if (!$is_before_start): ?>
             <div class="form-container" id="upload-form">
@@ -177,18 +176,15 @@ $stmt->execute();
                     </div>
                 </form>
             </div>
-        </div>
-            <?php if (!$is_before_start): ?>
-                <div class="countdown-bar duration-countdown" id="countdown-message">
-                    <div class="countdown-content">
-                        <i class="fas fa-hourglass-half"></i>
-                        <span><strong>Temps restant :</strong></span>
-                        <div class="countdown-timer">
-                            <span id="countdown-duration" class="countdown-text"></span>
-                        </div>
+            <div class="countdown-bar duration-countdown" id="countdown-message">
+                <div class="countdown-content">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span><strong>Temps restant :</strong></span>
+                    <div class="countdown-timer">
+                        <span id="countdown-duration" class="countdown-text"></span>
                     </div>
                 </div>
-            <?php endif; ?>
+            </div>
         <?php endif; ?>
     </main>
     <?php include '../includes/footer.php'; ?>
@@ -198,6 +194,7 @@ $stmt->execute();
         const startTime = new Date('<?php echo $quiz['start_datetime']; ?>').getTime();
         const durationMs = <?php echo $quiz['duration_hours'] * 3600000; ?>;
         const deadlineTime = startTime + durationMs;
+        let pdfLoaded = false;
 
         function formatTime(ms) {
             const hours = Math.floor(ms / 3600000);
@@ -207,6 +204,8 @@ $stmt->execute();
         }
 
         function loadPDF() {
+            if (pdfLoaded) return;
+            pdfLoaded = true;
             const pdfViewer = $('#pdf-viewer-<?php echo $quiz['id']; ?>');
             const url = pdfViewer.data('pdf');
             const canvasContainer = pdfViewer.find('.pdf-canvas');
@@ -231,6 +230,7 @@ $stmt->execute();
                         canvas.style.maxWidth = `${viewport.width}px`;
                         canvas.style.margin = '0 auto';
                         canvas.style.display = 'block';
+                        canvas.style.marginBottom = '10px';
 
                         const renderContext = { canvasContext: ctx, viewport: viewport };
                         page.render(renderContext);
@@ -266,9 +266,18 @@ $stmt->execute();
                 }
             });
 
+            pdfViewer.find('.fullscreen-toggle').click(() => {
+                const isFullscreen = pdfViewer.hasClass('fullscreen');
+                pdfViewer.toggleClass('fullscreen');
+                pdfViewer.find('.fullscreen-toggle i').toggleClass('fa-expand fa-compress');
+                pdfViewer.find('.fullscreen-toggle').contents().filter(function() {
+                    return this.nodeType === 3; // Text nodes
+                }).replaceWith(isFullscreen ? 'Plein écran' : 'Quitter plein écran');
+            });
+
             let isFocused = true;
             function applyBlur() {
-                if (!isFocused) {
+                if (!isFocused && !pdfViewer.hasClass('fullscreen')) {
                     pdfViewer.addClass('blurred');
                 } else {
                     pdfViewer.removeClass('blurred');
@@ -296,73 +305,40 @@ $stmt->execute();
         function updateCountdown() {
             const currentTime = new Date().getTime();
             const quizContent = $('#quiz-content');
-            const uploadForm = $('#upload-form');
+            const pdfViewer = $('#pdf-viewer-<?php echo $quiz['id']; ?>');
+            const countdownMessage = $('#countdown-message');
 
             if (currentTime < startTime) {
                 const timeLeft = startTime - currentTime;
                 $('#countdown-start').text(formatTime(timeLeft));
-                if (timeLeft <= 0) {
-                    quizContent.html(`
-                        <h3><i class="fas fa-file-pdf"></i> Quiz</h3>
-                        <div class="pdf-viewer" data-pdf="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" id="pdf-viewer-<?php echo $quiz['id']; ?>">
-                            <div class="pdf-controls-fixed">
-                                <button class="zoom-in btn-action"><i class="fas fa-search-plus"></i> Zoom Avant</button>
-                                <button class="zoom-out btn-action"><i class="fas fa-search-minus"></i> Zoom Arrière</button>
-                                <button class="rotate btn-action"><i class="fas fa-redo"></i> Rotation</button>
-                            </div>
-                            <div class="pdf-canvas"></div>
-                        </div>
-                    `);
-                    if (!uploadForm.length) {
-                        $('main.dashboard').append(`
-                            <div class="form-container" id="upload-form">
-                                <h3><i class="fas fa-upload"></i> Soumettre une Réponse</h3>
-                                <p class="info-message">Vous pouvez soumettre plusieurs fois. Chaque soumission est enregistrée séparément.</p>
-                                <form method="POST" enctype="multipart/form-data">
-                                    <div class="form-group">
-                                        <label for="response_pdf"><i class="fas fa-file-pdf"></i> Réponse PDF</label>
-                                        <input type="file" name="response_pdf" id="response_pdf" accept="application/pdf" required>
-                                    </div>
-                                    <div class="form-actions">
-                                        <button type="submit" class="save-course-btn"><i class="fas fa-upload"></i> Soumettre</button>
-                                        <a href="quizzes.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
-                                    </div>
-                                </form>
-                            </div>
-                        `);
-                    }
+                pdfViewer.hide();
+                countdownMessage.hide();
+                $('.start-countdown').show();
+            } else if (currentTime < deadlineTime) {
+                if (!pdfLoaded) {
+                    $('.start-countdown').hide();
+                    pdfViewer.show();
                     loadPDF();
                 }
-            } else if (currentTime < deadlineTime) {
                 const timeLeft = deadlineTime - currentTime;
                 $('#countdown-duration').text(formatTime(timeLeft));
-                $('#countdown-message').show();
+                countdownMessage.show();
                 if (timeLeft <= 0) {
-                    $('#countdown-message').hide();
-                    quizContent.append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
+                    countdownMessage.hide();
+                    if (!quizContent.find('.warning-message').length) {
+                        quizContent.append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
+                    }
                 }
             } else {
-                $('#countdown-message').hide();
+                countdownMessage.hide();
                 if (!quizContent.find('.warning-message').length) {
                     quizContent.append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
                 }
             }
         }
 
-        if (startTime <= new Date().getTime()) {
-            loadPDF();
-            if (deadlineTime <= new Date().getTime()) {
-                $('#countdown-message').hide();
-                if (!$('#quiz-content').find('.warning-message').length) {
-                    $('#quiz-content').append('<p class="warning-message">La période de soumission recommandée est terminée. Les soumissions tardives seront marquées comme telles.</p>');
-                }
-            }
-        }
-
-        if (startTime > new Date().getTime() || (startTime <= new Date().getTime() && new Date().getTime() <= deadlineTime)) {
-            setInterval(updateCountdown, 1000);
-            updateCountdown();
-        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
     });
     </script>
 </body>

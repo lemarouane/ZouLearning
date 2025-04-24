@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
             $student = $db->query("SELECT s.full_name, s.email FROM quiz_submissions qs 
                                    JOIN students s ON qs.student_id = s.id 
                                    WHERE qs.id = $submission_id")->fetch_assoc();
-            $webhook_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+            $webhook_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
             $post_data = json_encode([
                 'event' => 'grade_given',
                 'full_name' => $student['full_name'],

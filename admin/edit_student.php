@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Send course_added or level_added email if applicable
     if (!empty($new_courses) || $level_changed) {
-        $webhook_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+        $webhook_url = ' '; // Replace with your webhook URL
         $course_text = !empty($new_courses) ? implode(', ', $new_courses) : $new_level_name;
         $post_data = json_encode([
             'event' => 'course_added',

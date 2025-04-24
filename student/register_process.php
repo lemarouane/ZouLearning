@@ -16,14 +16,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dob = trim($_POST['dob']) ?: null;
     $gender = trim($_POST['gender']) ?: null;
     $city = trim($_POST['city']) ?: null;
+    $university = trim($_POST['university']) ?: null;
+    $custom_university = trim($_POST['custom_university']) ?: null;
+    $filiere = trim($_POST['filiere']) ?: null;
+    $custom_filiere = trim($_POST['custom_filiere']) ?: null;
     $device_fingerprint = trim($_POST['device_fingerprint']);
     $device_name = trim($_POST['device_name']);
     $latitude = !empty($_POST['latitude']) ? (float)$_POST['latitude'] : null;
     $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : null;
 
+    // Handle university: use custom input if "Autre" is selected
+    $final_university = ($university === 'Autre' && $custom_university) ? $custom_university : $university;
+
+    // Handle filiere: use custom input if "Autre" is selected
+    $final_filiere = ($filiere === 'Autre' && $custom_filiere) ? $custom_filiere : $filiere;
+
     // Basic validation
     if (empty($full_name) || empty($email) || empty($password) || empty($device_fingerprint)) {
         $_SESSION['error'] = 'Veuillez remplir tous les champs obligatoires.';
+        header("Location: register.php");
+        exit;
+    }
+
+    // Validate university
+    if ($final_university && strlen($final_university) > 100) {
+        $_SESSION['error'] = 'Le nom de l\'université ou école ne doit pas dépasser 100 caractères.';
+        header("Location: register.php");
+        exit;
+    }
+
+    // Validate filiere
+    if ($final_filiere && strlen($final_filiere) > 100) {
+        $_SESSION['error'] = 'Le nom de la filière ne doit pas dépasser 100 caractères.';
         header("Location: register.php");
         exit;
     }
@@ -74,20 +98,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Insert into students
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $db->prepare("
-            INSERT INTO students (full_name, email, phone, dob, gender, city, password, device_id, device_name, latitude, longitude, created_at, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')
+            INSERT INTO students (full_name, email, phone, dob, gender, city, university, filiere, password, device_id, device_name, latitude, longitude, created_at, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')
         ");
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $db->error);
         }
         $stmt->bind_param(
-            "sssssssisdd",
+            "sssssssssisdd",
             $full_name,
             $email,
             $phone,
             $dob,
             $gender,
             $city,
+            $final_university,
+            $final_filiere,
             $hashed_password,
             $device_id,
             $device_name,
@@ -129,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
 
         // Send email via Google Apps Script
-        $script_url = 'https://script.google.com/macros/s/AKfycbzexRy0kRH9wG624HgUCGwQwHjyl-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec';
+        $script_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec';
         $data = [
             'event' => 'register',
             'full_name' => $full_name,

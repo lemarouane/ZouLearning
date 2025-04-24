@@ -86,7 +86,6 @@ unset($subject);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voir Étudiant - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -114,6 +113,8 @@ unset($subject);
             <p><strong>Date de Naissance :</strong> <?php echo htmlspecialchars($student['dob'] ?? 'N/A'); ?></p>
             <p><strong>Genre :</strong> <?php echo htmlspecialchars($student['gender'] ? ($student['gender'] === 'Male' ? 'Homme' : ($student['gender'] === 'Female' ? 'Femme' : 'Autre')) : 'N/A'); ?></p>
             <p><strong>Ville :</strong> <?php echo htmlspecialchars($student['city'] ?? 'N/A'); ?></p>
+            <p><strong>Université ou École :</strong> <?php echo htmlspecialchars($student['university'] ?? 'N/A'); ?></p>
+            <p><strong>Filière :</strong> <?php echo htmlspecialchars($student['filiere'] ?? 'N/A'); ?></p>
             <p><strong>Validé :</strong> <?php echo $student['status'] == 'approved' ? 'Oui' : 'Non'; ?></p>
             <p><strong>Créé :</strong> <?php echo $student['created_at']; ?></p>
             <p><strong>ID Appareil :</strong> <?php echo htmlspecialchars($student['device_id']); ?></p>
