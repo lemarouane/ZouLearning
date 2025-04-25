@@ -39,7 +39,6 @@ $folders = $db->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voir Cours - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -60,21 +59,42 @@ $folders = $db->query("
         <div class="subfolder-section">
             <h3 class="section-title"><i class="fas fa-folder"></i> Dossiers du Cours</h3>
             <?php if ($folders->num_rows > 0): ?>
-                <?php while ($folder = $folders->fetch_assoc()): ?>
-                    <div class="folder-view-card" data-folder-id="<?php echo $folder['id']; ?>">
-                        <h4><i class="fas fa-folder"></i> <?php echo htmlspecialchars($folder['name']); ?> (<?php echo $folder['content_count']; ?> fichiers)</h4>
-                        <?php if ($folder['description']): ?>
-                            <p><?php echo htmlspecialchars($folder['description']); ?></p>
-                        <?php endif; ?>
-                    </div>
-                    <div class="content-view" id="content-<?php echo $folder['id']; ?>">
-                        <?php
+                <div class="folder-container">
+                    <?php while ($folder = $folders->fetch_assoc()): ?>
+                        <div class="folder-view-card" data-folder-id="<?php echo $folder['id']; ?>">
+                            <h4><i class="fas fa-folder"></i> <?php echo htmlspecialchars($folder['name']); ?> (<?php echo $folder['content_count']; ?> fichiers)</h4>
+                            <?php if ($folder['description']): ?>
+                                <p><?php echo htmlspecialchars($folder['description']); ?></p>
+                            <?php endif; ?>
+                            <div class="subfolder-container" id="subfolder-<?php echo $folder['id']; ?>">
+                                <?php
+                                $contents = $db->query("SELECT id, content_type, content_name, content_path FROM course_contents WHERE folder_id = {$folder['id']}");
+                                if ($contents->num_rows > 0):
+                                    while ($content = $contents->fetch_assoc()):
+                                ?>
+                                        <div class="subfolder-card" data-content-id="<?php echo $content['id']; ?>">
+                                            <h5><i class="fas fa-<?php echo $content['content_type'] == 'PDF' ? 'file-pdf' : 'video'; ?>"></i> <?php echo htmlspecialchars($content['content_name']); ?></h5>
+                                        </div>
+                                <?php
+                                    endwhile;
+                                else:
+                                ?>
+                                    <p class="empty-message">Aucun contenu dans ce dossier.</p>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
+                <!-- Content View Container for All Files -->
+                <div class="content-view-container">
+                    <?php
+                    $folders->data_seek(0);
+                    while ($folder = $folders->fetch_assoc()):
                         $contents = $db->query("SELECT id, content_type, content_name, content_path FROM course_contents WHERE folder_id = {$folder['id']}");
-                        if ($contents->num_rows > 0):
-                        ?>
-                            <?php while ($content = $contents->fetch_assoc()): ?>
+                        while ($content = $contents->fetch_assoc()):
+                    ?>
+                            <div class="content-view" id="content-<?php echo $content['id']; ?>" style="display: none;">
                                 <div class="content-item">
-                                    <h5><i class="fas fa-<?php echo $content['content_type'] == 'PDF' ? 'file-pdf' : 'video'; ?>"></i> <?php echo htmlspecialchars($content['content_name']); ?></h5>
                                     <?php if ($content['content_type'] == 'PDF'): ?>
                                         <div class="pdf-viewer" data-pdf="serve_pdf.php?file=<?php echo urlencode(basename($content['content_path'])); ?>&course_id=<?php echo $course_id; ?>" id="pdf-<?php echo $content['id']; ?>" tabindex="0">
                                             <div class="pdf-controls-fixed">
@@ -93,12 +113,12 @@ $folders = $db->query("
                                         </div>
                                     <?php endif; ?>
                                 </div>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <p class="empty-message">Aucun contenu dans ce dossier.</p>
-                        <?php endif; ?>
-                    </div>
-                <?php endwhile; ?>
+                            </div>
+                    <?php
+                        endwhile;
+                    endwhile;
+                    ?>
+                </div>
             <?php else: ?>
                 <p class="empty-message">Aucun dossier créé pour ce cours.</p>
             <?php endif; ?>
@@ -111,16 +131,57 @@ $folders = $db->query("
         import * as pdfjsLib from '../assets/js/pdf.mjs';
         pdfjsLib.GlobalWorkerOptions.workerSrc = '../assets/js/pdf.worker.mjs';
 
-        $('.folder-view-card').click(function() {
+        // Toggle subfolder visibility on folder click
+        $('.folder-view-card').click(function(e) {
+            e.stopPropagation();
             const folderId = $(this).data('folder-id');
-            const contentSection = $(`#content-${folderId}`);
-            contentSection.slideToggle(300);
+            const subfolderSection = $(`#subfolder-${folderId}`);
+            const parentCard = $(this);
+
+            // Remove active class from all folder cards
+            $('.folder-view-card').removeClass('active-folder');
+
+            // Collapse all other subfolder containers
+            $('.subfolder-container').not(subfolderSection).slideUp(400, function() {
+                const parent = $(this).parent('.folder-view-card');
+                parent.css({
+                    'height': '80px', // Fixed compact height
+                    'min-height': '0'
+                });
+                console.log(`Collapsed folder ${parent.find('h4').text()}: height set to 80px`);
+            });
+
+            // Toggle the clicked folder's subfolder container
+            subfolderSection.slideToggle(400, function() {
+                if (subfolderSection.is(':visible')) {
+                    parentCard.addClass('active-folder');
+                    parentCard.css({
+                        'height': 'auto', // Expand to fit subfolders
+                        'min-height': '80px'
+                    });
+                    console.log(`Expanded folder ${parentCard.find('h4').text()}: height set to auto`);
+                } else {
+                    parentCard.removeClass('active-folder');
+                    parentCard.css({
+                        'height': '80px', // Back to compact
+                        'min-height': '0'
+                    });
+                    console.log(`Collapsed folder ${parentCard.find('h4').text()}: height set to 80px`);
+                }
+            });
+        });
+
+        // Toggle content visibility on subfolder click
+        $('.subfolder-card').click(function(e) {
+            e.stopPropagation();
+            const contentId = $(this).data('content-id');
+            const contentSection = $(`#content-${contentId}`);
+            $('.content-view').not(contentSection).slideUp(400);
+            contentSection.slideToggle(400);
 
             if (contentSection.is(':visible')) {
-                contentSection.find('.pdf-viewer').each(function() {
-                    const pdfViewer = $(this);
-                    if (pdfViewer.find('.pdf-canvas').children().length > 0) return;
-
+                const pdfViewer = contentSection.find('.pdf-viewer');
+                if (pdfViewer.length && pdfViewer.find('.pdf-canvas').children().length === 0) {
                     const url = pdfViewer.data('pdf');
                     const canvasContainer = pdfViewer.find('.pdf-canvas');
                     const contentId = pdfViewer.attr('id').replace('pdf-', '');
@@ -191,7 +252,6 @@ $folders = $db->query("
                                     link.download = `screenshot_page_${visiblePage}.png`;
                                     link.click();
 
-                                    // Log screenshot
                                     $.post('../includes/log_screenshot.php', {
                                         user_id: '<?php echo $_SESSION['admin_id']; ?>',
                                         course_id: '<?php echo $course_id; ?>',
@@ -203,7 +263,6 @@ $folders = $db->query("
                         }
                     });
 
-                    // Blur handling
                     function toggleBlur(viewer, enable) {
                         const canvases = viewer.find('.pdf-page');
                         canvases.each(function() {
@@ -224,16 +283,14 @@ $folders = $db->query("
                         toggleBlur(pdfViewer, false);
                         pdfViewer.focus();
                     });
-                });
+                }
 
-                // Check video loading
                 contentSection.find('.video-viewer iframe').each(function() {
                     const iframe = $(this);
                     const errorMsg = iframe.siblings('.video-error');
                     iframe.on('error', function() {
                         errorMsg.show();
                     });
-                    // Test load
                     $.ajax({
                         url: iframe.attr('src'),
                         type: 'HEAD',
