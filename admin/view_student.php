@@ -56,6 +56,13 @@ foreach ($assigned_subjects as $subject_id => &$subject) {
     }
 }
 
+// Fetch approved devices (up to 2)
+$devices = [];
+$device_query = $db->query("SELECT device_fingerprint, device_name FROM student_devices WHERE student_id = $student_id AND status = 'approved' ORDER BY created_at ASC LIMIT 2");
+while ($device = $device_query->fetch_assoc()) {
+    $devices[] = $device;
+}
+
 function getLocationName($lat, $lon) {
     if (!$lat || !$lon) return 'N/A';
     $url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lon&format=json&zoom=16&addressdetails=1";
@@ -117,9 +124,9 @@ unset($subject);
             <p><strong>Filière :</strong> <?php echo htmlspecialchars($student['filiere'] ?? 'N/A'); ?></p>
             <p><strong>Validé :</strong> <?php echo $student['status'] == 'approved' ? 'Oui' : 'Non'; ?></p>
             <p><strong>Créé :</strong> <?php echo $student['created_at']; ?></p>
-            <p><strong>ID Appareil :</strong> <?php echo htmlspecialchars($student['device_id']); ?></p>
+            <p><strong>Appareil 1 :</strong> <?php echo isset($devices[0]) ? htmlspecialchars($devices[0]['device_name'] ?? $devices[0]['device_fingerprint']) : 'N/A'; ?></p>
+            <p><strong>Appareil 2 :</strong> <?php echo isset($devices[1]) ? htmlspecialchars($devices[1]['device_name'] ?? $devices[1]['device_fingerprint']) : 'N/A'; ?></p>
             <p><strong>Localisation :</strong> <?php echo htmlspecialchars(getLocationName($student['latitude'], $student['longitude'])); ?></p>
-            <p><strong>Dernier Appareil :</strong> <?php echo htmlspecialchars($student['device_name'] ?? 'N/A'); ?></p>
         </div>
 
         <div class="detail-card">

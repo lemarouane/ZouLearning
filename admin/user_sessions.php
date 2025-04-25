@@ -7,13 +7,18 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$sessions = $db->query("
+// Use prepared statement for better security and performance
+$stmt = $db->prepare("
     SELECT us.id, us.student_id, us.login_time, us.logout_time, us.latitude, us.longitude, us.device_info, us.ip_address,
-           s.full_name, s.email
+           s.full_name, s.email, sd.device_name
     FROM user_sessions us
     JOIN students s ON us.student_id = s.id
+    LEFT JOIN student_devices sd ON us.student_id = sd.student_id AND us.device_info = sd.device_fingerprint AND sd.status = 'approved'
     ORDER BY us.login_time DESC
 ");
+$stmt->execute();
+$sessions = $stmt->get_result();
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -23,12 +28,16 @@ $sessions = $db->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sessions Utilisateurs - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <style>
+        .device-active { color: #28a745; font-weight: bold; }
+        .device-active::after { content: ' (Actif)'; font-size: 0.8em; color: #28a745; }
+        .device-inactive { color: #6b7280; }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -54,9 +63,15 @@ $sessions = $db->query("
                         <tr>
                             <td><?php echo htmlspecialchars($session['full_name']); ?></td>
                             <td><?php echo htmlspecialchars($session['email']); ?></td>
-                            <td><?php echo $session['login_time']; ?></td>
+                            <td><?php echo htmlspecialchars($session['login_time']); ?></td>
                             <td><?php echo htmlspecialchars(getLocationName($session['latitude'], $session['longitude'])); ?></td>
-                            <td><?php echo htmlspecialchars(simplifyDeviceInfo($session['device_info'])); ?></td>
+                            <td class="<?php echo $session['logout_time'] ? 'device-inactive' : 'device-active'; ?>">
+                                <?php
+                                // Prioritize device_name, fall back to simplified device_info
+                                $device_display = $session['device_name'] ?? simplifyDeviceInfo($session['device_info']);
+                                echo htmlspecialchars($device_display);
+                                ?>
+                            </td>
                             <td><?php echo htmlspecialchars($session['ip_address']); ?></td>
                             <td>
                                 <?php
@@ -64,7 +79,7 @@ $sessions = $db->query("
                                     $login = new DateTime($session['login_time']);
                                     $logout = new DateTime($session['logout_time']);
                                     $interval = $login->diff($logout);
-                                    echo $interval->format('%h:%i:%s');
+                                    echo htmlspecialchars($interval->format('%h:%i:%s'));
                                 } else {
                                     echo 'Actif';
                                 }
@@ -94,10 +109,12 @@ $sessions = $db->query("
             $('#sessionsTable').DataTable({
                 pageLength: 10,
                 lengthChange: false,
-                order: [[2, 'desc']]
+                order: [[2, 'desc']],
+                columnDefs: [
+                    { orderable: false, targets: [4, 8] } // Disable sorting on Appareil and Actions
+                ]
             });
 
-            // Handle logout button click
             $('.logout-btn').click(function() {
                 const sessionId = $(this).data('session-id');
                 const button = $(this);
@@ -109,13 +126,11 @@ $sessions = $db->query("
                     dataType: 'json',
                     success: function(response) {
                         if (response.success) {
-                            // Update the row to show session is ended
                             const row = button.closest('tr');
                             row.find('td:eq(6)').text('Terminé');
                             row.find('td:eq(7)').text('Terminé');
+                            row.find('td:eq(4)').removeClass('device-active').addClass('device-inactive').text(row.find('td:eq(4)').text().replace(' (Actif)', ''));
                             button.remove();
-                            
-                            // Show success message
                             alert('L\'utilisateur a été déconnecté avec succès.');
                         } else {
                             alert('Erreur lors de la déconnexion: ' + response.error);

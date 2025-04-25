@@ -88,9 +88,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // Truncate device_fingerprint to fit students.device_id (varchar(36))
-    $device_id = substr($device_fingerprint, 0, 36);
-
     // Start transaction
     $db->begin_transaction();
 
@@ -98,14 +95,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Insert into students
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $db->prepare("
-            INSERT INTO students (full_name, email, phone, dob, gender, city, university, filiere, password, device_id, device_name, latitude, longitude, created_at, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')
+            INSERT INTO students (full_name, email, phone, dob, gender, city, university, filiere, password, latitude, longitude, created_at, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), 'pending')
         ");
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $db->error);
         }
         $stmt->bind_param(
-            "sssssssssisdd",
+            "sssssssssdd",
             $full_name,
             $email,
             $phone,
@@ -115,8 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $final_university,
             $final_filiere,
             $hashed_password,
-            $device_id,
-            $device_name,
             $latitude,
             $longitude
         );
@@ -128,14 +123,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Insert into student_devices (auto-approve first device)
         $ip_address = $_SERVER['REMOTE_ADDR'];
+        $default_device_name = 'Device 1';
         $stmt = $db->prepare("
-            INSERT INTO student_devices (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, created_at, status)
-            VALUES (?, ?, ?, ?, ?, ?, NOW(), 'approved')
+            INSERT INTO student_devices (student_id, device_fingerprint, device_name, device_info, ip_address, latitude, longitude, created_at, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'approved')
         ");
         if (!$stmt) {
             throw new Exception("Prepare failed: " . $db->error);
         }
-        $stmt->bind_param("isssdd", $student_id, $device_fingerprint, $device_name, $ip_address, $latitude, $longitude);
+        $stmt->bind_param("issssdd", $student_id, $device_fingerprint, $default_device_name, $device_name, $ip_address, $latitude, $longitude);
         if (!$stmt->execute()) {
             throw new Exception("Insert into student_devices failed: " . $stmt->error);
         }

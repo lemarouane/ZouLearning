@@ -19,11 +19,31 @@ if (!$student_query || $student_query->num_rows == 0) {
 }
 $student = $student_query->fetch_assoc();
 
+// Fetch approved devices (up to 2)
+$devices = [];
+$device_query = $db->query("SELECT id, device_fingerprint, device_name FROM student_devices WHERE student_id = $student_id AND status = 'approved' ORDER BY created_at ASC LIMIT 2");
+while ($device = $device_query->fetch_assoc()) {
+    $devices[] = $device;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $full_name = $db->real_escape_string($_POST['full_name']);
     $email = $db->real_escape_string($_POST['email']);
     $status = isset($_POST['status']) && $_POST['status'] == 'approved' ? 'approved' : 'pending';
     $level_id = (int)$_POST['level_id'];
+
+    // Device name updates
+    $device_names = isset($_POST['device_names']) ? $_POST['device_names'] : [];
+    foreach ($devices as $index => $device) {
+        $device_id = $device['id'];
+        $new_name = isset($device_names[$index]) ? trim($db->real_escape_string($device_names[$index])) : '';
+        if ($new_name && strlen($new_name) <= 50 && preg_match('/^[a-zA-Z0-9\s]+$/', $new_name)) {
+            $stmt = $db->prepare("UPDATE student_devices SET device_name = ? WHERE id = ? AND student_id = ?");
+            $stmt->bind_param("sii", $new_name, $device_id, $student_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
 
     // Check if level_id changed
     $level_changed = $student['level_id'] != $level_id;
@@ -36,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $db->prepare("UPDATE students SET full_name = ?, email = ?, status = ?, level_id = ? WHERE id = ?");
     $stmt->bind_param("sssii", $full_name, $email, $status, $level_id, $student_id);
     $stmt->execute();
+    $stmt->close();
 
     // Clear assignments only if requested
     if (isset($_POST['clear_assignments']) && $_POST['clear_assignments'] == '1') {
@@ -55,18 +76,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE all_courses = 1");
                 $stmt->bind_param("ii", $student_id, $subject_id);
                 $stmt->execute();
+                $stmt->close();
 
                 // Clear existing specific courses for this subject
                 $stmt = $db->prepare("DELETE FROM student_courses WHERE student_id = ? AND course_id IN 
                                       (SELECT id FROM courses WHERE subject_id = ?)");
                 $stmt->bind_param("ii", $student_id, $subject_id);
                 $stmt->execute();
+                $stmt->close();
 
                 // Assign all current courses for this subject
                 $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) 
                                       SELECT ?, id FROM courses WHERE subject_id = ?");
                 $stmt->bind_param("ii", $student_id, $subject_id);
                 $stmt->execute();
+                $stmt->close();
 
                 // Get subject name for email
                 $subject_result = $db->query("SELECT name FROM subjects WHERE id = $subject_id");
@@ -80,12 +104,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                       VALUES (?, ?, 0) ON DUPLICATE KEY UPDATE all_courses = 0");
                 $stmt->bind_param("ii", $student_id, $subject_id);
                 $stmt->execute();
+                $stmt->close();
             }
             $course_ids = array_map('intval', $_POST['course_ids']);
             foreach ($course_ids as $course_id) {
                 $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
                 $stmt->bind_param("ii", $student_id, $course_id);
                 $stmt->execute();
+                $stmt->close();
 
                 // Get course title for email
                 $course_result = $db->query("SELECT title FROM courses WHERE id = $course_id");
@@ -96,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Send course_added or level_added email if applicable
     if (!empty($new_courses) || $level_changed) {
-        $webhook_url = ' '; // Replace with your webhook URL
+        $webhook_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec';
         $course_text = !empty($new_courses) ? implode(', ', $new_courses) : $new_level_name;
         $post_data = json_encode([
             'event' => 'course_added',
@@ -148,7 +174,6 @@ while ($row = $course_result->fetch_assoc()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier Étudiant - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -159,6 +184,9 @@ while ($row = $course_result->fetch_assoc()) {
         .subject-item, .course-item { padding: 8px 12px; background: #e0f7fa; border-radius: 5px; display: flex; align-items: center; }
         .form-group select[multiple] { height: 150px; width: 100%; border-radius: 5px; padding: 5px; }
         .checkbox-group { margin-top: 10px; }
+        .device-container { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+        .device-container h3 { margin-top: 0; color: #333; }
+        .form-group input[type="text"] { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -191,6 +219,21 @@ while ($row = $course_result->fetch_assoc()) {
                         </option>
                     <?php endwhile; ?>
                 </select>
+            </div>
+
+            <!-- Device Management -->
+            <div class="device-container">
+                <h3><i class="fas fa-mobile-alt"></i> Gérer les Appareils</h3>
+                <?php if (empty($devices)): ?>
+                    <p>Aucun appareil approuvé.</p>
+                <?php else: ?>
+                    <?php foreach ($devices as $index => $device): ?>
+                        <div class="form-group">
+                            <label>Nom de l'Appareil <?php echo $index + 1; ?> (ID: <?php echo htmlspecialchars($device['device_fingerprint']); ?>)</label>
+                            <input type="text" name="device_names[<?php echo $index; ?>]" value="<?php echo htmlspecialchars($device['device_name'] ?? ''); ?>" placeholder="Entrez un nom personnalisé (ex: Téléphone de John)" maxlength="50" pattern="[a-zA-Z0-9\s]+">
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
 
             <!-- Current Assignments -->
@@ -229,7 +272,7 @@ while ($row = $course_result->fetch_assoc()) {
                 <div class="form-group">
                     <label><i class="fas fa-book"></i> Cours</label>
                     <select name="course_ids[]" id="courseIds" multiple>
-                        <option value="">Choisir féminin d'abord</option>
+                        <option value="">Choisir une matière d'abord</option>
                     </select>
                     <div class="checkbox-group">
                         <input type="checkbox" name="all_courses" id="allCourses" value="1">
@@ -264,11 +307,11 @@ while ($row = $course_result->fetch_assoc()) {
                 if (level_id) {
                     $.get('ajax/fetch_subjects.php?level_id=' + level_id, function(data) {
                         subjectIds.html(data);
-                        courseIds.html('<option value="">Choisir des matières d\'abord</option>');
+                        courseIds.html('<option value="">Choisir une matière d\'abord</option>');
                     });
                 } else {
                     subjectIds.html('<option value="">Choisir un niveau d\'abord</option>');
-                    courseIds.html('<option value="">Choisir des matières d\'abord</option>');
+                    courseIds.html('<option value="">Choisir une matière d\'abord</option>');
                 }
             });
 
@@ -279,7 +322,7 @@ while ($row = $course_result->fetch_assoc()) {
                         courseIds.html(data);
                     });
                 } else {
-                    courseIds.html('<option value="">Choisir des matières d\'abord</option>');
+                    courseIds.html('<option value="">Choisir une matière d\'abord</option>');
                 }
             });
 

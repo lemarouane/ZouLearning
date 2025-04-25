@@ -18,21 +18,26 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 
     if ($attempt) {
         if ($action === 'approve') {
-            $stmt = $db->prepare("INSERT INTO student_devices (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, created_at, status) 
-                                  VALUES (?, ?, ?, ?, ?, ?, NOW(), 'approved')");
-            $stmt->bind_param("isssdd", $attempt['student_id'], $attempt['device_fingerprint'], $attempt['device_info'], 
-                             $attempt['ip_address'], $attempt['latitude'], $attempt['longitude']);
+            // Check current approved device count
+            $device_count = $db->query("SELECT COUNT(*) FROM student_devices WHERE student_id = {$attempt['student_id']} AND status = 'approved'")->fetch_row()[0];
+            $device_name = $device_count == 0 ? 'Device 1' : 'Device 2';
+
+            $stmt = $db->prepare("INSERT INTO student_devices (student_id, device_fingerprint, device_name, device_info, ip_address, latitude, longitude, created_at, status) 
+                                  VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'approved')");
+            $stmt->bind_param("issssdd", $attempt['student_id'], $attempt['device_fingerprint'], $device_name, 
+                             $attempt['device_info'], $attempt['ip_address'], $attempt['latitude'], $attempt['longitude']);
             $stmt->execute();
+            $stmt->close();
 
             $db->query("UPDATE device_attempts SET status = 'approved' WHERE id = $attempt_id");
 
             // Send approval email
-            $webhook_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec'; // Replace with your webhook URL
+            $webhook_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec';
             $post_data = json_encode([
                 'event' => 'approval',
                 'full_name' => $attempt['full_name'],
                 'email' => $attempt['email'],
-                'details' => ['deviceId' => $attempt['device_fingerprint']]
+                'details' => ['deviceId' => $device_name]
             ]);
 
             $ch = curl_init($webhook_url);
@@ -47,7 +52,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             if ($http_code != 200) {
                 error_log("Failed to send approval email: HTTP $http_code, Response: $response");
             } else {
-                error_log("Approval email sent successfully for device: " . $attempt['device_fingerprint']);
+                error_log("Approval email sent successfully for device: $device_name");
             }
         } elseif ($action === 'deny') {
             $db->query("UPDATE device_attempts SET status = 'denied' WHERE id = $attempt_id");
@@ -73,7 +78,6 @@ $attempts = $db->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gérer les Demandes d'Appareils - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
