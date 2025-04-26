@@ -85,10 +85,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
                 $stmt->close();
 
-                // Assign all current courses for this subject
-                $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) 
-                                      SELECT ?, id FROM courses WHERE subject_id = ?");
-                $stmt->bind_param("ii", $student_id, $subject_id);
+                // Assign all current courses for this subject that are not blocked by QCMs
+                $stmt = $db->prepare("
+                    INSERT IGNORE INTO student_courses (student_id, course_id) 
+                    SELECT ?, c.id 
+                    FROM courses c 
+                    LEFT JOIN qcm q ON q.course_after_id = c.id
+                    LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = ? AND qs.passed = 1
+                    WHERE c.subject_id = ? 
+                    AND (q.id IS NULL OR qs.id IS NOT NULL)
+                ");
+                $stmt->bind_param("iii", $student_id, $student_id, $subject_id);
                 $stmt->execute();
                 $stmt->close();
 
@@ -108,10 +115,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $course_ids = array_map('intval', $_POST['course_ids']);
             foreach ($course_ids as $course_id) {
-                $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
-                $stmt->bind_param("ii", $student_id, $course_id);
-                $stmt->execute();
-                $stmt->close();
+                // Only assign course if not blocked by QCM or QCM is passed
+                $qcm_check = $db->query("
+                    SELECT q.id, qs.id AS submission_id
+                    FROM qcm q
+                    LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = $student_id AND qs.passed = 1
+                    WHERE q.course_after_id = $course_id
+                ")->fetch_assoc();
+                error_log("QCM check for course_id=$course_id: " . print_r($qcm_check, true));
+                if (!$qcm_check || $qcm_check['submission_id']) {
+                    $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
+                    $stmt->bind_param("ii", $student_id, $course_id);
+                    $stmt->execute();
+                    $stmt->close();
+                    error_log("Assigned course_id=$course_id to student_id=$student_id");
+                } else {
+                    error_log("Skipped course_id=$course_id for student_id=$student_id: QCM not passed");
+                }
 
                 // Get course title for email
                 $course_result = $db->query("SELECT title FROM courses WHERE id = $course_id");

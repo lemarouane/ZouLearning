@@ -21,11 +21,29 @@ $courses_query = $db->query("
     ) AS unique_courses
     JOIN courses c ON unique_courses.course_id = c.id 
     JOIN subjects s ON c.subject_id = s.id
+    LEFT JOIN qcm q ON q.course_after_id = c.id
+    LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = $student_id AND qs.passed = 1
+    WHERE q.id IS NULL OR qs.id IS NOT NULL
 ");
+
 if (!$courses_query) {
     die("Erreur dans la requête des cours : " . $db->error);
 }
 $courses = $courses_query;
+
+// Fetch available QCMs for the student
+$qcms_query = $db->query("
+    SELECT q.id, q.title, s.name AS subject
+    FROM qcm q
+    JOIN subjects s ON q.subject_id = s.id
+    JOIN student_subjects ss ON s.id = ss.subject_id
+    WHERE ss.student_id = $student_id
+    AND NOT EXISTS (
+        SELECT 1 FROM qcm_submissions qs 
+        WHERE qs.qcm_id = q.id AND qs.student_id = $student_id AND qs.passed = 1
+    )
+");
+$qcms = $qcms_query;
 ?>
 
 <!DOCTYPE html>
@@ -35,7 +53,6 @@ $courses = $courses_query;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Cours - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -49,6 +66,34 @@ $courses = $courses_query;
         <?php if (isset($_SESSION['message'])): ?>
             <p style="color: #4caf50;"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
         <?php endif; ?>
+        <h2><i class="fas fa-question-circle"></i> QCM Disponibles</h2>
+        <?php if ($qcms->num_rows > 0): ?>
+            <table id="qcmTable" class="display">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Matière</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($qcm = $qcms->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($qcm['title']); ?></td>
+                            <td><?php echo htmlspecialchars($qcm['subject']); ?></td>
+                            <td>
+                                <a href="student_take_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action view" title="Passer QCM">
+                                    <i class="fas fa-play"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p class="empty-message">Aucun QCM disponible.</p>
+        <?php endif; ?>
+        <h2><i class="fas fa-book"></i> Cours Disponibles</h2>
         <table id="coursesTable" class="display">
             <thead>
                 <tr>
@@ -76,10 +121,9 @@ $courses = $courses_query;
         </table>
     </main>
     <?php include '../includes/footer.php'; ?>
-
     <script>
         $(document).ready(function() {
-            $('#coursesTable').DataTable({ pageLength: 10, lengthChange: false });
+            $('#coursesTable, #qcmTable').DataTable({ pageLength: 10, lengthChange: false });
             $('.btn-action.view').on('click', function(e) {
                 var courseId = $(this).attr('href').split('id=')[1];
                 console.log('Redirecting to view_course.php?id=' + courseId);

@@ -1902,3 +1902,20 @@ body.dark-mode .pdf-page {
         max-height: 50vh;
     }
 }
+
+
+
+
+.question-block { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background: #f9f9f9; }
+.choices-container { margin-top: 10px; }
+.choice-block { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+.course-input, .course-textarea { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+.add-question-btn { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+.add-question-btn:hover { background: #218838; }
+
+
+
+.qcm-form { margin: 20px 0; }
+.question-block { margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+.choice-item { margin: 5px 0; }
+.error-message { color: red; font-weight: bold; }

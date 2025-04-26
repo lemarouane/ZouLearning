@@ -43,6 +43,8 @@ $admin_name = $admin ? htmlspecialchars($admin['username']) : 'Admin';
                 <li><a href="../admin/manage_quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Gérer les examens</span></a></li>
                 <li><a href="../admin/add_quiz.php" <?php echo basename($_SERVER['PHP_SELF']) == 'add_quiz.php' ? 'class="active"' : ''; ?>><i class="fas fa-plus-circle"></i> <span>Ajouter un examen</span></a></li>
                 <li><a href="../admin/grade_quizzes.php" <?php echo basename($_SERVER['PHP_SELF']) == 'grade_quizzes.php' ? 'class="active"' : ''; ?>><i class="fas fa-pen"></i> <span>Noter les examens</span></a></li>
+                <li><a href="../admin/manage_qcm.php" <?php echo basename($_SERVER['PHP_SELF']) == 'manage_qcm.php' ? 'class="active"' : ''; ?>><i class="fas fa-question-circle"></i> <span>Gérer les QCM</span></a></li>
+                <li><a href="../admin/add_qcm.php" <?php echo basename($_SERVER['PHP_SELF']) == 'add_qcm.php' ? 'class="active"' : ''; ?>><i class="fas fa-plus-circle"></i> <span>Ajouter un QCM</span></a></li>
                 <li><a href="../admin/device_requests.php" <?php echo basename($_SERVER['PHP_SELF']) == 'device_requests.php' ? 'class="active"' : ''; ?>><i class="fas fa-mobile-alt"></i> <span>Demandes d'appareils</span></a></li>
                 <li><a href="../admin/user_sessions.php" <?php echo basename($_SERVER['PHP_SELF']) == 'user_sessions.php' ? 'class="active"' : ''; ?>><i class="fas fa-clock"></i> <span>Sessions utilisateur</span></a></li>
                 <li><a href="../admin/logout.php"><i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span></a></li>
