@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['clear_assignments']) && $_POST['clear_assignments'] == '1') {
         $db->query("DELETE FROM student_courses WHERE student_id = $student_id");
         $db->query("DELETE FROM student_subjects WHERE student_id = $student_id");
+        error_log("Cleared all assignments for student_id=$student_id");
     }
 
     // Handle new assignments
@@ -85,23 +86,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute();
                 $stmt->close();
 
-                // Assign all current courses for this subject that are not blocked by QCMs
+                // Assign all current courses for this subject
                 $stmt = $db->prepare("
                     INSERT IGNORE INTO student_courses (student_id, course_id) 
                     SELECT ?, c.id 
                     FROM courses c 
-                    LEFT JOIN qcm q ON q.course_after_id = c.id
-                    LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = ? AND qs.passed = 1
-                    WHERE c.subject_id = ? 
-                    AND (q.id IS NULL OR qs.id IS NOT NULL)
+                    WHERE c.subject_id = ?
                 ");
-                $stmt->bind_param("iii", $student_id, $student_id, $subject_id);
+                $stmt->bind_param("ii", $student_id, $subject_id);
                 $stmt->execute();
                 $stmt->close();
+                error_log("Assigned all courses for subject_id=$subject_id to student_id=$student_id");
 
-                // Get subject name for email
+                // Get subject name and courses for email
                 $subject_result = $db->query("SELECT name FROM subjects WHERE id = $subject_id");
-                $new_courses[] = $subject_result->fetch_assoc()['name'] ?? 'Matière';
+                $subject_name = $subject_result->fetch_assoc()['name'] ?? 'Matière';
+                $new_courses[] = "$subject_name (Tous les cours)";
             }
         } 
         // "Specific Courses" mode
@@ -115,27 +115,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $course_ids = array_map('intval', $_POST['course_ids']);
             foreach ($course_ids as $course_id) {
-                // Only assign course if not blocked by QCM or QCM is passed
-                $qcm_check = $db->query("
-                    SELECT q.id, qs.id AS submission_id
-                    FROM qcm q
-                    LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = $student_id AND qs.passed = 1
-                    WHERE q.course_after_id = $course_id
-                ")->fetch_assoc();
-                error_log("QCM check for course_id=$course_id: " . print_r($qcm_check, true));
-                if (!$qcm_check || $qcm_check['submission_id']) {
-                    $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
-                    $stmt->bind_param("ii", $student_id, $course_id);
-                    $stmt->execute();
-                    $stmt->close();
-                    error_log("Assigned course_id=$course_id to student_id=$student_id");
-                } else {
-                    error_log("Skipped course_id=$course_id for student_id=$student_id: QCM not passed");
-                }
+                // Assign course directly (no QCM check for admin assignments)
+                $stmt = $db->prepare("INSERT IGNORE INTO student_courses (student_id, course_id) VALUES (?, ?)");
+                $stmt->bind_param("ii", $student_id, $course_id);
+                $stmt->execute();
+                $affected_rows = $stmt->affected_rows;
+                $stmt->close();
+                error_log("Assigned course_id=$course_id to student_id=$student_id, affected_rows=$affected_rows");
 
                 // Get course title for email
                 $course_result = $db->query("SELECT title FROM courses WHERE id = $course_id");
-                $new_courses[] = $course_result->fetch_assoc()['title'] ?? 'Cours';
+                $course_title = $course_result->fetch_assoc()['title'] ?? 'Cours';
+                $new_courses[] = $course_title;
             }
         }
     }

@@ -23,7 +23,7 @@ $assigned_subjects = [];
 $result = $db->query("SELECT subject_id, all_courses FROM student_subjects WHERE student_id = $student_id");
 while ($row = $result->fetch_assoc()) {
     $subject_id = $row['subject_id'];
-    $assigned_subjects[$subject_id] = ['all_courses' => $row['all_courses'], 'courses' => []];
+    $assigned_subjects[$subject_id] = ['all_courses' => $row['all_courses'], 'courses' => [], 'name' => ''];
 }
 
 // Fetch all courses per subject
@@ -41,6 +41,8 @@ while ($row = $result->fetch_assoc()) {
 
 // Fetch explicitly assigned courses (for Specific Courses)
 $result = $db->query("SELECT c.id AS course_id, c.title, c.subject_id FROM student_courses sc JOIN courses c ON sc.course_id = c.id WHERE sc.student_id = $student_id");
+$assigned_course_count = $result->num_rows;
+error_log("Fetched $assigned_course_count courses for student_id=$student_id");
 while ($row = $result->fetch_assoc()) {
     $subject_id = $row['subject_id'];
     if (isset($assigned_subjects[$subject_id]) && !$assigned_subjects[$subject_id]['all_courses']) {
@@ -48,11 +50,11 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 
-// Merge "All Courses" subjects with current courses
+// Merge "All Courses" subjects with current courses and set subject names
 foreach ($assigned_subjects as $subject_id => &$subject) {
-    $subject['name'] = $all_subjects[$subject_id]['name'];
+    $subject['name'] = $all_subjects[$subject_id]['name'] ?? 'Matière Inconnue';
     if ($subject['all_courses']) {
-        $subject['courses'] = $all_subjects[$subject_id]['courses'];
+        $subject['courses'] = $all_subjects[$subject_id]['courses'] ?? [];
     }
 }
 
@@ -106,6 +108,7 @@ unset($subject);
         .btn-action:hover { background: #152a55; }
         .btn-action.back { background: #6b7280; }
         .btn-action.back:hover { background: #4b5563; }
+        .no-courses { color: #888; font-style: italic; }
     </style>
 </head>
 <body>
@@ -145,6 +148,8 @@ unset($subject);
                                         <li><?php echo htmlspecialchars($course_title); ?></li>
                                     <?php endforeach; ?>
                                 </ul>
+                            <?php elseif (!$subject['all_courses']): ?>
+                                <p class="no-courses">Aucun cours spécifique assigné.</p>
                             <?php endif; ?>
                         </li>
                     <?php endforeach; ?>

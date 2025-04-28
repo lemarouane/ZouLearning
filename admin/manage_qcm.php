@@ -30,6 +30,16 @@ $qcms = $db->query("
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .add-course-btn, .view-submissions-btn { background: #1e3c72; color: #fff; padding: 10px 15px; border-radius: 5px; text-decoration: none; margin: 10px 0; display: inline-block; }
+        .add-course-btn:hover, .view-submissions-btn:hover { background: #152a55; }
+        .btn-action { color: #fff; padding: 5px 10px; border-radius: 5px; text-decoration: none; margin-right: 5px; }
+        .btn-action.view { background: #4caf50; }
+        .btn-action.edit { background: #ff9800; }
+        .btn-action.delete { background: #f44336; }
+        .btn-action.submissions { background: #2196f3; }
+        .btn-action:hover { opacity: 0.8; }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
@@ -41,7 +51,10 @@ $qcms = $db->query("
         <?php if (isset($_SESSION['error'])): ?>
             <p class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
         <?php endif; ?>
-        <a href="add_qcm.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un QCM</a>
+        <div>
+            <a href="add_qcm.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un QCM</a>
+            <a href="view_qcm_submissions.php" class="add-course-btn" style="background: #2196f3;"><i class="fas fa-list"></i> Voir Toutes les Soumissions</a>
+        </div>
         <table id="qcmTable" class="course-table">
             <thead>
                 <tr>
@@ -67,6 +80,7 @@ $qcms = $db->query("
                             <a href="view_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
                             <a href="edit_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
                             <a href="delete_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action delete" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?');"><i class="fas fa-trash"></i></a>
+                            <a href="view_qcm_submissions.php?qcm_id=<?php echo $qcm['id']; ?>" class="btn-action submissions" title="Voir les Soumissions"><i class="fas fa-list-alt"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>

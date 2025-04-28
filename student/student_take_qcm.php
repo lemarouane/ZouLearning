@@ -7,7 +7,7 @@ if (!isset($_SESSION['student_id'])) {
 }
 
 if (!isset($_GET['id'])) {
-    header("Location: dashboard.php");
+    header("Location: courses.php");
     exit;
 }
 
@@ -24,7 +24,7 @@ $qcm = $db->query("
 ")->fetch_assoc();
 
 if (!$qcm) {
-    header("Location: dashboard.php");
+    header("Location: courses.php");
     exit;
 }
 
@@ -57,6 +57,7 @@ foreach ($questions as $question) {
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         .qcm-form { margin: 20px 0; }
         .question-block { margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
@@ -90,7 +91,7 @@ foreach ($questions as $question) {
             <?php endforeach; ?>
             <div class="form-actions">
                 <button type="submit" class="save-course-btn"><i class="fas fa-save"></i> Soumettre</button>
-                <a href="dashboard.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
+                <a href="courses.php" class="btn-action cancel"><i class="fas fa-times"></i> Annuler</a>
             </div>
         </form>
     </main>

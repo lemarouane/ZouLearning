@@ -1,0 +1,25 @@
+[28-Apr-2025 00:35:38 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'zouhair_elearning.qcm_submission_answers' doesn't exist in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php:74
+Stack trace:
+#0 C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php(74): mysqli->query()
+#1 {main}
+  thrown in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php on line 74
+[28-Apr-2025 00:35:39 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'zouhair_elearning.qcm_submission_answers' doesn't exist in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php:74
+Stack trace:
+#0 C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php(74): mysqli->query()
+#1 {main}
+  thrown in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php on line 74
+[28-Apr-2025 00:35:39 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'zouhair_elearning.qcm_submission_answers' doesn't exist in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php:74
+Stack trace:
+#0 C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php(74): mysqli->query()
+#1 {main}
+  thrown in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php on line 74
+[28-Apr-2025 00:35:39 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'zouhair_elearning.qcm_submission_answers' doesn't exist in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php:74
+Stack trace:
+#0 C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php(74): mysqli->query()
+#1 {main}
+  thrown in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php on line 74
+[28-Apr-2025 00:35:42 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'zouhair_elearning.qcm_submission_answers' doesn't exist in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php:74
+Stack trace:
+#0 C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php(74): mysqli->query()
+#1 {main}
+  thrown in C:\xampp\htdocs\ZouLearning\student\view_qcm_submission.php on line 74

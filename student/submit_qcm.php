@@ -7,7 +7,8 @@ if (!isset($_SESSION['student_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] != 'POST' || !isset($_POST['qcm_id'])) {
-    header("Location: dashboard.php");
+    $_SESSION['error'] = "Requête invalide.";
+    header("Location: courses.php");
     exit;
 }
 
@@ -20,12 +21,14 @@ error_log("Received POST answers: " . print_r($answers, true));
 
 // Verify QCM and get threshold
 $qcm = $db->query("
-    SELECT threshold, course_after_id
-    FROM qcm
-    WHERE id = $qcm_id
+    SELECT q.id, q.title, q.threshold, q.course_after_id
+    FROM qcm q
+    JOIN student_subjects ss ON q.subject_id = ss.subject_id
+    WHERE q.id = $qcm_id AND ss.student_id = $student_id
 ")->fetch_assoc();
 
 if (!$qcm) {
+    $_SESSION['error'] = "QCM non trouvé ou non autorisé.";
     header("Location: courses.php");
     exit;
 }
@@ -42,7 +45,7 @@ $correct_answers = 0;
 
 foreach ($questions as $question) {
     $question_id = $question['id'];
-    $selected_choice_ids = isset($answers[$question_id]) ? array_map('intval', $answers[$question_id]) : [];
+    $selected_choice_ids = isset($answers[$question_id]) ? array_map('intval', (array)$answers[$question_id]) : [];
 
     // Get correct choices for the question
     $correct_choices = $db->query("
@@ -102,7 +105,23 @@ $stmt = $db->prepare("
 ");
 $stmt->bind_param("iidi", $qcm_id, $student_id, $score, $passed);
 $stmt->execute();
+$submission_id = $db->insert_id;
 $stmt->close();
+
+// Save student answers to qcm_submission_answers
+foreach ($answers as $question_id => $choice_ids) {
+    $question_id = (int)$question_id;
+    foreach ((array)$choice_ids as $choice_id) {
+        $choice_id = (int)$choice_id;
+        $stmt = $db->prepare("
+            INSERT INTO qcm_submission_answers (submission_id, question_id, choice_id)
+            VALUES (?, ?, ?)
+        ");
+        $stmt->bind_param("iii", $submission_id, $question_id, $choice_id);
+        $stmt->execute();
+        $stmt->close();
+    }
+}
 
 // If passed, unlock the next course
 if ($passed) {
@@ -116,6 +135,13 @@ if ($passed) {
     $stmt->close();
 }
 
+// Log activity
+$db->query("
+    INSERT INTO activity_logs (user_id, user_type, action, details, timestamp)
+    VALUES ($student_id, 'student', 'Submitted QCM', 'Submitted QCM ID $qcm_id: {$qcm['title']}', NOW())
+");
+
 $_SESSION['message'] = "QCM soumis. Votre score: " . number_format($score, 2) . "%. " . ($passed ? "Vous avez réussi et débloqué le cours suivant !" : "Vous n'avez pas atteint le seuil requis.");
 header("Location: courses.php");
 exit;
+?>
