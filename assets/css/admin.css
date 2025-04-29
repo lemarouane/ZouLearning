@@ -1919,3 +1919,25 @@ body.dark-mode .pdf-page {
 .question-block { margin: 15px 0; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
 .choice-item { margin: 5px 0; }
 .error-message { color: red; font-weight: bold; }
+
+
+/* Add these styles to the /* Buttons */ section */
+.btn-action.archive {
+    background: #6b7280; /* Gray for archive */
+    color: #fff;
+}
+
+.btn-action.archive:hover {
+    background: #4b5563;
+    transform: translateY(-2px);
+}
+
+.btn-action.restore {
+    background: #10b981; /* Green for restore */
+    color: #fff;
+}
+
+.btn-action.restore:hover {
+    background: #059669;
+    transform: translateY(-2px);
+}

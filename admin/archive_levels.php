@@ -5,8 +5,8 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-// Fetch only non-archived levels
-$levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name ASC");
+// Fetch only archived levels
+$archived_levels = $db->query("SELECT * FROM levels WHERE is_archived = 1 ORDER BY name ASC");
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +14,7 @@ $levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name A
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gérer les Niveaux - Zouhair E-Learning</title>
+    <title>Archives des Niveaux - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
@@ -25,12 +25,9 @@ $levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name A
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-layer-group"></i> Gérer les Niveaux</h1>
-        <div class="form-actions">
-            <a href="add_level.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter un Nouveau Niveau</a>
-            <a href="archive_levels.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
-        </div>
-        <table id="levelsTable" class="display">
+        <h1><i class="fas fa-archive"></i> Archives des Niveaux</h1>
+        <a href="manage_levels.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour aux Niveaux</a>
+        <table id="archivedLevelsTable" class="display">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -41,7 +38,7 @@ $levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name A
                 </tr>
             </thead>
             <tbody>
-                <?php while ($level = $levels->fetch_assoc()): ?>
+                <?php while ($level = $archived_levels->fetch_assoc()): ?>
                     <tr>
                         <td><?php echo $level['id']; ?></td>
                         <td><?php echo htmlspecialchars($level['name']); ?></td>
@@ -49,8 +46,7 @@ $levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name A
                         <td><?php echo $level['created_at']; ?></td>
                         <td>
                             <a href="view_level.php?id=<?php echo $level['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
-                            <a href="edit_level.php?id=<?php echo $level['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
-                            <a href="delete_level.php?id=<?php echo $level['id']; ?>" class="btn-action delete" onclick="return confirm('Êtes-vous sûr de vouloir archiver ce niveau ? Il sera déplacé vers les archives.');" title="Archiver"><i class="fas fa-trash"></i></a>
+                            <a href="restore_level.php?id=<?php echo $level['id']; ?>" class="btn-action restore" onclick="return confirm('Êtes-vous sûr de vouloir restaurer ce niveau ? Il sera remis dans la liste principale.');" title="Restaurer"><i class="fas fa-undo"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -61,7 +57,7 @@ $levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name A
 
     <script>
         $(document).ready(function() {
-            $('#levelsTable').DataTable({
+            $('#archivedLevelsTable').DataTable({
                 pageLength: 10,
                 lengthChange: false,
                 order: [[1, 'asc']] // Trier par nom par défaut
