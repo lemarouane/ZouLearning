@@ -6,6 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+// Fetch only non-archived QCMs
 $qcms = $db->query("
     SELECT q.id, q.title, q.threshold, s.name AS subject_name, l.name AS level_name, 
            c1.title AS course_before, c2.title AS course_after
@@ -14,6 +15,7 @@ $qcms = $db->query("
     JOIN levels l ON s.level_id = l.id
     JOIN courses c1 ON q.course_before_id = c1.id
     JOIN courses c2 ON q.course_after_id = c2.id
+    WHERE q.is_archived = 0
     ORDER BY q.created_at DESC
 ");
 ?>
@@ -30,30 +32,21 @@ $qcms = $db->query("
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .add-course-btn, .view-submissions-btn { background: #1e3c72; color: #fff; padding: 10px 15px; border-radius: 5px; text-decoration: none; margin: 10px 0; display: inline-block; }
-        .add-course-btn:hover, .view-submissions-btn:hover { background: #152a55; }
-        .btn-action { color: #fff; padding: 5px 10px; border-radius: 5px; text-decoration: none; margin-right: 5px; }
-        .btn-action.view { background: #4caf50; }
-        .btn-action.edit { background: #ff9800; }
-        .btn-action.delete { background: #f44336; }
-        .btn-action.submissions { background: #2196f3; }
-        .btn-action:hover { opacity: 0.8; }
-    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
         <h1><i class="fas fa-question-circle"></i> Gérer les QCM</h1>
-        <?php if (isset($_SESSION['message'])): ?>
-            <p class="success-message"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="success-message"><?php echo htmlspecialchars($_GET['success']); ?></div>
         <?php endif; ?>
-        <?php if (isset($_SESSION['error'])): ?>
-            <p class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
+        <?php if (isset($_GET['error'])): ?>
+            <div class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
-        <div>
+        <div class="form-actions">
             <a href="add_qcm.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un QCM</a>
             <a href="view_qcm_submissions.php" class="add-course-btn" style="background: #2196f3;"><i class="fas fa-list"></i> Voir Toutes les Soumissions</a>
+            <a href="archive_qcm.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
         </div>
         <table id="qcmTable" class="course-table">
             <thead>
@@ -79,7 +72,7 @@ $qcms = $db->query("
                         <td>
                             <a href="view_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
                             <a href="edit_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
-                            <a href="delete_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action delete" title="Supprimer" onclick="return confirm('Êtes-vous sûr ?');"><i class="fas fa-trash"></i></a>
+                            <a href="delete_qcm.php?id=<?php echo $qcm['id']; ?>" class="btn-action delete" title="Archiver" onclick="return confirm('Êtes-vous sûr de vouloir archiver ce QCM ? Il sera déplacé vers les archives.');"><i class="fas fa-trash"></i></a>
                             <a href="view_qcm_submissions.php?qcm_id=<?php echo $qcm['id']; ?>" class="btn-action submissions" title="Voir les Soumissions"><i class="fas fa-list-alt"></i></a>
                         </td>
                     </tr>

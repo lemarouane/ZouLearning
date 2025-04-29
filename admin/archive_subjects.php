@@ -6,8 +6,8 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-// Fetch only non-archived students
-$students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JOIN levels l ON s.level_id = l.id WHERE s.is_archived = 0 ORDER BY s.created_at DESC");
+// Fetch only archived subjects
+$subjects = $db->query("SELECT s.*, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id WHERE s.is_archived = 1 ORDER BY s.name ASC");
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +15,7 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gérer les Étudiants - Zouhair E-Learning</title>
+    <title>Archives des Matières - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
@@ -26,41 +26,34 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-users"></i> Gérer les Étudiants</h1>
+        <h1><i class="fas fa-archive"></i> Archives des Matières</h1>
         <?php if (isset($_GET['success'])): ?>
             <div class="success-message"><?php echo htmlspecialchars($_GET['success']); ?></div>
         <?php endif; ?>
         <?php if (isset($_GET['error'])): ?>
             <div class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
-        <div class="form-actions">
-            <a href="archive_students.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
-        </div>
-        <table id="studentsTable" class="display">
+        <a href="manage_subjects.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour aux Matières</a>
+        <table id="archivedSubjectsTable" class="display">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nom</th>
-                    <th>Email</th>
-                    <th>Statut</th>
                     <th>Niveau</th>
-                    <th>Inscrit</th>
+                    <th>Créé le</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while ($student = $students->fetch_assoc()): ?>
+                <?php while ($subject = $subjects->fetch_assoc()): ?>
                     <tr>
-                        <td><?php echo $student['id']; ?></td>
-                        <td><?php echo htmlspecialchars($student['full_name']); ?></td>
-                        <td><?php echo htmlspecialchars($student['email']); ?></td>
-                        <td><?php echo ucfirst($student['status']); ?></td>
-                        <td><?php echo $student['level_name'] ? htmlspecialchars($student['level_name']) : 'N/A'; ?></td>
-                        <td><?php echo $student['created_at']; ?></td>
+                        <td><?php echo $subject['id']; ?></td>
+                        <td><?php echo htmlspecialchars($subject['name']); ?></td>
+                        <td><?php echo htmlspecialchars($subject['level_name']); ?></td>
+                        <td><?php echo $subject['created_at']; ?></td>
                         <td>
-                            <a href="view_student.php?id=<?php echo $student['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
-                            <a href="edit_student.php?id=<?php echo $student['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
-                            <a href="delete_student.php?id=<?php echo $student['id']; ?>" class="btn-action delete" title="Archiver" onclick="return confirm('Êtes-vous sûr de vouloir archiver cet étudiant ? Il sera déplacé vers les archives.');"><i class="fas fa-trash"></i></a>
+                            <a href="view_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="restore_subject.php?id=<?php echo $subject['id']; ?>" class="btn-action restore" title="Restaurer" onclick="return confirm('Êtes-vous sûr de vouloir restaurer cette matière ? Elle sera remise dans la liste principale.');"><i class="fas fa-undo"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -71,9 +64,10 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
 
     <script>
         $(document).ready(function() {
-            $('#studentsTable').DataTable({ 
-                pageLength: 10, 
+            $('#archivedSubjectsTable').DataTable({
+                pageLength: 10,
                 lengthChange: false,
+                order: [[1, 'asc']],
                 language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json' }
             });
         });

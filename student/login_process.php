@@ -11,12 +11,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $longitude = !empty($_POST['longitude']) ? (float)$_POST['longitude'] : null;
 
     if (empty($email) || empty($password)) {
-        $_SESSION['error'] = 'Please fill in all fields.';
+        $_SESSION['error'] = 'Veuillez remplir tous les champs.';
         header("Location: login.php");
         exit;
     }
 
-    $stmt = $db->prepare("SELECT id, email, password FROM students WHERE email = ?");
+    $stmt = $db->prepare("SELECT id, email, password FROM students WHERE email = ? AND is_archived = 0");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit;
         }
     } else {
-        $_SESSION['error'] = 'Invalid email or password.';
+        $_SESSION['error'] = 'Email ou mot de passe invalide, ou compte archivé.';
         header("Location: login.php");
         exit;
     }

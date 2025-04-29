@@ -1,30 +1,19 @@
 <?php
 session_start();
 require_once '../includes/db_connect.php';
-if (!isset($_SESSION['student_id'])) {
+if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$student_id = (int)$_SESSION['student_id'];
+// Fetch only archived quizzes
 $quizzes = $db->query("
-    SELECT q.id, q.title, q.description, q.start_datetime, q.duration_hours,
-           s.name AS subject_name, l.name AS level_name,
-           qs.response_path, qs.grade, qs.feedback, qs.submitted_at
+    SELECT q.id, q.title, q.start_datetime, q.duration_hours, s.name AS subject_name, l.name AS level_name
     FROM quizzes q
     JOIN subjects s ON q.subject_id = s.id
     JOIN levels l ON s.level_id = l.id
-    LEFT JOIN quiz_submissions qs ON q.id = qs.quiz_id AND qs.student_id = $student_id
-    WHERE q.is_archived = 0 
-    AND s.is_archived = 0
-    AND q.subject_id IN (
-        SELECT subject_id FROM student_subjects WHERE student_id = $student_id
-        UNION
-        SELECT subject_id FROM student_courses sc
-        JOIN courses c ON sc.course_id = c.id
-        WHERE sc.student_id = $student_id AND c.is_archived = 0
-    )
-    ORDER BY q.start_datetime DESC
+    WHERE q.is_archived = 1
+    ORDER BY q.created_at DESC
 ");
 ?>
 
@@ -33,29 +22,33 @@ $quizzes = $db->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Examens - Zouhair E-Learning</title>
+    <title>Archives des Examens - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <?php include '../includes/student_header.php'; ?>
+    <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-question-circle"></i> Mes Examens</h1>
-        <table id="quizzesTable" class="course-table">
+        <h1><i class="fas fa-archive"></i> Archives des Examens</h1>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="success-message"><?php echo htmlspecialchars($_GET['success']); ?></div>
+        <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <div class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></div>
+        <?php endif; ?>
+        <a href="manage_quizzes.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour aux Examens</a>
+        <table id="archivedQuizzesTable" class="course-table">
             <thead>
                 <tr>
                     <th>Titre</th>
                     <th>Matière</th>
                     <th>Niveau</th>
-                    <th>Début</th>
+                    <th>Début (GMT+1)</th>
                     <th>Durée (h)</th>
-                    <th>Soumis</th>
-                    <th>Note</th>
-                    <th>Commentaires</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -67,13 +60,10 @@ $quizzes = $db->query("
                         <td><?php echo htmlspecialchars($quiz['level_name']); ?></td>
                         <td><?php echo htmlspecialchars($quiz['start_datetime']); ?></td>
                         <td><?php echo number_format($quiz['duration_hours'], 2); ?></td>
-                        <td><?php echo $quiz['submitted_at'] ? htmlspecialchars($quiz['submitted_at']) : '<span class="badge pending">Non soumis</span>'; ?></td>
                         <td>
-                            <?php echo $quiz['grade'] !== null ? number_format($quiz['grade'], 2) . '/20' : '<span class="badge pending">Non noté</span>'; ?>
-                        </td>
-                        <td><?php echo $quiz['feedback'] ? htmlspecialchars(substr($quiz['feedback'], 0, 50)) . '...' : '-'; ?></td>
-                        <td>
-                            <a href="view_quiz.php?id=<?php echo $quiz['id']; ?>" class="btn-action view" title="Voir Quiz"><i class="fas fa-eye"></i></a>
+                            <a href="../includes/serve_quiz_pdf.php?quiz_id=<?php echo $quiz['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
+                            <a href="restore_quiz.php?id=<?php echo $quiz['id']; ?>" class="btn-action restore" title="Restaurer" onclick="return confirm('Êtes-vous sûr de vouloir restaurer cet examen ? Il sera remis dans la liste principale.');"><i class="fas fa-undo"></i></a>
+                            <a href="grade_quizzes_by_quiz.php?quiz_id=<?php echo $quiz['id']; ?>" class="btn-action validate" title="Noter"><i class="fas fa-pen"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -83,7 +73,7 @@ $quizzes = $db->query("
     <?php include '../includes/footer.php'; ?>
     <script>
         $(document).ready(function() {
-            $('#quizzesTable').DataTable({
+            $('#archivedQuizzesTable').DataTable({
                 pageLength: 10,
                 lengthChange: false,
                 language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json' }

@@ -12,16 +12,17 @@ $student_id = (int)$_SESSION['student_id'];
 $assigned_courses = $db->query("
     SELECT course_id
     FROM student_courses
-    WHERE student_id = $student_id
+    JOIN courses c ON student_courses.course_id = c.id
+    WHERE student_id = $student_id AND c.is_archived = 0
 ")->fetch_all(MYSQLI_ASSOC);
 $assigned_course_ids = array_column($assigned_courses, 'course_id');
 
-// Fetch subjects assigned to the student
+// Fetch non-archived subjects assigned to the student
 $subjects_query = $db->query("
     SELECT s.id, s.name
     FROM subjects s
     JOIN student_subjects ss ON s.id = ss.subject_id
-    WHERE ss.student_id = $student_id
+    WHERE ss.student_id = $student_id AND s.is_archived = 0
     ORDER BY s.name
 ");
 if (!$subjects_query) {
@@ -35,32 +36,34 @@ $qcms_by_subject = [];
 foreach ($subjects as $subject) {
     $subject_id = $subject['id'];
 
-    // Fetch courses for this subject
+    // Fetch non-archived courses for this subject
     $courses_query = $db->query("
         SELECT DISTINCT c.id, c.title, s.name AS subject
         FROM (
             SELECT sc.course_id
             FROM student_courses sc
-            WHERE sc.student_id = $student_id
+            JOIN courses c ON sc.course_id = c.id
+            WHERE sc.student_id = $student_id AND c.is_archived = 0
             UNION
             SELECT c.id AS course_id
             FROM student_subjects ss
             JOIN courses c ON ss.subject_id = c.subject_id
-            WHERE ss.student_id = $student_id AND ss.all_courses = 1
+            JOIN subjects s ON c.subject_id = s.id
+            WHERE ss.student_id = $student_id AND ss.all_courses = 1 AND c.is_archived = 0 AND s.is_archived = 0
         ) AS unique_courses
         JOIN courses c ON unique_courses.course_id = c.id
         JOIN subjects s ON c.subject_id = s.id
         LEFT JOIN qcm q ON q.course_after_id = c.id
         LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = $student_id AND qs.passed = 1
-        WHERE s.id = $subject_id
-        AND (q.id IS NULL OR qs.id IS NOT NULL)
+        WHERE s.id = $subject_id AND s.is_archived = 0
+        AND (q.id IS NULL OR qs.id IS NOT NULL OR q.is_archived = 0)
     ");
     if (!$courses_query) {
         die("Erreur dans la requête des cours pour la matière {$subject['name']} : " . $db->error);
     }
     $courses_by_subject[$subject_id] = $courses_query->fetch_all(MYSQLI_ASSOC);
 
-    // Fetch all QCMs for this subject, including passed ones
+    // Fetch non-archived QCMs for this subject
     $qcms_query = $db->query("
         SELECT q.id, q.title, s.name AS subject, qs.passed, qs.score, qs.id AS submission_id
         FROM qcm q
@@ -69,6 +72,8 @@ foreach ($subjects as $subject) {
         LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = $student_id
         WHERE ss.student_id = $student_id
         AND s.id = $subject_id
+        AND s.is_archived = 0
+        AND q.is_archived = 0
         AND q.course_after_id IN (" . (empty($assigned_course_ids) ? '0' : implode(',', $assigned_course_ids)) . ")
     ");
     if (!$qcms_query) {
@@ -113,8 +118,11 @@ foreach ($subjects as $subject) {
     <?php include '../includes/student_header.php'; ?>
     <main class="dashboard">
         <h1><i class="fas fa-book"></i> Mes Cours</h1>
-        <?php if (isset($_SESSION['message'])): ?>
-            <p style="color: #4caf50;"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></p>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="success-message"><?php echo htmlspecialchars($_GET['success']); ?></div>
+        <?php endif; ?>
+        <?php if (isset($_GET['error'])): ?>
+            <div class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
         <?php if (empty($subjects)): ?>
             <p class="empty-message">Aucune matière assignée.</p>

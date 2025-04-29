@@ -6,8 +6,8 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-// Fetch only non-archived students
-$students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JOIN levels l ON s.level_id = l.id WHERE s.is_archived = 0 ORDER BY s.created_at DESC");
+// Fetch only archived students
+$students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JOIN levels l ON s.level_id = l.id WHERE s.is_archived = 1 ORDER BY s.created_at DESC");
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +15,7 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gérer les Étudiants - Zouhair E-Learning</title>
+    <title>Archives des Étudiants - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
@@ -26,17 +26,15 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-users"></i> Gérer les Étudiants</h1>
+        <h1><i class="fas fa-archive"></i> Archives des Étudiants</h1>
         <?php if (isset($_GET['success'])): ?>
             <div class="success-message"><?php echo htmlspecialchars($_GET['success']); ?></div>
         <?php endif; ?>
         <?php if (isset($_GET['error'])): ?>
             <div class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
-        <div class="form-actions">
-            <a href="archive_students.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
-        </div>
-        <table id="studentsTable" class="display">
+        <a href="manage_students.php" class="btn-action back"><i class="fas fa-arrow-left"></i> Retour aux Étudiants</a>
+        <table id="archivedStudentsTable" class="display">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -59,8 +57,7 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
                         <td><?php echo $student['created_at']; ?></td>
                         <td>
                             <a href="view_student.php?id=<?php echo $student['id']; ?>" class="btn-action view" title="Voir"><i class="fas fa-eye"></i></a>
-                            <a href="edit_student.php?id=<?php echo $student['id']; ?>" class="btn-action edit" title="Modifier"><i class="fas fa-edit"></i></a>
-                            <a href="delete_student.php?id=<?php echo $student['id']; ?>" class="btn-action delete" title="Archiver" onclick="return confirm('Êtes-vous sûr de vouloir archiver cet étudiant ? Il sera déplacé vers les archives.');"><i class="fas fa-trash"></i></a>
+                            <a href="restore_student.php?id=<?php echo $student['id']; ?>" class="btn-action restore" title="Restaurer" onclick="return confirm('Êtes-vous sûr de vouloir restaurer cet étudiant ? Il sera remis dans la liste principale.');"><i class="fas fa-undo"></i></a>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -71,7 +68,7 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
 
     <script>
         $(document).ready(function() {
-            $('#studentsTable').DataTable({ 
+            $('#archivedStudentsTable').DataTable({ 
                 pageLength: 10, 
                 lengthChange: false,
                 language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json' }

@@ -12,10 +12,10 @@ if (!isset($_SESSION['student_id'])) {
 
 $student_id = (int)$_SESSION['student_id'];
 
-// Fetch student details
-$student_query = $db->query("SELECT * FROM students WHERE id = $student_id");
+// Fetch student details (only non-archived)
+$student_query = $db->query("SELECT * FROM students WHERE id = $student_id AND is_archived = 0");
 if (!$student_query || $student_query->num_rows == 0) {
-    die("Erreur : Étudiant introuvable.");
+    die("Erreur : Étudiant introuvable ou compte archivé.");
 }
 $student = $student_query->fetch_assoc();
 
@@ -25,18 +25,30 @@ $total_courses_query = $db->query("
     FROM (
         SELECT sc.course_id 
         FROM student_courses sc 
-        WHERE sc.student_id = $student_id
+        JOIN courses c ON sc.course_id = c.id
+        WHERE sc.student_id = $student_id AND c.is_archived = 0
         UNION
         SELECT c.id AS course_id 
         FROM student_subjects ss 
         JOIN courses c ON ss.subject_id = c.subject_id 
-        WHERE ss.student_id = $student_id AND ss.all_courses = 1
+        JOIN subjects s ON c.subject_id = s.id
+        WHERE ss.student_id = $student_id AND ss.all_courses = 1 AND c.is_archived = 0 AND s.is_archived = 0
     ) AS unique_courses
 ");
 $total_courses = $total_courses_query->fetch_row()[0] ?? 0;
 
-$total_subjects = $db->query("SELECT COUNT(*) FROM student_subjects WHERE student_id = $student_id")->fetch_row()[0] ?? 0;
-$level_query = $db->query("SELECT name FROM levels WHERE id = " . (int)$student['level_id']);
+$total_subjects = $db->query("
+    SELECT COUNT(*) 
+    FROM student_subjects ss 
+    JOIN subjects s ON ss.subject_id = s.id 
+    WHERE ss.student_id = $student_id AND s.is_archived = 0
+")->fetch_row()[0] ?? 0;
+
+$level_query = $db->query("
+    SELECT name 
+    FROM levels 
+    WHERE id = " . (int)$student['level_id'] . " AND is_archived = 0
+");
 $level = $level_query && $level_query->num_rows > 0 ? $level_query->fetch_assoc()['name'] : 'N/A';
 
 // Recent courses
@@ -45,15 +57,18 @@ $courses_query = $db->query("
     FROM (
         SELECT sc.course_id 
         FROM student_courses sc 
-        WHERE sc.student_id = $student_id
+        JOIN courses c ON sc.course_id = c.id
+        WHERE sc.student_id = $student_id AND c.is_archived = 0
         UNION
         SELECT c.id AS course_id 
         FROM student_subjects ss 
         JOIN courses c ON ss.subject_id = c.subject_id 
-        WHERE ss.student_id = $student_id AND ss.all_courses = 1
+        JOIN subjects s ON c.subject_id = s.id
+        WHERE ss.student_id = $student_id AND ss.all_courses = 1 AND c.is_archived = 0 AND s.is_archived = 0
     ) AS unique_courses
     JOIN courses c ON unique_courses.course_id = c.id 
     JOIN subjects s ON c.subject_id = s.id 
+    WHERE s.is_archived = 0
     LIMIT 5
 ");
 if (!$courses_query) {
@@ -70,7 +85,9 @@ $result = $db->query("
     LEFT JOIN courses c ON s.id = c.subject_id 
     LEFT JOIN student_courses sc ON c.id = sc.course_id AND sc.student_id = $student_id
     WHERE ss.student_id = $student_id 
+    AND s.is_archived = 0 
     AND (ss.all_courses = 1 OR sc.course_id IS NOT NULL)
+    AND (c.id IS NULL OR c.is_archived = 0)
     GROUP BY s.id, s.name
 ");
 if ($result) {
@@ -81,19 +98,19 @@ if ($result) {
     echo "Erreur dans la requête des sujets : " . $db->error;
 }
 
-
-
-$student_id = (int)$_SESSION['student_id'];
+// New and graded quizzes
 $new_quizzes = $db->query("
     SELECT COUNT(*) AS count
     FROM quizzes q
     JOIN subjects s ON q.subject_id = s.id
-    WHERE q.subject_id IN (
+    WHERE q.is_archived = 0 
+    AND s.is_archived = 0
+    AND q.subject_id IN (
         SELECT subject_id FROM student_subjects WHERE student_id = $student_id
         UNION
         SELECT subject_id FROM student_courses sc
         JOIN courses c ON sc.course_id = c.id
-        WHERE sc.student_id = $student_id
+        WHERE sc.student_id = $student_id AND c.is_archived = 0
     )
     AND q.id NOT IN (
         SELECT quiz_id FROM quiz_submissions WHERE student_id = $student_id
@@ -103,7 +120,10 @@ $new_quizzes = $db->query("
 $graded_quizzes = $db->query("
     SELECT COUNT(*) AS count
     FROM quiz_submissions qs
-    WHERE qs.student_id = $student_id AND qs.grade IS NOT NULL
+    JOIN quizzes q ON qs.quiz_id = q.id
+    WHERE qs.student_id = $student_id 
+    AND qs.grade IS NOT NULL 
+    AND q.is_archived = 0
 ")->fetch_assoc()['count'];
 ?>
 
@@ -114,7 +134,6 @@ $graded_quizzes = $db->query("
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -138,15 +157,14 @@ $graded_quizzes = $db->query("
                 <p><?php echo $total_subjects; ?></p>
             </div>
             <div class="stat-card">
-    <h3><i class="fas fa-question-circle"></i> Notifications Examens</h3>
-    <p><a href="quizzes.php"><?php echo $new_quizzes; ?> nouveaux Examens</a></p>
-    <p><a href="quizzes.php"><?php echo $graded_quizzes; ?> Examens notés</a></p>
-</div>
+                <h3><i class="fas fa-question-circle"></i> Notifications Examens</h3>
+                <p><a href="quizzes.php"><?php echo $new_quizzes; ?> nouveaux Examens</a></p>
+                <p><a href="quizzes.php"><?php echo $graded_quizzes; ?> Examens notés</a></p>
+            </div>
             <div class="stat-card">
                 <h3><i class="fas fa-layer-group"></i> Niveau</h3>
                 <p><?php echo htmlspecialchars($level); ?></p>
             </div>
-
         </section>
 
         <!-- Charts Section -->
