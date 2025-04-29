@@ -44,8 +44,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     foreach ($questions as $q_index => $question) {
-        if (empty(trim($question['text'] ?? ''))) {
-            $errors[] = "La question " . ($q_index + 1) . " est vide.";
+        if (empty(trim($question['text'] ?? '')) && empty($_FILES['questions']['name'][$q_index]['image'])) {
+            $errors[] = "La question " . ($q_index + 1) . " doit avoir du texte ou une image.";
         }
         if (!isset($question['choices']) || count($question['choices']) != 4) {
             $errors[] = "La question " . ($q_index + 1) . " doit avoir exactement 4 choix.";
@@ -64,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
+    // Handle image uploads
+    $upload_dir = '../Uploads/qcm_images/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+
     if (empty($errors)) {
         $db->begin_transaction();
         try {
@@ -79,8 +85,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Insert Questions
             foreach ($questions as $q_index => $question) {
-                $question_text = trim($question['text']);
+                $question_text = trim($question['text'] ?? '');
                 $order = $q_index + 1;
+
+                // Handle image upload
+                if (!empty($_FILES['questions']['name'][$q_index]['image'])) {
+                    $file = $_FILES['questions']['tmp_name'][$q_index]['image'];
+                    $file_name = $_FILES['questions']['name'][$q_index]['image'];
+                    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                    $allowed_exts = ['jpg', 'jpeg', 'png'];
+                    $max_size = 2 * 1024 * 1024; // 2MB
+
+                    if (!in_array($file_ext, $allowed_exts)) {
+                        throw new Exception("Format d'image non autorisé pour la question " . ($q_index + 1) . ". Utilisez JPG ou PNG.");
+                    }
+                    if ($_FILES['questions']['size'][$q_index]['image'] > $max_size) {
+                        throw new Exception("L'image pour la question " . ($q_index + 1) . " dépasse 2 Mo.");
+                    }
+
+                    $new_file_name = "qcm_{$qcm_id}_q{$order}_" . time() . '.' . $file_ext;
+                    $dest_path = $upload_dir . $new_file_name;
+                    if (!move_uploaded_file($file, $dest_path)) {
+                        throw new Exception("Échec du téléchargement de l'image pour la question " . ($q_index + 1));
+                    }
+
+                    $image_tag = "<img src='/Uploads/qcm_images/{$new_file_name}' alt='Question Image' style='max-width: 100%;'>";
+                    $question_text = $question_text ? $question_text . "<br>" . $image_tag : $image_tag;
+                }
+
                 $stmt = $db->prepare("
                     INSERT INTO qcm_questions (qcm_id, question_text, `order`, created_at)
                     VALUES (?, ?, ?, NOW())
@@ -140,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <p class="error-message"><?php echo htmlspecialchars($error); ?></p>
         <?php endforeach; ?>
         <div class="form-container">
-            <form method="POST" id="qcmForm">
+            <form method="POST" id="qcmForm" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="title"><i class="fas fa-heading"></i> Titre</label>
                     <input type="text" name="title" id="title" class="course-input" value="<?php echo isset($_POST['title']) ? htmlspecialchars($_POST['title']) : ''; ?>" required>
@@ -185,7 +217,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <div class="question-block" data-question-index="0">
                         <div class="form-group">
                             <label>Question 1</label>
-                            <textarea name="questions[0][text]" class="course-textarea" required><?php echo isset($_POST['questions'][0]['text']) ? htmlspecialchars($_POST['questions'][0]['text']) : ''; ?></textarea>
+                            <textarea name="questions[0][text]" class="course-textarea"><?php echo isset($_POST['questions'][0]['text']) ? htmlspecialchars($_POST['questions'][0]['text']) : ''; ?></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="question_image_0"><i class="fas fa-image"></i> Image (optionnel, JPG/PNG, max 2 Mo)</label>
+                            <input type="file" name="questions[0][image]" id="question_image_0" class="course-input qcm-image-upload" accept="image/jpeg,image/png">
+                            <img class="qcm-image-preview" id="preview_0" style="display: none; max-width: 200px; margin-top: 10px;" alt="Aperçu de l'image">
                         </div>
                         <div class="choices-container">
                             <?php for ($c = 0; $c < 4; $c++): ?>
@@ -240,13 +277,34 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             });
 
+            // Image preview
+            $(document).on('change', '.qcm-image-upload', function() {
+                const index = $(this).closest('.question-block').data('question-index');
+                const preview = $(`#preview_${index}`);
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.attr('src', e.target.result).show();
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.hide();
+                }
+            });
+
             // Add new question
             $('.add-question-btn').click(function() {
                 const questionBlock = `
                     <div class="question-block" data-question-index="${questionIndex}">
                         <div class="form-group">
                             <label>Question ${questionIndex + 1}</label>
-                            <textarea name="questions[${questionIndex}][text]" class="course-textarea" required></textarea>
+                            <textarea name="questions[${questionIndex}][text]" class="course-textarea"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="question_image_${questionIndex}"><i class="fas fa-image"></i> Image (optionnel, JPG/PNG, max 2 Mo)</label>
+                            <input type="file" name="questions[${questionIndex}][image]" id="question_image_${questionIndex}" class="course-input qcm-image-upload" accept="image/jpeg,image/png">
+                            <img class="qcm-image-preview" id="preview_${questionIndex}" style="display: none; max-width: 200px; margin-top: 10px;" alt="Aperçu de l'image">
                         </div>
                         <div class="choices-container">
                             <div class="choice-block">
@@ -285,8 +343,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .choices-container { margin-top: 10px; }
         .choice-block { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
         .course-input, .course-textarea { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; }
+        .qcm-image-upload { padding: 8px; }
+        .qcm-image-preview { border-radius: 5px; }
         .add-question-btn { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
         .add-question-btn:hover { background: #218838; }
+        body.dark-mode .question-block { background: #2d3748; border-color: #4a5568; }
+        body.dark-mode .course-input, body.dark-mode .course-textarea { background: #4a5568; border-color: #718096; color: #fff; }
+        body.dark-mode .qcm-image-preview { border: 1px solid #718096; }
     </style>
 </body>
 </html>

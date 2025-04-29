@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt->bind_param("isssdd", $student['id'], $device_fingerprint, $device_info, $ip_address, $latitude, $longitude);
             $stmt->execute();
 
-            $_SESSION['error'] = 'This device needs admin approval. Try again later or use your original device.';
+            $_SESSION['error'] = 'Cet appareil nécessite l\'approbation de l\'administrateur. Réessayez plus tard ou utilisez votre appareil d\'origine.';
             header("Location: pending.php");
             exit;
         }

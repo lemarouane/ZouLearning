@@ -112,7 +112,7 @@ if ($result) {
         <!-- Section des Statistiques -->
         <section class="stats">
             <div class="stat-card">
-                <h3><i class="fas fa-users"></i> Total des Étudiants</h3>
+                <h3><i class="fas fa-users"></i>Étudiants</h3>
                 <p><?php echo $total_students; ?></p>
             </div>
             <div class="stat-card">
@@ -128,7 +128,7 @@ if ($result) {
                 <p><a href="manage_courses.php"><?php echo $total_courses; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-layer-group"></i> Total des Niveaux</h3>
+                <h3><i class="fas fa-layer-group"></i>Niveaux</h3>
                 <p><a href="manage_levels.php"><?php echo $total_levels; ?></a></p>
             </div>
             <div class="stat-card">
@@ -136,7 +136,7 @@ if ($result) {
                 <p><a href="grade_quizzes.php"><?php echo $ungraded_submissions; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-mobile-alt"></i> Appareils en Attente</h3>
+                <h3><i class="fas fa-mobile-alt"></i>en Attente</h3>
                 <p><a href="device_requests.php"><?php echo $pending_devices; ?></a></p>
             </div>
         </section>

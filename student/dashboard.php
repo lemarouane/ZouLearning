@@ -134,7 +134,7 @@ $graded_quizzes = $db->query("
                 <p><?php echo $total_courses; ?></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-folder"></i> Sujets</h3>
+                <h3><i class="fas fa-folder"></i> Matières</h3>
                 <p><?php echo $total_subjects; ?></p>
             </div>
             <div class="stat-card">
