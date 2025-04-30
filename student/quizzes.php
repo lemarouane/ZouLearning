@@ -82,13 +82,25 @@ $quizzes = $db->query("
     </main>
     <?php include '../includes/footer.php'; ?>
     <script>
-        $(document).ready(function() {
-            $('#quizzesTable').DataTable({
-                pageLength: 10,
-                lengthChange: false,
-                language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json' }
+    $(document).ready(function() {
+        $('#quizzesTable').DataTable({
+            pageLength: 10,
+            lengthChange: false,
+            language: { url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json' }
+        });
+
+        // Activity tracking for session
+        $(document).on('mousemove keydown', function() {
+            $.ajax({
+                url: 'update_activity.php',
+                method: 'POST',
+                data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
+                error: function() {
+                    console.error('Error updating activity');
+                }
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>

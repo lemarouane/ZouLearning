@@ -221,7 +221,67 @@ $graded_quizzes = $db->query("
             });
             $('.display').DataTable({ searching: false, paging: false, info: false });
             $('.charts, .recent-tables').addClass('animate-in');
+
+            // Inactivity and tab switch detection
+            let inactivityTimer;
+            const INACTIVITY_TIMEOUT = 1800000; // 30 minutes in milliseconds
+
+            // Reset timer on activity
+            function resetInactivityTimer() {
+                clearTimeout(inactivityTimer);
+                inactivityTimer = setTimeout(logout, INACTIVITY_TIMEOUT);
+            }
+
+            // Logout function
+            function logout() {
+                window.location.href = 'logout.php';
+            }
+
+            // Track activity on dashboard
+            $(document).on('mousemove keydown', function() {
+                resetInactivityTimer();
+            });
+
+            // Track tab visibility
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    // Tab is hidden, start checking for activity in other tabs
+                    startActivityCheck();
+                } else {
+                    // Tab is visible, reset timer and stop activity check
+                    resetInactivityTimer();
+                    stopActivityCheck();
+                }
+            });
+
+            let activityCheckInterval;
+            function startActivityCheck() {
+                activityCheckInterval = setInterval(function() {
+                    $.ajax({
+                        url: 'check_activity.php',
+                        method: 'POST',
+                        data: { student_id: <?php echo $student_id; ?> },
+                        success: function(response) {
+                            if (response.isActive) {
+                                // Activity detected in another tab, start logout timer
+                                clearTimeout(inactivityTimer);
+                                inactivityTimer = setTimeout(logout, INACTIVITY_TIMEOUT);
+                            }
+                        },
+                        error: function() {
+                            console.error('Error checking activity');
+                        }
+                    });
+                }, 5000); // Check every 5 seconds
+            }
+
+            function stopActivityCheck() {
+                clearInterval(activityCheckInterval);
+            }
+
+            // Initialize timer
+            resetInactivityTimer();
         });
     </script>
 </body>
-</html>
+</html>2

@@ -217,29 +217,41 @@ foreach ($subjects as $subject) {
     </main>
     <?php include '../includes/footer.php'; ?>
     <script>
-        $(document).ready(function() {
-            // Initialize DataTables for each subject
-            <?php foreach ($subjects as $subject): ?>
-                $('#qcmTable_<?php echo $subject['id']; ?>').DataTable({
-                    pageLength: 3,
-                    lengthChange: false,
-                    searching: false,
-                    ordering: true,
-                    info: false
-                });
-                $('#courseTable_<?php echo $subject['id']; ?>').DataTable({
-                    pageLength: 3,
-                    lengthChange: false,
-                    searching: false,
-                    ordering: true,
-                    info: false
-                });
-            <?php endforeach; ?>
-            $('.btn-action.view').on('click', function(e) {
-                var id = $(this).attr('href').split('id=')[1];
-                console.log('Redirecting to ?id=' + id);
+    $(document).ready(function() {
+        // Existing DataTables initialization
+        <?php foreach ($subjects as $subject): ?>
+            $('#qcmTable_<?php echo $subject['id']; ?>').DataTable({
+                pageLength: 3,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: false
+            });
+            $('#courseTable_<?php echo $subject['id']; ?>').DataTable({
+                pageLength: 3,
+                lengthChange: false,
+                searching: false,
+                ordering: true,
+                info: false
+            });
+        <?php endforeach; ?>
+        $('.btn-action.view').on('click', function(e) {
+            var id = $(this).attr('href').split('id=')[1];
+            console.log('Redirecting to ?id=' + id);
+        });
+
+        // Activity tracking for session
+        $(document).on('mousemove keydown', function() {
+            $.ajax({
+                url: 'update_activity.php',
+                method: 'POST',
+                data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
+                error: function() {
+                    console.error('Error updating activity');
+                }
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>

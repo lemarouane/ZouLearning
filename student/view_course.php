@@ -381,6 +381,17 @@ $stmt->execute();
             }
             return 1;
         }
+            // Activity tracking for session
+$(document).on('mousemove keydown', function() {
+    $.ajax({
+        url: 'update_activity.php',
+        method: 'POST',
+        data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
+        error: function() {
+            console.error('Error updating activity');
+        }
+    });
+});
     </script>
 </body>
 </html>
