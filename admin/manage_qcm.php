@@ -46,7 +46,7 @@ $qcms = $db->query("
         <div class="form-actions">
             <a href="add_qcm.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un QCM</a>
             <a href="view_qcm_submissions.php" class="add-course-btn" style="background: #2196f3;"><i class="fas fa-list"></i> Voir Toutes les Soumissions</a>
-            <a href="archive_qcm.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
+            <a href="archive_qcm.php" class="btn-action archive" style="background-color: #007bff; color: white;"><i class="fas fa-archive"></i> Voir les Archives</a>
         </div>
         <table id="qcmTable" class="course-table">
             <thead>

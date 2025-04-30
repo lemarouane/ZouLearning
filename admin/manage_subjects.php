@@ -35,7 +35,7 @@ $subjects = $db->query("SELECT s.*, l.name AS level_name FROM subjects s JOIN le
         <?php endif; ?>
         <div class="form-actions">
             <a href="add_subject.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter une Nouvelle Matière</a>
-            <a href="archive_subjects.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
+            <a href="archive_subjects.php" class="btn-action archive" style="background-color: #007bff; color: white;"><i class="fas fa-archive"></i> Voir les Archives</a>
         </div>
         <table id="subjectsTable" class="display">
             <thead>

@@ -34,7 +34,7 @@ $students = $db->query("SELECT s.*, l.name AS level_name FROM students s LEFT JO
             <div class="error-message"><?php echo htmlspecialchars($_GET['error']); ?></div>
         <?php endif; ?>
         <div class="form-actions">
-            <a href="archive_students.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
+            <a href="archive_students.php" class="btn-action archive" style="background-color: #007bff; color: white;"><i class="fas fa-archive"></i> Voir les Archives</a>
         </div>
         <table id="studentsTable" class="display">
             <thead>

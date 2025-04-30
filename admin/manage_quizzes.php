@@ -42,7 +42,7 @@ $quizzes = $db->query("
         <?php endif; ?>
         <div class="form-actions">
             <a href="add_quiz.php" class="add-course-btn"><i class="fas fa-plus"></i> Ajouter un Examen</a>
-            <a href="archive_quizzes.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
+            <a href="archive_quizzes.php" class="btn-action archive" style="background-color: #007bff; color: white;"><i class="fas fa-archive"></i> Voir les Archives</a>
         </div>
         <table id="quizzesTable" class="course-table">
             <thead>

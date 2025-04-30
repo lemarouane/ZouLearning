@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submission_id'])) {
 <body>
     <?php include '../includes/header.php'; ?>
     <main class="dashboard">
-        <h1><i class="fas fa-pen"></i> Noter les Quiz</h1>
+        <h1><i class="fas fa-pen"></i> Noter les Examnes</h1>
         <?php if ($success): ?>
             <p class="success-message"><?php echo $success; ?></p>
         <?php endif; ?>

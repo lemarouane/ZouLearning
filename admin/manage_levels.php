@@ -28,7 +28,7 @@ $levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name A
         <h1><i class="fas fa-layer-group"></i> Gérer les Niveaux</h1>
         <div class="form-actions">
             <a href="add_level.php" class="btn-action add"><i class="fas fa-plus"></i> Ajouter un Nouveau Niveau</a>
-            <a href="archive_levels.php" class="btn-action archive"><i class="fas fa-archive"></i> Voir les Archives</a>
+            <a href="archive_levels.php" class="btn-action archive" style="background-color: #007bff; color: white;"><i class="fas fa-archive"></i> Voir les Archives</a>
         </div>
         <table id="levelsTable" class="display">
             <thead>

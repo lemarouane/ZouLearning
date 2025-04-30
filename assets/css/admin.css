@@ -723,7 +723,6 @@ body.dark-mode .course-select {
 
 .form-actions,
 .form-controls {
-    display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
     justify-content: flex-end;
