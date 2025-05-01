@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch levels and current assignments
-$levels = $db->query("SELECT * FROM levels");
+$levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name");
 $assigned_subjects = [];
 $subject_result = $db->query("SELECT subject_id, all_courses FROM student_subjects WHERE student_id = $student_id");
 while ($row = $subject_result->fetch_assoc()) {

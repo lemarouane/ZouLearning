@@ -17,7 +17,7 @@ if (!$subject) {
     exit;
 }
 
-$levels = $db->query("SELECT * FROM levels ORDER BY name ASC");
+$levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];

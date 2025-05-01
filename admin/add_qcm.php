@@ -6,7 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$levels = $db->query("SELECT id, name FROM levels ORDER BY name");
+$levels = $db->query("SELECT * FROM levels WHERE is_archived = 0 ORDER BY name");
 $subjects = $db->query("SELECT id, name, level_id FROM subjects ORDER BY name");
 $courses = $db->query("SELECT c.id, c.title, s.level_id, s.id AS subject_id FROM courses c JOIN subjects s ON c.subject_id = s.id ORDER BY c.title");
 $errors = [];

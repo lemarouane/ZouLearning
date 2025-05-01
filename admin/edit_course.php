@@ -18,7 +18,7 @@ if (!$course) {
     exit;
 }
 
-$subjects = $db->query("SELECT s.id, s.name, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id ORDER BY s.name ASC");
+$subjects = $db->query("SELECT s.id, s.name, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id WHERE s.is_archived = 0 ORDER BY s.name ASC");
 $folders = $db->query("SELECT id, name, description FROM course_folders WHERE course_id = $course_id");
 
 // Ensure upload directory exists
@@ -447,14 +447,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                     <?php endwhile; ?>
                 </select>
             </div>
-            <div class="course-input-group">
-                <label class="course-label"><i class="fas fa-tachometer-alt"></i> Difficulté</label>
-                <select name="difficulty" class="course-select" required>
-                    <option value="Easy" <?php echo $course['difficulty'] == 'Easy' ? 'selected' : ''; ?>>Facile</option>
-                    <option value="Medium" <?php echo $course['difficulty'] == 'Medium' ? 'selected' : ''; ?>>Moyen</option>
-                    <option value="Hard" <?php echo $course['difficulty'] == 'Hard' ? 'selected' : ''; ?>>Difficile</option>
-                </select>
-            </div>
+ 
 
             <div class="subfolder-section-test">
                 <h3 class="section-title"><i class="fas fa-folder"></i> Dossiers Existants</h3>

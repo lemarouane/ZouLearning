@@ -6,7 +6,7 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
-$subjects = $db->query("SELECT s.id, s.name, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id ORDER BY s.name ASC");
+$subjects = $db->query("SELECT s.id, s.name, l.name AS level_name FROM subjects s JOIN levels l ON s.level_id = l.id WHERE s.is_archived = 0 ORDER BY s.name ASC");
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $db->real_escape_string(trim($_POST['title']));
