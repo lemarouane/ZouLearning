@@ -8,15 +8,6 @@ if (!isset($_SESSION['student_id'])) {
 
 $student_id = (int)$_SESSION['student_id'];
 
-// Fetch student’s assigned course IDs (for QCM filtering)
-$assigned_courses = $db->query("
-    SELECT course_id
-    FROM student_courses
-    JOIN courses c ON student_courses.course_id = c.id
-    WHERE student_id = $student_id AND c.is_archived = 0
-")->fetch_all(MYSQLI_ASSOC);
-$assigned_course_ids = array_column($assigned_courses, 'course_id');
-
 // Fetch non-archived subjects assigned to the student
 $subjects_query = $db->query("
     SELECT s.id, s.name
@@ -26,7 +17,8 @@ $subjects_query = $db->query("
     ORDER BY s.name
 ");
 if (!$subjects_query) {
-    die("Erreur dans la requête des matières : " . $db->error);
+    error_log("Error fetching subjects for student $student_id: " . $db->error);
+    die("Erreur dans la requête des matières.");
 }
 $subjects = $subjects_query->fetch_all(MYSQLI_ASSOC);
 
@@ -59,7 +51,8 @@ foreach ($subjects as $subject) {
         AND (q.id IS NULL OR qs.id IS NOT NULL)
     ");
     if (!$courses_query) {
-        die("Erreur dans la requête des cours pour la matière {$subject['name']} : " . $db->error);
+        error_log("Error fetching courses for subject $subject_id: " . $db->error);
+        die("Erreur dans la requête des cours pour la matière {$subject['name']}.");
     }
     $courses = $courses_query->fetch_all(MYSQLI_ASSOC);
     error_log("Courses fetched for subject_id=$subject_id: " . json_encode($courses));
@@ -76,12 +69,27 @@ foreach ($subjects as $subject) {
         AND s.id = $subject_id
         AND s.is_archived = 0
         AND q.is_archived = 0
-        AND q.course_after_id IN (" . (empty($assigned_course_ids) ? '0' : implode(',', $assigned_course_ids)) . ")
+        AND (
+            q.course_after_id IN (
+                SELECT sc.course_id
+                FROM student_courses sc
+                JOIN courses c ON sc.course_id = c.id
+                WHERE sc.student_id = $student_id AND c.is_archived = 0
+                UNION
+                SELECT c.id
+                FROM student_subjects ss
+                JOIN courses c ON ss.subject_id = c.subject_id
+                JOIN subjects s ON c.subject_id = s.id
+                WHERE ss.student_id = $student_id AND ss.all_courses = 1 AND c.is_archived = 0 AND s.is_archived = 0
+            )
+        )
     ");
     if (!$qcms_query) {
-        die("Erreur dans la requête des QCM pour la matière {$subject['name']} : " . $db->error);
+        error_log("Error fetching QCMs for subject $subject_id: " . $db->error);
+        die("Erreur dans la requête des QCM pour la matière {$subject['name']}.");
     }
     $qcms_by_subject[$subject_id] = $qcms_query->fetch_all(MYSQLI_ASSOC);
+    error_log("QCMs fetched for subject_id=$subject_id: " . json_encode($qcms_by_subject[$subject_id]));
 }
 ?>
 
@@ -219,41 +227,43 @@ foreach ($subjects as $subject) {
     </main>
     <?php include '../includes/footer.php'; ?>
     <script>
-    $(document).ready(function() {
-        // Existing DataTables initialization
-        <?php foreach ($subjects as $subject): ?>
-            $('#qcmTable_<?php echo $subject['id']; ?>').DataTable({
-                pageLength: 3,
-                lengthChange: false,
-                searching: false,
-                ordering: true,
-                info: false
-            });
-            $('#courseTable_<?php echo $subject['id']; ?>').DataTable({
-                pageLength: 3,
-                lengthChange: false,
-                searching: false,
-                ordering: true,
-                info: false
-            });
-        <?php endforeach; ?>
-        $('.btn-action.view').on('click', function(e) {
-            var id = $(this).attr('href').split('id=')[1];
-            console.log('Redirecting to ?id=' + id);
-        });
+        $(document).ready(function() {
+            // Initialize DataTables
+            <?php foreach ($subjects as $subject): ?>
+                $('#qcmTable_<?php echo $subject['id']; ?>').DataTable({
+                    pageLength: 3,
+                    lengthChange: false,
+                    searching: false,
+                    ordering: true,
+                    info: false
+                });
+                $('#courseTable_<?php echo $subject['id']; ?>').DataTable({
+                    pageLength: 3,
+                    lengthChange: false,
+                    searching: false,
+                    ordering: true,
+                    info: false
+                });
+            <?php endforeach; ?>
 
-        // Activity tracking for session
-        $(document).on('mousemove keydown', function() {
-            $.ajax({
-                url: 'update_activity.php',
-                method: 'POST',
-                data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
-                error: function() {
-                    console.error('Error updating activity');
-                }
+            // Log redirects for debugging
+            $('.btn-action.view').on('click', function(e) {
+                var id = $(this).attr('href').split('id=')[1];
+                console.log('Redirecting to ?id=' + id);
+            });
+
+            // Activity tracking
+            $(document).on('mousemove keydown', function() {
+                $.ajax({
+                    url: 'update_activity.php',
+                    method: 'POST',
+                    data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
+                    error: function() {
+                        console.error('Error updating activity');
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 </body>
 </html>

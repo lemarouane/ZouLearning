@@ -732,7 +732,7 @@ body.dark-mode .course-select {
 /* -----------------------------------
    Course Management
 ----------------------------------- */
-.subfolder-section {
+.subfolder-section-test {
     margin: 1.5rem 0;
 }
 
@@ -749,7 +749,7 @@ body.dark-mode .section-title {
     color: #e2e8f0;
 }
 
-.subfolder-card {
+.subfolder-card-test {
     background: #f7fafc;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
@@ -1755,6 +1755,7 @@ body.dark-mode .subfolder-container {
     width: 150px; /* Fixed width for subfolders */
     cursor: pointer;
     transition: background 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 10px;
 }
 
 body.dark-mode .subfolder-card {
@@ -1772,7 +1773,7 @@ body.dark-mode .subfolder-card {
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    margin: 0; /* Remove default margins */
+    margin: 5px; /* Remove default margins */
 }
 
 /* Content View Container */

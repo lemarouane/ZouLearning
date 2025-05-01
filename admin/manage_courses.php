@@ -51,7 +51,6 @@ $courses_query = $db->query("
                 <tr>
                     <th>Titre</th>
                     <th>Matière</th>
-                    <th>Difficulté</th>
                     <th>Dossiers</th>
                     <th>Fichiers</th>
                     <th>Actions</th>
@@ -62,7 +61,6 @@ $courses_query = $db->query("
                     <tr>
                         <td><?php echo htmlspecialchars($course['title']); ?></td>
                         <td><?php echo htmlspecialchars($course['subject_name']); ?></td>
-                        <td><?php echo $course['difficulty']; ?></td>
                         <td><?php echo $course['folder_count']; ?></td>
                         <td><?php echo $course['content_count']; ?></td>
                         <td>

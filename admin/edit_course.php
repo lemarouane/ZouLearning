@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                     continue;
                 }
 
-                // Sanitize filename (preserve Arabic, replace spaces/special chars)
+                // Sanitize filename
                 $clean_name = preg_replace('/[^\p{L}\p{N}\-.() ]/u', '', basename($pdf_name));
                 $clean_name = str_replace(' ', '_', $clean_name);
                 $pdf_file_name = time() . '_' . $clean_name;
@@ -295,214 +295,268 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier Cours - Zouhair E-Learning</title>
     <link rel="icon" type="image/png" href="../assets/img/logo.png">
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        .course-form .card-header {
-            background-color: #1e3c72;
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
-        .btn-danger {
-            background-color: #e53e3e;
-            border-color: #e53e3e;
+        .content-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9f9f9;
         }
-        .btn-danger:hover {
-            background-color: #c53030;
-            border-color: #c53030;
+        .form-check-label {
+            margin-left: 10px;
+            color: #333;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .modal-header, .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .modal-body {
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #333;
+        }
+        .btn-close:hover {
+            color: #000;
+        }
+        /* Button Styles */
+        .sparkle-add-folder, .glow-add-pdf, .shine-add-video, .victory-save-course, .retreat-cancel-course, .fire-remove-folder, .storm-remove-content, .blaze-delete-content, .calm-modal-cancel, .inferno-modal-delete {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .sparkle-add-folder, .glow-add-pdf, .shine-add-video {
+            background: linear-gradient(135deg, #28a745, #218838);
+            color: #fff;
+        }
+        .sparkle-add-folder:hover, .glow-add-pdf:hover, .shine-add-video:hover {
+            background: linear-gradient(135deg, #218838, #1e7e34);
+            transform: scale(1.05);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .victory-save-course {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: #fff;
+        }
+        .victory-save-course:hover {
+            background: linear-gradient(135deg, #0056b3, #004085);
+            transform: scale(1.05);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .retreat-cancel-course, .calm-modal-cancel {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: #fff;
+        }
+        .retreat-cancel-course:hover, .calm-modal-cancel:hover {
+            background: linear-gradient(135deg, #5a6268, #545b62);
+            transform: scale(1.05);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .fire-remove-folder, .storm-remove-content, .blaze-delete-content, .inferno-modal-delete {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: #fff;
+        }
+        .fire-remove-folder:hover, .storm-remove-content:hover, .blaze-delete-content:hover, .inferno-modal-delete:hover {
+            background: linear-gradient(135deg, #c82333, #bd2130);
+            transform: scale(1.05);
+            filter: brightness(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .sparkle-add-folder i, .glow-add-pdf i, .shine-add-video i, .victory-save-course i, .retreat-cancel-course i, .fire-remove-folder i, .storm-remove-content i, .blaze-delete-content i, .calm-modal-cancel i, .inferno-modal-delete i {
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
-    <main class="container mt-4">
-        <h1 class="mb-4 text-primary"><i class="fas fa-edit"></i> Modifier Cours</h1>
+    <main class="dashboard">
+        <h1><i class="fas fa-edit"></i> Modifier Cours</h1>
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
+            <p class="error-message"><?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
         <?php endif; ?>
         <form method="POST" enctype="multipart/form-data" class="course-form">
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-book"></i> Informations du Cours</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label"><i class="fas fa-book"></i> Titre du Cours</label>
-                            <input type="text" name="title" class="form-control" value="<?php echo htmlspecialchars($course['title']); ?>" required>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label"><i class="fas fa-book-open"></i> Matière</label>
-                            <select name="subject_id" class="form-select" required>
-                                <option value="">Sélectionnez une matière</option>
-                                <?php
-                                $subjects->data_seek(0);
-                                while ($sub = $subjects->fetch_assoc()): ?>
-                                    <option value="<?php echo $sub['id']; ?>" <?php echo $sub['id'] == $course['subject_id'] ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($sub['name'] . " (" . $sub['level_name'] . ")"); ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            </select>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <label class="form-label"><i class="fas fa-tachometer-alt"></i> Difficulté</label>
-                            <select name="difficulty" class="form-select" required>
-                                <option value="">Sélectionnez une difficulté</option>
-                                <option value="Easy" <?php echo $course['difficulty'] == 'Easy' ? 'selected' : ''; ?>>Facile</option>
-                                <option value="Medium" <?php echo $course['difficulty'] == 'Medium' ? 'selected' : ''; ?>>Moyen</option>
-                                <option value="Hard" <?php echo $course['difficulty'] == 'Hard' ? 'selected' : ''; ?>>Difficile</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+            <div class="course-input-group">
+                <label class="course-label"><i class="fas fa-book"></i> Titre du Cours</label>
+                <input type="text" name="title" class="course-input" value="<?php echo htmlspecialchars($course['title']); ?>" required>
+            </div>
+            <div class="course-input-group">
+                <label class="course-label"><i class="fas fa-book-open"></i> Matière</label>
+                <select name="subject_id" class="course-select" required>
+                    <option value="">Sélectionnez une matière</option>
+                    <?php
+                    $subjects->data_seek(0);
+                    while ($sub = $subjects->fetch_assoc()): ?>
+                        <option value="<?php echo $sub['id']; ?>" <?php echo $sub['id'] == $course['subject_id'] ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($sub['name'] . " (" . $sub['level_name'] . ")"); ?>
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+            <div class="course-input-group">
+                <label class="course-label"><i class="fas fa-tachometer-alt"></i> Difficulté</label>
+                <select name="difficulty" class="course-select" required>
+                    <option value="Easy" <?php echo $course['difficulty'] == 'Easy' ? 'selected' : ''; ?>>Facile</option>
+                    <option value="Medium" <?php echo $course['difficulty'] == 'Medium' ? 'selected' : ''; ?>>Moyen</option>
+                    <option value="Hard" <?php echo $course['difficulty'] == 'Hard' ? 'selected' : ''; ?>>Difficile</option>
+                </select>
             </div>
 
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-folder"></i> Dossiers Existants</h5>
-                </div>
-                <div class="card-body">
-                    <div class="accordion" id="folder-accordion">
-                        <?php
-                        $folders->data_seek(0);
-                        while ($folder = $folders->fetch_assoc()):
-                            $folder_id = $folder['id'];
-                            $contents = $db->query("SELECT id, content_type, content_name, content_path FROM course_contents WHERE folder_id = $folder_id");
-                        ?>
-                            <div class="accordion-item">
-                                <h2 class="accordion-header" id="heading-<?php echo $folder_id; ?>">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-<?php echo $folder_id; ?>" aria-expanded="false" aria-controls="collapse-<?php echo $folder_id; ?>">
-                                        <i class="fas fa-folder me-2"></i> <?php echo htmlspecialchars($folder['name']); ?>
-                                    </button>
-                                </h2>
-                                <div id="collapse-<?php echo $folder_id; ?>" class="accordion-collapse collapse" aria-labelledby="heading-<?php echo $folder_id; ?>" data-bs-parent="#folder-accordion">
-                                    <div class="accordion-body">
-                                        <input type="hidden" name="folder_ids[]" value="<?php echo $folder_id; ?>">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nom du Dossier</label>
-                                            <input type="text" name="folder_names[]" class="form-control" value="<?php echo htmlspecialchars($folder['name']); ?>" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Description (facultatif)</label>
-                                            <textarea name="folder_descriptions[]" class="form-control"><?php echo htmlspecialchars($folder['description'] ?? ''); ?></textarea>
-                                        </div>
-                                        <ul class="nav nav-tabs mb-3" id="content-tabs-<?php echo $folder_id; ?>" role="tablist">
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link active" id="pdf-tab-<?php echo $folder_id; ?>" data-bs-toggle="tab" data-bs-target="#pdf-content-<?php echo $folder_id; ?>" type="button" role="tab" aria-controls="pdf-content-<?php echo $folder_id; ?>" aria-selected="true"><i class="fas fa-file-pdf"></i> PDFs</button>
-                                            </li>
-                                            <li class="nav-item" role="presentation">
-                                                <button class="nav-link" id="video-tab-<?php echo $folder_id; ?>" data-bs-toggle="tab" data-bs-target="#video-content-<?php echo $folder_id; ?>" type="button" role="tab" aria-controls="video-content-<?php echo $folder_id; ?>" aria-selected="false"><i class="fas fa-video"></i> Vidéos</button>
-                                            </li>
-                                        </ul>
-                                        <div class="tab-content" id="content-tab-content-<?php echo $folder_id; ?>">
-                                            <div class="tab-pane fade show active" id="pdf-content-<?php echo $folder_id; ?>" role="tabpanel" aria-labelledby="pdf-tab-<?php echo $folder_id; ?>">
-                                                <h6>Contenu Existant</h6>
-                                                <div class="row">
-                                                    <?php
-                                                    $contents->data_seek(0);
-                                                    $has_pdfs = false;
-                                                    while ($content = $contents->fetch_assoc()):
-                                                        if ($content['content_type'] == 'PDF'):
-                                                            $has_pdfs = true;
-                                                    ?>
-                                                            <div class="col-md-6 col-lg-4 mb-3">
-                                                                <div class="content-item card h-100">
-                                                                    <div class="card-body d-flex justify-content-between align-items-center">
-                                                                        <span><i class="fas fa-file-pdf me-2"></i> <?php echo htmlspecialchars($content['content_name']); ?></span>
-                                                                        <button type="button" class="btn btn-danger btn-sm delete-content-btn" data-content-id="<?php echo $content['id']; ?>" data-content-name="<?php echo htmlspecialchars($content['content_name']); ?>"><i class="fas fa-trash"></i></button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                    <?php
-                                                        endif;
-                                                    endwhile;
-                                                    if (!$has_pdfs):
-                                                    ?>
-                                                        <p class="text-muted">Aucun PDF dans ce dossier.</p>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <h6>Ajouter des PDFs</h6>
-                                                <button type="button" class="btn btn-outline-primary add-pdf-btn mb-3" data-folder="<?php echo $folder_id; ?>"><i class="fas fa-plus"></i> Ajouter PDF</button>
-                                                <div class="pdf-list"></div>
-                                            </div>
-                                            <div class="tab-pane fade" id="video-content-<?php echo $folder_id; ?>" role="tabpanel" aria-labelledby="video-tab-<?php echo $folder_id; ?>">
-                                                <h6>Contenu Existant</h6>
-                                                <div class="row">
-                                                    <?php
-                                                    $contents->data_seek(0);
-                                                    $has_videos = false;
-                                                    while ($content = $contents->fetch_assoc()):
-                                                        if ($content['content_type'] == 'Video'):
-                                                            $has_videos = true;
-                                                    ?>
-                                                            <div class="col-md-6 col-lg-4 mb-3">
-                                                                <div class="content-item card h-100">
-                                                                    <div class="card-body d-flex justify-content-between align-items-center">
-                                                                        <span><i class="fas fa-video me-2"></i> <?php echo htmlspecialchars($content['content_name']); ?></span>
-                                                                        <button type="button" class="btn btn-danger btn-sm delete-content-btn" data-content-id="<?php echo $content['id']; ?>" data-content-name="<?php echo htmlspecialchars($content['content_name']); ?>"><i class="fas fa-trash"></i></button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                    <?php
-                                                        endif;
-                                                    endwhile;
-                                                    if (!$has_videos):
-                                                    ?>
-                                                        <p class="text-muted">Aucune vidéo dans ce dossier.</p>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <h6>Ajouter des Vidéos</h6>
-                                                <button type="button" class="btn btn-outline-primary add-video-btn mb-3" data-folder="<?php echo $folder_id; ?>"><i class="fas fa-plus"></i> Ajouter Vidéo</button>
-                                                <div class="video-list"></div>
-                                            </div>
-                                        </div>
-                                        <div class="mt-3">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" name="delete_folders[]" value="<?php echo $folder_id; ?>" class="form-check-input">
-                                                Supprimer ce dossier
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
+            <div class="subfolder-section-test">
+                <h3 class="section-title"><i class="fas fa-folder"></i> Dossiers Existants</h3>
+                <div id="existing-folder-list">
+                    <?php
+                    $folders->data_seek(0);
+                    while ($folder = $folders->fetch_assoc()):
+                        $folder_id = $folder['id'];
+                        $contents = $db->query("SELECT id, content_type, content_name, content_path FROM course_contents WHERE folder_id = $folder_id");
+                    ?>
+                        <div class="subfolder-card-test">
+                            <input type="hidden" name="folder_ids[]" value="<?php echo $folder_id; ?>">
+                            <div class="course-input-group">
+                                <label class="course-label"><i class="fas fa-folder"></i> Nom du Dossier</label>
+                                <input type="text" name="folder_names[]" class="course-input" value="<?php echo htmlspecialchars($folder['name']); ?>" required>
                             </div>
-                        <?php endwhile; ?>
-                    </div>
+                            <div class="course-input-group">
+                                <label class="course-label"><i class="fas fa-info-circle"></i> Description (facultatif)</label>
+                                <textarea name="folder_descriptions[]" class="course-textarea"><?php echo htmlspecialchars($folder['description'] ?? ''); ?></textarea>
+                            </div>
+                            <div class="course-input-group">
+                                <label class="course-label"><i class="fas fa-file-pdf"></i> Contenu Existant (PDFs)</label>
+                                <div class="content-list">
+                                    <?php
+                                    $contents->data_seek(0);
+                                    $has_pdfs = false;
+                                    while ($content = $contents->fetch_assoc()):
+                                        if ($content['content_type'] == 'PDF'):
+                                            $has_pdfs = true;
+                                    ?>
+                                            <div class="content-item">
+                                                <span><i class="fas fa-file-pdf"></i> <?php echo htmlspecialchars($content['content_name']); ?></span>
+                                                <button type="button" class="blaze-delete-content" data-content-id="<?php echo $content['id']; ?>" data-content-name="<?php echo htmlspecialchars($content['content_name']); ?>"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endwhile; ?>
+                                    <?php if (!$has_pdfs): ?>
+                                        <p class="text-muted">Aucun PDF dans ce dossier.</p>
+                                    <?php endif; ?>
+                                </div>
+                                <button type="button" class="glow-add-pdf" data-folder="<?php echo $folder_id; ?>"><i class="fas fa-plus"></i> Ajouter PDF</button>
+                                <div class="pdf-list"></div>
+                            </div>
+                            <div class="course-input-group">
+                                <label class="course-label"><i class="fas fa-video"></i> Contenu Existant (Vidéos)</label>
+                                <div class="content-list">
+                                    <?php
+                                    $contents->data_seek(0);
+                                    $has_videos = false;
+                                    while ($content = $contents->fetch_assoc()):
+                                        if ($content['content_type'] == 'Video'):
+                                            $has_videos = true;
+                                    ?>
+                                            <div class="content-item">
+                                                <span><i class="fas fa-video"></i> <?php echo htmlspecialchars($content['content_name']); ?></span>
+                                                <button type="button" class="blaze-delete-content" data-content-id="<?php echo $content['id']; ?>" data-content-name="<?php echo htmlspecialchars($content['content_name']); ?>"><i class="fas fa-trash"></i></button>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endwhile; ?>
+                                    <?php if (!$has_videos): ?>
+                                        <p class="text-muted">Aucune vidéo dans ce dossier.</p>
+                                    <?php endif; ?>
+                                </div>
+                                <button type="button" class="shine-add-video" data-folder="<?php echo $folder_id; ?>"><i class="fas fa-plus"></i> Ajouter Vidéo</button>
+                                <div class="video-list"></div>
+                            </div>
+                            <div class="course-input-group">
+                                <label class="form-check-label">
+                                    <input type="checkbox" name="delete_folders[]" value="<?php echo $folder_id; ?>" class="form-check-input">
+                                    Supprimer ce dossier
+                                </label>
+                            </div>
+                        </div>
+                    <?php endwhile; ?>
                 </div>
             </div>
 
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-folder-plus"></i> Nouveaux Dossiers</h5>
-                </div>
-                <div class="card-body">
-                    <button type="button" id="addFolder" class="btn btn-primary mb-3"><i class="fas fa-plus"></i> Ajouter un Dossier</button>
-                    <div id="new-folder-list"></div>
-                </div>
+            <div class="subfolder-section-test">
+                <h3 class="section-title"><i class="fas fa-folder-plus"></i> Nouveaux Dossiers</h3>
+                <button type="button" id="addFolder" class="sparkle-add-folder"><i class="fas fa-plus"></i> Ajouter un Dossier</button>
+                <div id="new-folder-list"></div>
             </div>
 
-            <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-success me-2"><i class="fas fa-save"></i> Enregistrer</button>
-                <a href="manage_courses.php" class="btn btn-secondary"><i class="fas fa-times"></i> Annuler</a>
+            <div class="form-controls">
+                <button type="submit" class="victory-save-course"><i class="fas fa-save"></i> Enregistrer</button>
+                <a href="manage_courses.php" class="retreat-cancel-course"><i class="fas fa-times"></i> Annuler</a>
             </div>
         </form>
     </main>
 
-    <div class="modal fade" id="deleteContentModal" tabindex="-1" aria-labelledby="deleteContentModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteContentModalLabel">Confirmer la Suppression</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Êtes-vous sûr de vouloir supprimer "<span id="delete-content-name"></span>" ? Cette action est irréversible.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">Supprimer</button>
-                </div>
+    <div class="modal" id="deleteContentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>Confirmer la Suppression</h5>
+                <button type="button" class="btn-close" data-modal-close>×</button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer "<span id="delete-content-name"></span>" ? Cette action est irréversible.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="calm-modal-cancel" data-modal-close><i class="fas fa-times"></i> Annuler</button>
+                <button type="button" class="inferno-modal-delete" id="confirm-delete-btn"><i class="fas fa-trash"></i> Supprimer</button>
             </div>
         </div>
     </div>
@@ -516,100 +570,86 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
             function addFolder() {
                 folderCount++;
                 const folderHtml = `
-                    <div class="subfolder-card mb-3">
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label"><i class="fas fa-folder"></i> Nom du Dossier</label>
-                                    <input type="text" name="new_folder_names[]" class="form-control" placeholder="ex., Les Matrices">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label"><i class="fas fa-info-circle"></i> Description (facultatif)</label>
-                                    <textarea name="new_folder_descriptions[]" class="form-control" placeholder="Description du dossier"></textarea>
-                                </div>
-                                <ul class="nav nav-tabs mb-3" id="new-content-tabs-${folderCount}" role="tablist">
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link active" id="new-pdf-tab-${folderCount}" data-bs-toggle="tab" data-bs-target="#new-pdf-content-${folderCount}" type="button" role="tab" aria-controls="new-pdf-content-${folderCount}" aria-selected="true"><i class="fas fa-file-pdf"></i> PDFs</button>
-                                    </li>
-                                    <li class="nav-item" role="presentation">
-                                        <button class="nav-link" id="new-video-tab-${folderCount}" data-bs-toggle="tab" data-bs-target="#new-video-content-${folderCount}" type="button" role="tab" aria-controls="new-video-content-${folderCount}" aria-selected="false"><i class="fas fa-video"></i> Vidéos</button>
-                                    </li>
-                                </ul>
-                                <div class="tab-content" id="new-content-tab-content-${folderCount}">
-                                    <div class="tab-pane fade show active" id="new-pdf-content-${folderCount}" role="tabpanel" aria-labelledby="new-pdf-tab-${folderCount}">
-                                        <button type="button" class="btn btn-outline-primary add-pdf-btn mb-3" data-folder="${folderCount}"><i class="fas fa-plus"></i> Ajouter PDF</button>
-                                        <div class="pdf-list"></div>
-                                    </div>
-                                    <div class="tab-pane fade" id="new-video-content-${folderCount}" role="tabpanel" aria-labelledby="new-video-tab-${folderCount}">
-                                        <button type="button" class="btn btn-outline-primary add-video-btn mb-3" data-folder="${folderCount}"><i class="fas fa-plus"></i> Ajouter Vidéo</button>
-                                        <div class="video-list"></div>
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-danger remove-folder-btn mt-3"><i class="fas fa-trash"></i> Supprimer Dossier</button>
-                            </div>
+                    <div class="subfolder-card-test" id="folder-${folderCount}">
+                        <div class="course-input-group">
+                            <label class="course-label"><i class="fas fa-folder"></i> Nom du Dossier</label>
+                            <input type="text" name="new_folder_names[]" class="course-input" placeholder="ex., Les Matrices">
                         </div>
+                        <div class="course-input-group">
+                            <label class="course-label"><i class="fas fa-info-circle"></i> Description (facultatif)</label>
+                            <textarea name="new_folder_descriptions[]" class="course-textarea" placeholder="Description du dossier"></textarea>
+                        </div>
+                        <div class="course-input-group">
+                            <label class="course-label"><i class="fas fa-file-pdf"></i> PDFs</label>
+                            <button type="button" class="glow-add-pdf" data-folder="${folderCount}"><i class="fas fa-plus"></i> Ajouter PDF</button>
+                            <div class="pdf-list"></div>
+                        </div>
+                        <div class="course-input-group">
+                            <label class="course-label"><i class="fas fa-video"></i> Vidéos</label>
+                            <button type="button" class="shine-add-video" data-folder="${folderCount}"><i class="fas fa-plus"></i> Ajouter Vidéo</button>
+                            <div class="video-list"></div>
+                        </div>
+                        <button type="button" class="fire-remove-folder"><i class="fas fa-trash"></i> Supprimer Dossier</button>
                     </div>`;
-                $('#new-folder-list').append(folderHtml);
+                $('#new-folder-list').append(folderHtml).find(`#folder-${folderCount}`).hide().slideDown(300);
             }
 
             $('#addFolder').click(addFolder);
 
-            $(document).on('click', '.add-pdf-btn', function() {
+            $(document).on('click', '.glow-add-pdf', function() {
                 const folderId = $(this).data('folder');
-                const namePrefix = $(this).closest('.subfolder-card').length ? 'new_pdf_names' : 'pdf_names';
-                const filePrefix = $(this).closest('.subfolder-card').length ? 'new_pdf_files' : 'pdf_files';
+                const namePrefix = $(this).closest('.subfolder-card-test').parent().attr('id') === 'new-folder-list' ? 'new_pdf_names' : 'pdf_names';
+                const filePrefix = $(this).closest('.subfolder-card-test').parent().attr('id') === 'new-folder-list' ? 'new_pdf_files' : 'pdf_files';
                 const pdfHtml = `
-                    <div class="content-item card mb-3">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nom du PDF</label>
-                                    <input type="text" name="${namePrefix}[${folderId}][]" class="form-control" placeholder="ex., Introduction aux Matrices">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Fichier PDF</label>
-                                    <input type="file" name="${filePrefix}[${folderId}][]" class="form-control" accept=".pdf">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-outline-danger btn-sm remove-content-btn"><i class="fas fa-times"></i> Supprimer</button>
+                    <div class="content-item">
+                        <div class="course-input-group">
+                            <label class="course-label">Nom du PDF</label>
+                            <input type="text" name="${namePrefix}[${folderId}][]" class="course-input" placeholder="ex., Introduction aux Matrices">
                         </div>
+                        <div class="course-input-group">
+                            <label class="course-label">Fichier PDF</label>
+                            <input type="file" name="${filePrefix}[${folderId}][]" class="course-input" accept=".pdf">
+                        </div>
+                        <button type="button" class="storm-remove-content"><i class="fas fa-times"></i> Supprimer</button>
                     </div>`;
-                $(this).siblings('.pdf-list').append(pdfHtml);
+                $(this).siblings('.pdf-list').append(pdfHtml).find('.content-item').last().hide().slideDown(300);
             });
 
-            $(document).on('click', '.add-video-btn', function() {
+            $(document).on('click', '.shine-add-video', function() {
                 const folderId = $(this).data('folder');
-                const namePrefix = $(this).closest('.subfolder-card').length ? 'new_video_names' : 'video_names';
-                const urlPrefix = $(this).closest('.subfolder-card').length ? 'new_video_urls' : 'video_urls';
+                const namePrefix = $(this).closest('.subfolder-card-test').parent().attr('id') === 'new-folder-list' ? 'new_video_names' : 'video_names';
+                const urlPrefix = $(this).closest('.subfolder-card-test').parent().attr('id') === 'new-folder-list' ? 'new_video_urls' : 'video_urls';
                 const videoHtml = `
-                    <div class="content-item card mb-3">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Nom de la Vidéo</label>
-                                    <input type="text" name="${namePrefix}[${folderId}][]" class="form-control" placeholder="ex., Vidéo d'Introduction">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">URL YouTube</label>
-                                    <input type="url" name="${urlPrefix}[${folderId}][]" class="form-control" placeholder="ex., https://www.youtube.com/watch?v=xyz">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-outline-danger btn-sm remove-content-btn"><i class="fas fa-times"></i> Supprimer</button>
+                    <div class="content-item">
+                        <div class="course-input-group">
+                            <label class="course-label">Nom de la Vidéo</label>
+                            <input type="text" name="${namePrefix}[${folderId}][]" class="course-input" placeholder="ex., Vidéo d'Introduction">
                         </div>
+                        <div class="course-input-group">
+                            <label class="course-label">URL YouTube</label>
+                            <input type="url" name="${urlPrefix}[${folderId}][]" class="course-input" placeholder="ex., https://www.youtube.com/watch?v=xyz">
+                        </div>
+                        <button type="button" class="storm-remove-content"><i class="fas fa-times"></i> Supprimer</button>
                     </div>`;
-                $(this).siblings('.video-list').append(videoHtml);
+                $(this).siblings('.video-list').append(videoHtml).find('.content-item').last().hide().slideDown(300);
             });
 
-            $(document).on('click', '.remove-folder-btn, .remove-content-btn', function() {
-                $(this).closest('.subfolder-card, .content-item').remove();
+            $(document).on('click', '.fire-remove-folder, .storm-remove-content', function() {
+                $(this).closest('.subfolder-card-test, .content-item').slideUp(300, function() {
+                    $(this).remove();
+                });
             });
 
             let deleteContentId = null;
-            $(document).on('click', '.delete-content-btn', function() {
+            $(document).on('click', '.blaze-delete-content', function() {
                 deleteContentId = $(this).data('content-id');
                 const contentName = $(this).data('content-name');
                 $('#delete-content-name').text(contentName);
-                $('#deleteContentModal').modal('show');
+                $('#deleteContentModal').show();
+            });
+
+            $(document).on('click', '[data-modal-close]', function() {
+                $('#deleteContentModal').hide();
             });
 
             $('#confirm-delete-btn').click(function() {
@@ -621,8 +661,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                         dataType: 'json',
                         success: function(response) {
                             if (response.success) {
-                                $(`.delete-content-btn[data-content-id="${deleteContentId}"]`).closest('.content-item').remove();
-                                $('#deleteContentModal').modal('hide');
+                                $(`.blaze-delete-content[data-content-id="${deleteContentId}"]`).closest('.content-item').slideUp(300, function() {
+                                    $(this).remove();
+                                });
+                                $('#deleteContentModal').hide();
                             } else {
                                 alert(response.error || 'Erreur lors de la suppression');
                             }
