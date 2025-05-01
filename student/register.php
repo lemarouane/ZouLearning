@@ -131,7 +131,6 @@ if (isset($_SESSION['error'])) {
             align-items: center;
             gap: 15px;
             margin-left: -22px;
-
         }
         .signup-image {
             margin-top: 60px;
@@ -181,6 +180,7 @@ if (isset($_SESSION['error'])) {
             font-size: 16px;
             color: #1e40af;
             text-decoration: underline;
+            cursor: pointer;
         }
         .signup-form {
             margin-left: 90px;
@@ -207,7 +207,6 @@ if (isset($_SESSION['error'])) {
             font-family: Poppins;
             box-sizing: border-box;
             font-size: 18px;
-
             border-radius: 8px;
         }
         input::-webkit-input-placeholder, select::-webkit-input-placeholder {
@@ -290,6 +289,97 @@ if (isset($_SESSION['error'])) {
         }
         .hidden {
             display: none;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            animation: fadeIn 0.3s ease-in;
+        }
+        .modal-content {
+            background: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            font-family: Poppins;
+            animation: slideIn 0.3s ease-in-out;
+        }
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 28px;
+            color: #1e40af;
+            font-weight: 600;
+        }
+        .modal-content p, .modal-content li {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .modal-content ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+        .modal-content li {
+            list-style-type: disc;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #6b7280;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .modal-close:hover {
+            color: #1e40af;
+        }
+        .modal-content .close-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #3b82f6, #1e40af);
+            color: #fff;
+            padding: 12px 30px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        .modal-content .close-btn:hover {
+            background: linear-gradient(90deg, #1e40af, #3b82f6);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+        @media screen and (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            .modal-content h3 {
+                font-size: 24px;
+            }
+            .modal-content p, .modal-content li {
+                font-size: 14px;
+            }
+            .modal-close {
+                font-size: 24px;
+            }
         }
 
         /* Responsive Design */
@@ -379,9 +469,11 @@ if (isset($_SESSION['error'])) {
                                 <input type="tel" name="phone" id="phone" pattern="[0-9]{10,15}" placeholder="Numéro de Téléphone (ex: 0612345678)">
                             </div>
                             <div class="form-group">
-                                <label for="dob"><i class="zmdi zmdi-calendar"></i></label>
-                                <input type="date" name="dob" id="dob" max="<?php echo date('Y-m-d', strtotime('-16 years')); ?>" required>
-                            </div>
+    <label for="dob"></i></label>
+    <input type="date" name="dob" id="dob" max="<?php echo date('Y-m-d', strtotime('-16 years')); ?>" required>
+    <small class="form-text text-muted">Veuillez sélectionner votre date de naissance</small>
+</div>
+
                             <div class="form-group">
                                 <label for="gender"><i class="zmdi zmdi-male-female"></i></label>
                                 <select name="gender" id="gender">
@@ -391,12 +483,59 @@ if (isset($_SESSION['error'])) {
                                     <option value="Other">Autre</option>
                                 </select>
                             </div>
+<div class="form-group">
+    <label for="city"><i class="zmdi zmdi-city"></i></label>
+    <select name="city" id="city" class="form-control">
+        <option value="">Sélectionnez une ville</option>
+        <option value="Agadir">Agadir</option>
+        <option value="Al Hoceima">Al Hoceima</option>
+        <option value="Azilal">Azilal</option>
+        <option value="Beni Mellal">Beni Mellal</option>
+        <option value="Casablanca">Casablanca</option>
+        <option value="Chefchaouen">Chefchaouen</option>
+        <option value="El Jadida">El Jadida</option>
+        <option value="Fes">Fes</option>
+        <option value="Ifrane">Ifrane</option>
+        <option value="Kenitra">Kenitra</option>
+        <option value="Marrakech">Marrakech</option>
+        <option value="Meknes">Meknes</option>
+        <option value="Ouarzazate">Ouarzazate</option>
+        <option value="Rabat">Rabat</option>
+        <option value="Salé">Salé</option>
+        <option value="Tangier">Tangier</option>
+        <option value="Taza">Taza</option>
+        <option value="Tétouan">Tétouan</option>
+        <option value="Taroudant">Taroudant</option>
+        <option value="Safi">Safi</option>
+        <option value="Nador">Nador</option>
+        <option value="Oujda">Oujda</option>
+        <option value="Dakhla">Dakhla</option>
+        <option value="Laâyoune">Laâyoune</option>
+        <option value="Errachidia">Errachidia</option>
+        <option value="Guelmim">Guelmim</option>
+        <option value="Tinghir">Tinghir</option>
+        <option value="El Kelaâ des Sraghna">El Kelaâ des Sraghna</option>
+        <option value="Settat">Settat</option>
+        <option value="Ksar el-Kébir">Ksar el-Kébir</option>
+        <option value="Ouezzane">Ouezzane</option>
+        <option value="Berkane">Berkane</option>
+        <option value="Midelt">Midelt</option>
+        <option value="Figuig">Figuig</option>
+        <option value="Tantan">Tantan</option>
+        <option value="Sidi Kacem">Sidi Kacem</option>
+        <option value="Tiznit">Tiznit</option>
+        <option value="Chichaoua">Chichaoua</option>
+        <option value="Taroudant">Taroudant</option>
+        <option value="Boudnib">Boudnib</option>
+        <option value="Sidi Ifni">Sidi Ifni</option>
+        <option value="Tan-Tan">Tan-Tan</option>
+        <option value="Benslimane">Benslimane</option>
+        <option value="Boujdour">Boujdour</option>
+    </select>
+</div>
+
                             <div class="form-group">
-                                <label for="city"><i class="zmdi zmdi-city"></i></label>
-                                <input type="text" name="city" id="city" placeholder="Ville (ex: Tanger)">
-                            </div>
-                            <div class="form-group">
-                                <label for="filiere"><i class="zmdi zmdi-graduation-cap"></i></label>
+                                <label for="university"><i class="zmdi zmdi-graduation-cap"></i></label>
                                 <select name="university" id="university" onchange="toggleCustomInput('university')">
                                     <option value="">Sélectionnez une université</option>
                                     <option value="Abdelmalek Essaadi University">Abdelmalek Essaadi University (Tétouan, Tangier)</option>
@@ -463,7 +602,7 @@ if (isset($_SESSION['error'])) {
                             </div>
                             <div class="form-group">
                                 <input type="checkbox" name="agree-term" id="agree-term" class="agree-term" required />
-                                <label for="agree-term" class="label-agree-term"><span><span></span></span>J'accepte les <a href="#" class="term-service">conditions d'utilisation</a></label>
+                                <label for="agree-term" class="label-agree-term"><span><span></span></span>J'accepte les <a href="#" class="term-service" id="termsLink">conditions d'utilisation</a></label>
                             </div>
                             <input type="hidden" id="device_fingerprint" name="device_fingerprint">
                             <input type="hidden" id="device_name" name="device_name">
@@ -481,6 +620,33 @@ if (isset($_SESSION['error'])) {
                 </div>
             </div>
         </section>
+
+        <!-- Terms Modal -->
+        <div id="termsModal" class="modal">
+            <div class="modal-content">
+                <span class="modal-close">&times;</span>
+                <h3>Conditions d'Utilisation - Zouhair E-Learning</h3>
+                <p>En vous inscrivant sur Zouhair E-Learning, vous acceptez les conditions suivantes. Veuillez lire attentivement :</p>
+                <ul>
+                    <li><strong>Collecte de Données Personnelles</strong>: Nous collectons des informations telles que votre nom complet, adresse e-mail, numéro de téléphone, date de naissance, genre, ville, université, et filière pour créer et gérer votre compte. Ces données sont utilisées pour personnaliser votre expérience d'apprentissage et assurer la sécurité de la plateforme.</li>
+                    <li><strong>Suivi de la Localisation</strong>: La plateforme utilise la géolocalisation pour enregistrer votre position (latitude et longitude) lors de l'inscription et de certaines activités (comme les examens). Cela nous aide à vérifier votre identité et à prévenir les fraudes. L'accès à la localisation est obligatoire pour utiliser la plateforme.</li>
+                    <li><strong>Empreinte Numérique de l'Appareil</strong>: Nous utilisons FingerprintJS pour générer une empreinte unique de votre appareil (basée sur des caractéristiques comme le navigateur, le système d'exploitation, et autres). Cela permet de sécuriser votre compte et de détecter toute activité suspecte. Les informations sur votre appareil (nom et empreinte) sont stockées de manière sécurisée.</li>
+                    <li><strong>Règles de la Plateforme</strong>:
+                        <ul>
+                            <li>Vous devez avoir au moins 16 ans pour vous inscrire.</li>
+                            <li>Il est strictement interdit de partager votre compte ou de tricher lors des examens. Toute violation entraînera une suspension ou une suppression du compte.</li>
+                            <li>Vous êtes responsable de maintenir la confidentialité de votre mot de passe et de vos informations de connexion.</li>
+                            <li>Le contenu téléchargé (par exemple, réponses aux quiz) doit respecter les lois et ne pas contenir de matériel inapproprié.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Utilisation des Données</strong>: Vos données peuvent être utilisées pour analyser les performances, améliorer la plateforme, et communiquer avec vous (par exemple, via des notifications par e-mail). Nous ne vendons pas vos données à des tiers, mais elles peuvent être partagées avec des partenaires de confiance pour des services comme l'hébergement ou l'analyse.</li>
+                    <li><strong>Consentement</strong>: En cochant la case "J'accepte les conditions d'utilisation", vous consentez à la collecte, au stockage, et à l'utilisation de vos données comme décrit ci-dessus. Vous acceptez également de respecter les règles de la plateforme.</li>
+                    <li><strong>Modifications des Conditions</strong>: Nous pouvons mettre à jour ces conditions à tout moment. Les utilisateurs seront informés des changements importants via e-mail ou sur la plateforme.</li>
+                </ul>
+                <p>Pour toute question, contactez-nous à <a href="mailto:support@zouhairelearning.com">support@zouhairelearning.com</a>.</p>
+                <button class="close-btn">Fermer</button>
+            </div>
+        </div>
     </div>
 
     <!-- JavaScript -->
@@ -598,6 +764,31 @@ if (isset($_SESSION['error'])) {
                 alert('Le nom de la filière sélectionnée est trop long.');
                 return;
             }
+        });
+
+        // Modal Toggle
+        $(document).ready(function() {
+            const modal = $('#termsModal');
+            const termsLink = $('#termsLink');
+            const closeBtn = $('.modal-close, .close-btn');
+
+            // Open modal on terms link click
+            termsLink.on('click', function(e) {
+                e.preventDefault();
+                modal.css('display', 'block');
+            });
+
+            // Close modal on close button or outside click
+            closeBtn.on('click', function() {
+                modal.css('display', 'none');
+            });
+
+            // Close modal when clicking outside the modal content
+            $(window).on('click', function(e) {
+                if (e.target === modal[0]) {
+                    modal.css('display', 'none');
+                }
+            });
         });
     </script>
 </body>

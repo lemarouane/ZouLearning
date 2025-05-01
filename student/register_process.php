@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->close();
 
         // Send email via Google Apps Script
-        $script_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec';
+        $script_url = 'https://script.google.com/macros/s/AKfycbytEgChb_M-U_QriJ8oDBFUe8EwK0hb5weD_hS0Y6neShr4FmDlSdKmse1CfKr9VqaS/exec';
         $data = [
             'event' => 'register',
             'full_name' => $full_name,

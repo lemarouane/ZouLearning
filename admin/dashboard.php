@@ -66,6 +66,21 @@ if ($other_filiere_count > 0) {
     $filiere_chart['Other'] = $other_filiere_count;
 }
 
+// City distribution (top 5 + Other)
+$city_chart = [];
+$other_city_count = 0;
+$result = $db->query("SELECT city, COUNT(*) as count FROM students WHERE city IS NOT NULL GROUP BY city ORDER BY count DESC");
+while ($row = $result->fetch_assoc()) {
+    if (count($city_chart) < 5) {
+        $city_chart[$row['city']] = $row['count'];
+    } else {
+        $other_city_count += $row['count'];
+    }
+}
+if ($other_city_count > 0) {
+    $city_chart['Other'] = $other_city_count;
+}
+
 // Recent data
 $recent_students = $db->query("SELECT * FROM students ORDER BY created_at DESC LIMIT 5");
 $recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5") ?? [];
@@ -166,6 +181,10 @@ if ($result) {
             <div class="chart-container">
                 <h2><i class="fas fa-chart-line"></i> Tendance d'Activité</h2>
                 <canvas id="activityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2><i class="fas fa-city"></i> Distribution par Ville</h2>
+                <canvas id="cityChart"></canvas>
             </div>
         </section>
 
@@ -321,6 +340,25 @@ if ($result) {
             options: {
                 scales: { y: { beginAtZero: true, ticks: { color: '#666' } }, x: { ticks: { color: '#666' } } },
                 animation: { duration: 1000 },
+                plugins: { legend: { labels: { color: '#666' } } }
+            }
+        });
+
+        new Chart(document.getElementById('cityChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [<?php echo "'" . implode("','", array_keys($city_chart)) . "'"; ?>],
+                datasets: [{
+                    label: 'Étudiants',
+                    data: [<?php echo implode(',', array_values($city_chart)); ?>],
+                    backgroundColor: '#9C27B0',
+                    borderColor: '#7B1FA2',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true, ticks: { color: '#666' } }, x: { ticks: { color: '#666' } } },
+                animation: { duration: 1000, easing: 'easeInOutQuad' },
                 plugins: { legend: { labels: { color: '#666' } } }
             }
         });

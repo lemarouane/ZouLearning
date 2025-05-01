@@ -53,15 +53,17 @@ foreach ($subjects as $subject) {
         ) AS unique_courses
         JOIN courses c ON unique_courses.course_id = c.id
         JOIN subjects s ON c.subject_id = s.id
-        LEFT JOIN qcm q ON q.course_after_id = c.id
+        LEFT JOIN qcm q ON q.course_after_id = c.id AND q.is_archived = 0
         LEFT JOIN qcm_submissions qs ON q.id = qs.qcm_id AND qs.student_id = $student_id AND qs.passed = 1
         WHERE s.id = $subject_id AND s.is_archived = 0
-        AND (q.id IS NULL OR qs.id IS NOT NULL OR q.is_archived = 0)
+        AND (q.id IS NULL OR qs.id IS NOT NULL)
     ");
     if (!$courses_query) {
         die("Erreur dans la requête des cours pour la matière {$subject['name']} : " . $db->error);
     }
-    $courses_by_subject[$subject_id] = $courses_query->fetch_all(MYSQLI_ASSOC);
+    $courses = $courses_query->fetch_all(MYSQLI_ASSOC);
+    error_log("Courses fetched for subject_id=$subject_id: " . json_encode($courses));
+    $courses_by_subject[$subject_id] = $courses;
 
     // Fetch non-archived QCMs for this subject
     $qcms_query = $db->query("

@@ -32,7 +32,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
             $db->query("UPDATE device_attempts SET status = 'approved' WHERE id = $attempt_id");
 
             // Send approval email
-            $webhook_url = 'https://script.google.com/macros/s/-WORClZ90-vf4V36NlqJyNj6ZYMS0t06Ng_I0zf/exec';
+            $webhook_url = 'https://script.google.com/macros/s/AKfycbwhXgubbwzV2E3yLoopMQLiOj32bpR6xbe1OLYl4XFm8Hh3uwGCD7iCKkmHIWfClELQ/exec';
             $post_data = json_encode([
                 'event' => 'approval',
                 'full_name' => $attempt['full_name'],
