@@ -488,21 +488,21 @@ if (isset($_SESSION['error'])) {
     <select name="city" id="city" class="form-control">
         <option value="">Sélectionnez une ville</option>
         <option value="Agadir">Agadir</option>
-        <option value="Al Hoceima">Al Hoceima</option>
+        <option value="Al Hoceima">Al Hoceïma</option>
         <option value="Azilal">Azilal</option>
-        <option value="Beni Mellal">Beni Mellal</option>
+        <option value="Beni Mellal">Béni Mellal</option>
         <option value="Casablanca">Casablanca</option>
         <option value="Chefchaouen">Chefchaouen</option>
         <option value="El Jadida">El Jadida</option>
-        <option value="Fes">Fes</option>
+        <option value="Fes">Fès</option>
         <option value="Ifrane">Ifrane</option>
-        <option value="Kenitra">Kenitra</option>
+        <option value="Kenitra">Kénitra</option>
         <option value="Marrakech">Marrakech</option>
-        <option value="Meknes">Meknes</option>
+        <option value="Meknes">Meknès</option>
         <option value="Ouarzazate">Ouarzazate</option>
         <option value="Rabat">Rabat</option>
         <option value="Salé">Salé</option>
-        <option value="Tangier">Tangier</option>
+        <option value="Tangier">Tanger</option>
         <option value="Taza">Taza</option>
         <option value="Tétouan">Tétouan</option>
         <option value="Taroudant">Taroudant</option>
@@ -521,52 +521,49 @@ if (isset($_SESSION['error'])) {
         <option value="Berkane">Berkane</option>
         <option value="Midelt">Midelt</option>
         <option value="Figuig">Figuig</option>
-        <option value="Tantan">Tantan</option>
+        <option value="Tantan">Tan-Tan</option>
         <option value="Sidi Kacem">Sidi Kacem</option>
         <option value="Tiznit">Tiznit</option>
         <option value="Chichaoua">Chichaoua</option>
-        <option value="Taroudant">Taroudant</option>
         <option value="Boudnib">Boudnib</option>
         <option value="Sidi Ifni">Sidi Ifni</option>
-        <option value="Tan-Tan">Tan-Tan</option>
         <option value="Benslimane">Benslimane</option>
         <option value="Boujdour">Boujdour</option>
     </select>
 </div>
-
-                            <div class="form-group">
-                                <label for="university"><i class="zmdi zmdi-graduation-cap"></i></label>
-                                <select name="university" id="university" onchange="toggleCustomInput('university')">
-                                    <option value="">Sélectionnez une université</option>
-                                    <option value="Abdelmalek Essaadi University">Abdelmalek Essaadi University (Tétouan, Tangier)</option>
-                                    <option value="Al Akhawayn University">Al Akhawayn University (Ifrane)</option>
-                                    <option value="Cadi Ayyad University">Cadi Ayyad University (Marrakech)</option>
-                                    <option value="Chouaib Doukkali University">Chouaib Doukkali University (El Jadida)</option>
-                                    <option value="Euro-Mediterranean University of Fes">Euro-Mediterranean University of Fes (Fes)</option>
-                                    <option value="Hassan I University">Hassan I University (Settat)</option>
-                                    <option value="Hassan II University of Casablanca">Hassan II University of Casablanca (Casablanca)</option>
-                                    <option value="Ibn Tofail University">Ibn Tofail University (Kénitra)</option>
-                                    <option value="Ibn Zohr University">Ibn Zohr University (Agadir)</option>
-                                    <option value="International University of Casablanca">International University of Casablanca (Casablanca)</option>
-                                    <option value="International University of Rabat">International University of Rabat (Rabat)</option>
-                                    <option value="Mohammed V University">Mohammed V University (Rabat)</option>
-                                    <option value="Mohammed VI Polytechnic University">Mohammed VI Polytechnic University (Benguerir)</option>
-                                    <option value="Moulay Ismail University">Moulay Ismail University (Meknès)</option>
-                                    <option value="Sidi Mohamed Ben Abdellah University">Sidi Mohamed Ben Abdellah University (Fes)</option>
-                                    <option value="University of Al Quaraouiyyin">University of Al Quaraouiyyin (Fes)</option>
-                                    <option value="ENSIAS">ENSIAS (Rabat)</option>
-                                    <option value="EHTP">EHTP (Casablanca)</option>
-                                    <option value="ENSEM">ENSEM (Casablanca)</option>
-                                    <option value="INSEA">INSEA (Rabat)</option>
-                                    <option value="EMI">EMI (Rabat)</option>
-                                    <option value="ISCAE">ISCAE (Casablanca)</option>
-                                    <option value="ENCG">ENCG (Various Cities)</option>
-                                    <option value="ENSA">ENSA (Various Cities)</option>
-                                    <option value="EST">EST (Various Cities)</option>
-                                    <option value="Autre">Autre</option>
-                                </select>
-                                <input type="text" name="custom_university" id="custom_university" class="hidden" placeholder="Entrez le nom de l’université">
-                            </div>
+<div class="form-group">
+    <label for="university"><i class="zmdi zmdi-graduation-cap"></i></label>
+    <select name="university" id="university" onchange="toggleCustomInput('university')">
+        <option value="">Sélectionnez une université</option>
+        <option value="Université Abdelmalek Essaadi">Université Abdelmalek Essaadi (Tétouan, Tanger)</option>
+        <option value="Université Al Akhawayn">Université Al Akhawayn (Ifrane)</option>
+        <option value="Université Cadi Ayyad">Université Cadi Ayyad (Marrakech)</option>
+        <option value="Université Chouaib Doukkali">Université Chouaib Doukkali (El Jadida)</option>
+        <option value="Université Euro-Méditerranéenne de Fès">Université Euro-Méditerranéenne de Fès (Fès)</option>
+        <option value="Université Hassan I">Université Hassan I (Settat)</option>
+        <option value="Université Hassan II de Casablanca">Université Hassan II de Casablanca (Casablanca)</option>
+        <option value="Université Ibn Tofail">Université Ibn Tofail (Kénitra)</option>
+        <option value="Université Ibn Zohr">Université Ibn Zohr (Agadir)</option>
+        <option value="Université Internationale de Casablanca">Université Internationale de Casablanca (Casablanca)</option>
+        <option value="Université Internationale de Rabat">Université Internationale de Rabat (Rabat)</option>
+        <option value="Université Mohammed V">Université Mohammed V (Rabat)</option>
+        <option value="Université Mohammed VI Polytechnique">Université Mohammed VI Polytechnique (Benguerir)</option>
+        <option value="Université Moulay Ismail">Université Moulay Ismail (Meknès)</option>
+        <option value="Université Sidi Mohamed Ben Abdellah">Université Sidi Mohamed Ben Abdellah (Fès)</option>
+        <option value="Université Al Quaraouiyyin">Université Al Quaraouiyyin (Fès)</option>
+        <option value="ENSIAS">ENSIAS (Rabat)</option>
+        <option value="EHTP">EHTP (Casablanca)</option>
+        <option value="ENSEM">ENSEM (Casablanca)</option>
+        <option value="INSEA">INSEA (Rabat)</option>
+        <option value="EMI">EMI (Rabat)</option>
+        <option value="ISCAE">ISCAE (Casablanca)</option>
+        <option value="ENCG">ENCG (Diverses Villes)</option>
+        <option value="ENSA">ENSA (Diverses Villes)</option>
+        <option value="EST">EST (Diverses Villes)</option>
+        <option value="Autre">Autre</option>
+    </select>
+    <input type="text" name="custom_university" id="custom_university" class="hidden" placeholder="Entrez le nom de l’université">
+</div>
                             <div class="form-group">
                                 <label for="filiere"><i class="zmdi zmdi-graduation-cap"></i></label>
                                 <select name="filiere" id="filiere" onchange="toggleCustomInput('filiere')">
