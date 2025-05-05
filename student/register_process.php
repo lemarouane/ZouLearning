@@ -150,8 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
         $stmt->close();
 
-        // Send email via Google Apps Script
-        $script_url = 'https://script.google.com/macros/s/AKfycbytEgChb_M-U_QriJ8oDBFUe8EwK0hb5weD_hS0Y6neShr4FmDlSdKmse1CfKr9VqaS/exec';
+        // Send student welcome email via Google Apps Script
+        $script_url = 'https://script.google.com/macros/s/AKfycbxKlF3bjY6ODVuYkt8C_CrNpU7rew24Z62OLibUmtCnN3sdQgOouwfXHl0kXsHjx9H7/exec';
         $data = [
             'event' => 'register',
             'full_name' => $full_name,
@@ -168,11 +168,57 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $result = file_get_contents($script_url, false, $context);
 
         if ($result === false) {
-            error_log('Échec de l\'envoi de l\'email via Google Apps Script');
+            error_log('Échec de l\'envoi de l\'email étudiant via Google Apps Script');
         } else {
             $response = json_decode($result, true);
             if ($response['status'] !== 'success') {
-                error_log('Erreur Google Apps Script: ' . $response['message']);
+                error_log('Erreur Google Apps Script (étudiant): ' . $response['message']);
+            }
+        }
+
+        // Send admin notification email via Google Apps Script
+        $admin_email = 'marouanehaddad08@gmail.com'; // Your admin email
+        $location = getLocationName($latitude, $longitude);
+        $admin_data = [
+            'event' => 'admin_new_student',
+            'full_name' => $full_name,
+            'email' => $email,
+            'admin_email' => $admin_email,
+            'details' => [
+                'phone' => $phone ?: 'Non fourni',
+                'dob' => $dob ?: 'Non fourni',
+                'gender' => $gender ?: 'Non fourni',
+                'city' => $city ?: 'Non fourni',
+                'university' => $final_university ?: 'Non fourni',
+                'filiere' => $final_filiere ?: 'Non fourni',
+                'device_fingerprint' => $device_fingerprint,
+                'device_name' => $device_name,
+                'ip_address' => $ip_address,
+                'location' => $location
+            ]
+        ];
+        $admin_options = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/json',
+                'content' => json_encode($admin_data)
+            ]
+        ];
+        $admin_context = stream_context_create($admin_options);
+        $http_response_header = null; // Reset to capture response headers
+        $admin_result = file_get_contents($script_url, false, $admin_context);
+        
+        if ($admin_result === false) {
+            $error = error_get_last();
+            error_log('Échec de l\'envoi de l\'email admin via Google Apps Script: ' . ($error['message'] ?? 'Unknown error'));
+            if ($http_response_header) {
+                error_log('HTTP Response Headers: ' . print_r($http_response_header, true));
+            }
+        } else {
+            $response = json_decode($admin_result, true);
+            error_log('Admin email response: ' . print_r($response, true));
+            if ($response['status'] !== 'success') {
+                error_log('Erreur Google Apps Script (admin): ' . ($response['message'] ?? 'No message'));
             }
         }
 

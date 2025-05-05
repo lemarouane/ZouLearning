@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
-    $stmt = $db->prepare("SELECT id, email, password FROM students WHERE email = ? AND is_archived = 0");
+    $stmt = $db->prepare("SELECT id, email, password, full_name FROM students WHERE email = ? AND is_archived = 0");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -54,6 +54,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt = $db->prepare("INSERT INTO device_attempts (student_id, device_fingerprint, device_info, ip_address, latitude, longitude, attempted_at, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'pending')");
             $stmt->bind_param("isssdd", $student['id'], $device_fingerprint, $device_info, $ip_address, $latitude, $longitude);
             $stmt->execute();
+            $stmt->close();
+
+            // Send admin notification email via Google Apps Script
+            $admin_email = 'marouanehaddad08@gmail.com'; // Your admin email
+            $location = getLocationName($latitude, $longitude);
+            $attempt_time = date('Y-m-d H:i:s'); // Current time
+            $admin_data = [
+                'event' => 'admin_new_device_attempt',
+                'full_name' => $student['full_name'],
+                'email' => $email,
+                'admin_email' => $admin_email,
+                'details' => [
+                    'device_fingerprint' => $device_fingerprint,
+                    'device_info' => $device_info,
+                    'ip_address' => $ip_address,
+                    'location' => $location,
+                    'attempt_time' => $attempt_time
+                ]
+            ];
+            $script_url = 'https://script.google.com/macros/s/AKfycbwYOkPT1TgE5i0uGIT4TcsER4NmWcnf78iVyiqpeufeYo5rvvm7TjhcAVRmP7meDvHK/exec';
+            $admin_options = [
+                'http' => [
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/json',
+                    'content' => json_encode($admin_data)
+                ]
+            ];
+            $admin_context = stream_context_create($admin_options);
+            $http_response_header = null; // Reset to capture response headers
+            $admin_result = file_get_contents($script_url, false, $admin_context);
+            
+            if ($admin_result === false) {
+                $error = error_get_last();
+                error_log('Échec de l\'envoi de l\'email admin (new device attempt): ' . ($error['message'] ?? 'Unknown error'));
+                if ($http_response_header) {
+                    error_log('HTTP Response Headers: ' . print_r($http_response_header, true));
+                }
+            } else {
+                $response = json_decode($admin_result, true);
+                error_log('Admin device attempt email response: ' . print_r($response, true));
+                if ($response['status'] !== 'success') {
+                    error_log('Erreur Google Apps Script (admin device attempt): ' . ($response['message'] ?? 'No message'));
+                }
+            }
 
             $_SESSION['error'] = 'Cet appareil nécessite l\'approbation de l\'administrateur. Réessayez plus tard ou utilisez votre appareil d\'origine.';
             header("Location: pending.php");

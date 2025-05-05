@@ -129,7 +129,7 @@ if (isset($_SESSION['error'])) {
             margin-bottom: 60px;
             text-align: center;
         }
-        .form-submit {
+        .form-submit, .geo-try-again {
             display: inline-block;
             background: linear-gradient(90deg, #3b82f6, #1e40af);
             color: #fff;
@@ -143,10 +143,21 @@ if (isset($_SESSION['error'])) {
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .form-submit:hover {
+        .form-submit:hover, .geo-try-again:hover {
             background: linear-gradient(90deg, #1e40af, #3b82f6);
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
+        }
+        .form-submit:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .geo-try-again {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 30px;
         }
         .signin-image-link {
             font-size: 18px;
@@ -271,6 +282,10 @@ if (isset($_SESSION['error'])) {
             label {
                 font-size: 20px;
             }
+            .geo-try-again {
+                padding: 10px 25px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -293,7 +308,8 @@ if (isset($_SESSION['error'])) {
                             <p class="success"><?php echo htmlspecialchars($_SESSION['message']); ?></p>
                             <?php unset($_SESSION['message']); ?>
                         <?php endif; ?>
-                        <form method="POST" class="login-form" id="loginForm" action="login_process.php">
+                        <p class="error" id="geo-error" style="display: none;">Veuillez autoriser la géolocalisation pour continuer.</p>
+                        <form method="POST" class="login-form" id="loginForm" action="login_process.php" onsubmit="return validateGeolocation()">
                             <div class="form-group">
                                 <label for="email"><i class="zmdi zmdi-email"></i></label>
                                 <input type="email" name="email" id="email" placeholder="Email" required>
@@ -306,7 +322,8 @@ if (isset($_SESSION['error'])) {
                             <input type="hidden" id="latitude" name="latitude">
                             <input type="hidden" id="longitude" name="longitude">
                             <div class="form-group form-button">
-                                <input type="submit" name="signin" id="signin" class="form-submit" value="Se connecter" />
+                                <input type="submit" name="signin" id="signin" class="form-submit" value="Se connecter" disabled />
+                                <button type="button" id="geo-try-again" class="geo-try-again" style="display: none;">Réessayer la géolocalisation</button>
                             </div>
                         </form>
                     </div>
@@ -325,18 +342,53 @@ if (isset($_SESSION['error'])) {
             document.getElementById('device_fingerprint').value = fingerprint;
         });
 
-        // Get geolocation
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    document.getElementById('latitude').value = position.coords.latitude;
-                    document.getElementById('longitude').value = position.coords.longitude;
-                },
-                (error) => {
-                    console.error("Geolocation error:", error);
-                }
-            );
+        // Geolocation enforcement
+        const signinButton = document.getElementById('signin');
+        const geoError = document.getElementById('geo-error');
+        const tryAgainButton = document.getElementById('geo-try-again');
+        let isGeolocationAuthorized = false;
+
+        function checkGeolocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('latitude').value = position.coords.latitude;
+                        document.getElementById('longitude').value = position.coords.longitude;
+                        isGeolocationAuthorized = true;
+                        signinButton.disabled = false;
+                        geoError.style.display = 'none';
+                        tryAgainButton.style.display = 'none';
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        isGeolocationAuthorized = false;
+                        signinButton.disabled = true;
+                        geoError.style.display = 'block';
+                        tryAgainButton.style.display = 'inline-block';
+                    }
+                );
+            } else {
+                isGeolocationAuthorized = false;
+                signinButton.disabled = true;
+                geoError.textContent = 'La géolocalisation n’est pas prise en charge par votre navigateur.';
+                geoError.style.display = 'block';
+                tryAgainButton.style.display = 'none';
+            }
         }
+
+        function validateGeolocation() {
+            if (!isGeolocationAuthorized) {
+                geoError.style.display = 'block';
+                return false;
+            }
+            return true;
+        }
+
+        // Initial geolocation check
+        checkGeolocation();
+
+        // Try again button
+        tryAgainButton.addEventListener('click', checkGeolocation);
     </script>
 </body>
 </html>

@@ -37,6 +37,29 @@ $stmt->close();
         .device-active { color: #28a745; font-weight: bold; }
         .device-active::after { content: ' (Actif)'; font-size: 0.8em; color: #28a745; }
         .device-inactive { color: #6b7280; }
+        .btn-action { 
+            display: inline-block; 
+            padding: 8px 12px; 
+            margin: 0 5px; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            font-size: 14px; 
+            transition: all 0.3s ease; 
+        }
+        .logout-btn { 
+            background: #dc2626; 
+            color: #fff; 
+        }
+        .logout-btn:hover { 
+            background: #b91c1c; 
+        }
+        .stats-btn { 
+            background: #3b82f6; 
+            color: #fff; 
+        }
+        .stats-btn:hover { 
+            background: #1e40af; 
+        }
     </style>
 </head>
 <body>
@@ -87,6 +110,9 @@ $stmt->close();
                             </td>
                             <td><?php echo $session['logout_time'] ? 'Terminé' : 'Actif'; ?></td>
                             <td>
+                                <a href="user_stats.php?student_id=<?php echo $session['student_id']; ?>" class="btn-action stats-btn">
+                                    <i class="fas fa-chart-line"></i> Stats
+                                </a>
                                 <?php if (!$session['logout_time']): ?>
                                     <button class="btn-action logout-btn" data-session-id="<?php echo $session['id']; ?>">
                                         <i class="fas fa-sign-out-alt"></i> Déconnecter
