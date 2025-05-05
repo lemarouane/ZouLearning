@@ -158,7 +158,7 @@ $graded_quizzes = $db->query("
             </div>
             <div class="stat-card">
                 <h3><i class="fas fa-question-circle"></i> Notifications Examens</h3>
-                <p><a href="quizzes.php"><?php echo $new_quizzes; ?>Examens</a></p>
+                <p><a href="quizzes.php"><?php echo $new_quizzes; ?> Examens</a></p>
             </div>
             <div class="stat-card">
                 <h3><i class="fas fa-question-circle"></i> Notifications Examens</h3>

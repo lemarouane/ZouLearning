@@ -480,7 +480,6 @@ if (isset($_SESSION['error'])) {
                                     <option value="">Sélectionnez le Genre</option>
                                     <option value="Male">Homme</option>
                                     <option value="Female">Femme</option>
-                                    <option value="Other">Autre</option>
                                 </select>
                             </div>
 <div class="form-group">

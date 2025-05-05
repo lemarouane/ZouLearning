@@ -1,27 +1,63 @@
 <?php
 session_start();
 require_once '../includes/db_connect.php';
+
+// Check admin session
 if (!isset($_SESSION['admin_id'])) {
     header("Location: login.php");
     exit;
 }
 
-// Fetch stats
-$total_students = $db->query("SELECT COUNT(*) FROM students")->fetch_row()[0];
-$validated_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'approved'")->fetch_row()[0];
-$pending_students = $db->query("SELECT COUNT(*) FROM students WHERE status = 'pending'")->fetch_row()[0];
-$total_courses = $db->query("SELECT COUNT(*) FROM courses")->fetch_row()[0] ?? 0;
-$total_levels = $db->query("SELECT COUNT(*) FROM levels")->fetch_row()[0] ?? 0;
-$notifications = $db->query("SELECT COUNT(*) FROM activity_logs WHERE timestamp > NOW() - INTERVAL 1 DAY")->fetch_row()[0] ?? 0;
-$ungraded_submissions = $db->query("SELECT COUNT(*) AS count FROM quiz_submissions WHERE grade IS NULL")->fetch_assoc()['count'];
-$pending_devices = $db->query("SELECT COUNT(*) FROM device_attempts WHERE status = 'pending'")->fetch_row()[0];
+// Fetch stats with is_archived filter
+$stmt = $db->prepare("SELECT COUNT(*) FROM students WHERE is_archived = 0");
+$stmt->execute();
+$total_students = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) FROM students WHERE status = 'approved' AND is_archived = 0");
+$stmt->execute();
+$validated_students = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) FROM students WHERE status = 'pending' AND is_archived = 0");
+$stmt->execute();
+$pending_students = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) FROM courses WHERE is_archived = 0");
+$stmt->execute();
+$total_courses = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) FROM levels WHERE is_archived = 0");
+$stmt->execute();
+$total_levels = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) FROM activity_logs WHERE timestamp > NOW() - INTERVAL 1 DAY");
+$stmt->execute();
+$notifications = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) AS count FROM quiz_submissions WHERE grade IS NULL");
+$stmt->execute();
+$ungraded_submissions = $stmt->get_result()->fetch_assoc()['count'] ?? 0;
+$stmt->close();
+
+$stmt = $db->prepare("SELECT COUNT(*) FROM device_attempts WHERE status = 'pending'");
+$stmt->execute();
+$pending_devices = $stmt->get_result()->fetch_row()[0] ?? 0;
+$stmt->close();
 
 // Gender distribution
 $gender_chart = [];
-$result = $db->query("SELECT gender, COUNT(*) as count FROM students WHERE gender IS NOT NULL GROUP BY gender");
+$stmt = $db->prepare("SELECT gender, COUNT(*) as count FROM students WHERE gender IS NOT NULL AND is_archived = 0 GROUP BY gender");
+$stmt->execute();
+$result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
     $gender_chart[$row['gender']] = $row['count'];
 }
+$stmt->close();
 
 // University distribution (top 5 + Other)
 $university_chart = [];
@@ -33,7 +69,9 @@ $predefined_universities = [
     'Mohammed VI Polytechnic University', 'Moulay Ismail University', 'Sidi Mohamed Ben Abdellah University', 'University of Al Quaraouiyyin',
     'ENSIAS', 'EHTP', 'ENSEM', 'INSEA', 'EMI', 'ISCAE', 'ENCG', 'ENSA', 'EST'
 ];
-$result = $db->query("SELECT university, COUNT(*) as count FROM students WHERE university IS NOT NULL GROUP BY university ORDER BY count DESC");
+$stmt = $db->prepare("SELECT university, COUNT(*) as count FROM students WHERE university IS NOT NULL AND is_archived = 0 GROUP BY university ORDER BY count DESC");
+$stmt->execute();
+$result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
     if (count($university_chart) < 5 && in_array($row['university'], $predefined_universities)) {
         $university_chart[$row['university']] = $row['count'];
@@ -41,6 +79,7 @@ while ($row = $result->fetch_assoc()) {
         $other_university_count += $row['count'];
     }
 }
+$stmt->close();
 if ($other_university_count > 0) {
     $university_chart['Other'] = $other_university_count;
 }
@@ -54,7 +93,9 @@ $predefined_filieres = [
     'Chimie', 'Biologie', 'Géologie', 'Architecture', 'Agriculture', 'Sciences de l’Éducation', 'Langues et Littératures',
     'Études Islamiques', 'Psychologie', 'Sociologie', 'Tourisme et Hôtellerie'
 ];
-$result = $db->query("SELECT filiere, COUNT(*) as count FROM students WHERE filiere IS NOT NULL GROUP BY filiere ORDER BY count DESC");
+$stmt = $db->prepare("SELECT filiere, COUNT(*) as count FROM students WHERE filiere IS NOT NULL AND is_archived = 0 GROUP BY filiere ORDER BY count DESC");
+$stmt->execute();
+$result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
     if (count($filiere_chart) < 5 && in_array($row['filiere'], $predefined_filieres)) {
         $filiere_chart[$row['filiere']] = $row['count'];
@@ -62,6 +103,7 @@ while ($row = $result->fetch_assoc()) {
         $other_filiere_count += $row['count'];
     }
 }
+$stmt->close();
 if ($other_filiere_count > 0) {
     $filiere_chart['Other'] = $other_filiere_count;
 }
@@ -69,7 +111,9 @@ if ($other_filiere_count > 0) {
 // City distribution (top 5 + Other)
 $city_chart = [];
 $other_city_count = 0;
-$result = $db->query("SELECT city, COUNT(*) as count FROM students WHERE city IS NOT NULL GROUP BY city ORDER BY count DESC");
+$stmt = $db->prepare("SELECT city, COUNT(*) as count FROM students WHERE city IS NOT NULL AND is_archived = 0 GROUP BY city ORDER BY count DESC");
+$stmt->execute();
+$result = $stmt->get_result();
 while ($row = $result->fetch_assoc()) {
     if (count($city_chart) < 5) {
         $city_chart[$row['city']] = $row['count'];
@@ -77,32 +121,46 @@ while ($row = $result->fetch_assoc()) {
         $other_city_count += $row['count'];
     }
 }
+$stmt->close();
 if ($other_city_count > 0) {
     $city_chart['Other'] = $other_city_count;
 }
 
 // Recent data
-$recent_students = $db->query("SELECT * FROM students ORDER BY created_at DESC LIMIT 5");
-$recent_courses = $db->query("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id ORDER BY c.created_at DESC LIMIT 5") ?? [];
-$notifs = $db->query("SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 5") ?? [];
+$stmt = $db->prepare("SELECT * FROM students WHERE is_archived = 0 ORDER BY created_at DESC LIMIT 5");
+$stmt->execute();
+$recent_students = $stmt->get_result();
+$stmt->close();
+
+$stmt = $db->prepare("SELECT c.*, s.name AS subject FROM courses c LEFT JOIN subjects s ON c.subject_id = s.id WHERE c.is_archived = 0 AND (s.is_archived = 0 OR s.is_archived IS NULL) ORDER BY c.created_at DESC LIMIT 5");
+$stmt->execute();
+$recent_courses = $stmt->get_result();
+$stmt->close();
+
+$stmt = $db->prepare("SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT 5");
+$stmt->execute();
+$notifs = $stmt->get_result();
+$stmt->close();
 
 // Subjects chart data
 $subjects_chart = [];
-$result = $db->query("SELECT s.name, COUNT(c.id) as count FROM subjects s LEFT JOIN courses c ON s.id = c.subject_id GROUP BY s.id, s.name");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $subjects_chart[$row['name']] = $row['count'];
-    }
+$stmt = $db->prepare("SELECT s.name, COUNT(c.id) as count FROM subjects s LEFT JOIN courses c ON s.id = c.subject_id WHERE s.is_archived = 0 AND (c.is_archived = 0 OR c.is_archived IS NULL) GROUP BY s.id, s.name");
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $subjects_chart[$row['name']] = $row['count'];
 }
+$stmt->close();
 
 // Activity trend data (last 7 days)
 $activity_trend = [];
-$result = $db->query("SELECT DATE(timestamp) AS day, COUNT(*) AS count FROM activity_logs WHERE timestamp > NOW() - INTERVAL 7 DAY GROUP BY day ORDER BY day ASC");
-if ($result) {
-    while ($row = $result->fetch_assoc()) {
-        $activity_trend[$row['day']] = $row['count'];
-    }
+$stmt = $db->prepare("SELECT DATE(timestamp) AS day, COUNT(*) AS count FROM activity_logs WHERE timestamp > NOW() - INTERVAL 7 DAY GROUP BY day ORDER BY day ASC");
+$stmt->execute();
+$result = $stmt->get_result();
+while ($row = $result->fetch_assoc()) {
+    $activity_trend[$row['day']] = $row['count'];
 }
+$stmt->close();
 ?>
 
 <!DOCTYPE html>
@@ -127,7 +185,7 @@ if ($result) {
         <!-- Section des Statistiques -->
         <section class="stats">
             <div class="stat-card">
-                <h3><i class="fas fa-users"></i>Étudiants</h3>
+                <h3><i class="fas fa-users"></i> Étudiants</h3>
                 <p><?php echo $total_students; ?></p>
             </div>
             <div class="stat-card">
@@ -143,7 +201,7 @@ if ($result) {
                 <p><a href="manage_courses.php"><?php echo $total_courses; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-layer-group"></i>Niveaux</h3>
+                <h3><i class="fas fa-layer-group"></i> Niveaux</h3>
                 <p><a href="manage_levels.php"><?php echo $total_levels; ?></a></p>
             </div>
             <div class="stat-card">
@@ -151,7 +209,7 @@ if ($result) {
                 <p><a href="grade_quizzes.php"><?php echo $ungraded_submissions; ?></a></p>
             </div>
             <div class="stat-card">
-                <h3><i class="fas fa-mobile-alt"></i>en Attente</h3>
+                <h3><i class="fas fa-mobile-alt"></i> En Attente</h3>
                 <p><a href="device_requests.php"><?php echo $pending_devices; ?></a></p>
             </div>
         </section>
@@ -201,7 +259,7 @@ if ($result) {
                             <tr>
                                 <td><?php echo htmlspecialchars($student['full_name']); ?></td>
                                 <td><?php echo htmlspecialchars($student['email']); ?></td>
-                                <td><?php echo $student['created_at']; ?></td>
+                                <td><?php echo htmlspecialchars($student['created_at']); ?></td>
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
@@ -218,7 +276,7 @@ if ($result) {
                             <tr>
                                 <td><?php echo htmlspecialchars($course['title'] ?? 'N/A'); ?></td>
                                 <td><?php echo htmlspecialchars($course['subject'] ?? 'N/A'); ?></td>
-                                <td><?php echo $course['created_at'] ?? 'N/A'; ?></td>
+                                <td><?php echo htmlspecialchars($course['created_at'] ?? 'N/A'); ?></td>
                             </tr>
                         <?php endwhile; endif; ?>
                     </tbody>
@@ -233,9 +291,9 @@ if ($result) {
         new Chart(document.getElementById('studentChart').getContext('2d'), {
             type: 'bar',
             data: {
-                labels: ['Validated', 'Pending'],
+                labels: ['Validés', 'En Attente'],
                 datasets: [{
-                    label: 'Students',
+                    label: 'Étudiants',
                     data: [<?php echo $validated_students; ?>, <?php echo $pending_students; ?>],
                     backgroundColor: ['#4CAF50', '#FF9800'],
                     borderColor: ['#388E3C', '#F57C00'],
@@ -326,7 +384,7 @@ if ($result) {
             data: {
                 labels: [<?php echo "'" . implode("','", array_keys($activity_trend)) . "'"; ?>],
                 datasets: [{
-                    label: 'Activity',
+                    label: 'Activité',
                     data: [<?php echo implode(',', array_values($activity_trend)); ?>],
                     borderColor: '#2196F3',
                     backgroundColor: 'rgba(33, 150, 243, 0.2)',

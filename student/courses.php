@@ -164,7 +164,7 @@ foreach ($subjects as $subject) {
                                                             <?php echo $qcm['passed'] ? 'Réussi' : 'Non passé'; ?>
                                                         </span>
                                                     <?php else: ?>
-                                                        <span>Non tenté</span>
+                                                        <span>Faut passer qcm</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
