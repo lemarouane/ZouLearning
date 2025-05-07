@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             mkdir($upload_dir, 0755, true);
         }
         $file_name = uniqid() . '_' . basename($file['name']);
-        $file_path = $upload_dir . $file_name;
+        $file_path = "{$upload_dir}{$file_name}";
 
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
             $stmt = $db->prepare("
@@ -150,16 +150,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <script>
         $(document).ready(function() {
             const subjects = <?php echo json_encode($subjects->fetch_all(MYSQLI_ASSOC)); ?>;
-            $('#level_id').change(function() {
+            $('#level_id').on('change', function() {
                 const levelId = $(this).val();
-                $('#subject_id').empty().append('<option value="">Sélectionner une matière</option>');
-                if (levelId) {
-                    subjects.forEach(subject => {
-                        if (subject.level_id == levelId) {
-                            $('#subject_id').append(`<option value="${subject.id}">${subject.name}</option>`);
-                        }
-                    });
-                }
+                const filteredSubjects = subjects.filter(subject => subject.level_id == levelId);
+                $('#subject_id').html('<option value="">Sélectionner une matière</option>');
+                filteredSubjects.forEach(subject => {
+                    $('#subject_id').append(`<option value="${subject.id}">${subject.name}</option>`);
+                });
             });
         });
     </script>

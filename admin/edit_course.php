@@ -71,12 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
     $subject_id = (int)$_POST['subject_id'];
     $difficulty = $db->real_escape_string($_POST['difficulty']);
 
-    // Validate inputs
-    if (empty($title) || !$subject_id || !in_array($difficulty, ['Easy', 'Medium', 'Hard'])) {
-        $_SESSION['error'] = "Veuillez remplir tous les champs correctement.";
-        header("Location: edit_course.php?id=$course_id");
-        exit;
-    }
+
 
     // Update course
     $stmt = $db->prepare("UPDATE courses SET title = ?, subject_id = ?, difficulty = ? WHERE id = ?");

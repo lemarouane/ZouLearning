@@ -171,202 +171,222 @@ $stmt->execute();
             }
         }
 
-        // Toggle subfolder visibility on folder click
-        $('.folder-view-card').click(function(e) {
-            e.stopPropagation();
-            const folderId = $(this).data('folder-id');
-            const subfolderSection = $(`#subfolder-${folderId}`);
-            const parentCard = $(this);
-
-            // Remove active class from all folder cards
-            $('.folder-view-card').removeClass('active-folder');
-
-            // Collapse all other subfolder containers
-            $('.subfolder-container').not(subfolderSection).slideUp(400, function() {
-                const parent = $(this).parent('.folder-view-card');
-                parent.css({
-                    'height': '80px', // Fixed compact height
-                    'min-height': '0'
-                });
-                console.log(`Collapsed folder ${parent.find('h4').text()}: height set to 80px`);
-            });
-
-            // Toggle the clicked folder's subfolder container
-            subfolderSection.slideToggle(400, function() {
-                if (subfolderSection.is(':visible')) {
-                    parentCard.addClass('active-folder');
-                    parentCard.css({
-                        'height': 'auto', // Expand to fit subfolders
-                        'min-height': '80px'
-                    });
-                    console.log(`Expanded folder ${parentCard.find('h4').text()}: height set to auto`);
-                } else {
-                    parentCard.removeClass('active-folder');
-                    parentCard.css({
-                        'height': '80px', // Back to compact
+        // Improved folder toggle functionality - fixes hosting issues
+        $(document).ready(function() {
+            // First, make sure all subfolders are hidden initially
+            $('.subfolder-container').hide();
+            
+            // Toggle subfolder visibility on folder click
+            $('.folder-view-card').on('click', function(e) {
+                e.stopPropagation();
+                const folderId = $(this).data('folder-id');
+                const subfolderSection = $(`#subfolder-${folderId}`);
+                const parentCard = $(this);
+    
+                console.log(`Clicked on folder ID: ${folderId}`);
+    
+                // Remove active class from all folder cards
+                $('.folder-view-card').removeClass('active-folder');
+    
+                // Hide all other subfolder containers
+                $('.subfolder-container').not(subfolderSection).each(function() {
+                    $(this).hide();
+                    const parent = $(this).parent('.folder-view-card');
+                    parent.css({
+                        'height': '80px',
                         'min-height': '0'
                     });
-                    console.log(`Collapsed folder ${parentCard.find('h4').text()}: height set to 80px`);
+                });
+    
+                // Toggle the clicked folder's subfolder container
+                if (subfolderSection.is(':visible')) {
+                    subfolderSection.hide();
+                    parentCard.removeClass('active-folder');
+                    parentCard.css({
+                        'height': '80px',
+                        'min-height': '0'
+                    });
+                    console.log(`Collapsed folder ${parentCard.find('h4').text()}`);
+                } else {
+                    subfolderSection.show();
+                    parentCard.addClass('active-folder');
+                    parentCard.css({
+                        'height': 'auto',
+                        'min-height': '80px'
+                    });
+                    console.log(`Expanded folder ${parentCard.find('h4').text()}`);
+                }
+            });
+    
+            // Toggle content visibility on subfolder click
+            $('.subfolder-card').on('click', function(e) {
+                e.stopPropagation();
+                const contentId = $(this).data('content-id');
+                const contentSection = $(`#content-${contentId}`);
+                
+                console.log(`Clicked on content ID: ${contentId}`);
+    
+                // Hide all other content views
+                $('.content-view').not(contentSection).hide();
+                
+                // Toggle visibility of clicked content
+                if (contentSection.is(':visible')) {
+                    contentSection.hide();
+                } else {
+                    contentSection.show();
+                    loadPdfIfNeeded(contentSection);
                 }
             });
         });
 
-        // Toggle content visibility on subfolder click
-        $('.subfolder-card').click(function(e) {
-            e.stopPropagation();
-            const contentId = $(this).data('content-id');
-            const contentSection = $(`#content-${contentId}`);
-            $('.content-view').not(contentSection).slideUp(400);
-            contentSection.slideToggle(400);
+        // Function to load PDF if needed
+        function loadPdfIfNeeded(contentSection) {
+            const pdfViewer = contentSection.find('.pdf-viewer');
+            if (pdfViewer.length && pdfViewer.find('.pdf-canvas').children().length === 0) {
+                const url = pdfViewer.data('pdf');
+                const canvasContainer = pdfViewer.find('.pdf-canvas');
+                const contentId = pdfViewer.attr('id').replace('pdf-', '');
+                const courseTitle = '<?php echo addslashes(htmlspecialchars($course['title'])); ?>';
+                let pdfDoc = null;
+                let scale = 1.5;
+                let rotation = 0;
 
-            if (contentSection.is(':visible')) {
-                const pdfViewer = contentSection.find('.pdf-viewer');
-                if (pdfViewer.length && pdfViewer.find('.pdf-canvas').children().length === 0) {
-                    const url = pdfViewer.data('pdf');
-                    const canvasContainer = pdfViewer.find('.pdf-canvas');
-                    const contentId = pdfViewer.attr('id').replace('pdf-', '');
-                    const courseTitle = '<?php echo addslashes(htmlspecialchars($course['title'])); ?>';
-                    let pdfDoc = null;
-                    let scale = 1.5;
-                    let rotation = 0;
+                function renderPages(pdf, scale, rotation) {
+                    canvasContainer.empty();
+                    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                        const canvas = document.createElement('canvas');
+                        canvas.className = 'pdf-page';
+                        canvas.dataset.pageNum = pageNum;
+                        canvasContainer.append(canvas);
+                        const ctx = canvas.getContext('2d');
 
-                    function renderPages(pdf, scale, rotation) {
-                        canvasContainer.empty();
-                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-                            const canvas = document.createElement('canvas');
-                            canvas.className = 'pdf-page';
-                            canvas.dataset.pageNum = pageNum;
-                            canvasContainer.append(canvas);
-                            const ctx = canvas.getContext('2d');
+                        pdf.getPage(pageNum).then(page => {
+                            const viewport = page.getViewport({ scale: scale, rotation: rotation });
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+                            canvas.style.width = '100%';
+                            canvas.style.maxWidth = `${viewport.width}px`;
 
-                            pdf.getPage(pageNum).then(page => {
-                                const viewport = page.getViewport({ scale: scale, rotation: rotation });
-                                canvas.height = viewport.height;
-                                canvas.width = viewport.width;
-                                canvas.style.width = '100%';
-                                canvas.style.maxWidth = `${viewport.width}px`;
+                            const renderContext = { canvasContext: ctx, viewport: viewport };
+                            page.render(renderContext);
+                        });
+                    }
+                }
 
-                                const renderContext = { canvasContext: ctx, viewport: viewport };
-                                page.render(renderContext);
+                pdfjsLib.getDocument(url).promise.then(pdf => {
+                    pdfDoc = pdf;
+                    renderPages(pdf, scale, rotation);
+                    updateScreenshotInfo(pdfViewer);
+                }).catch(error => {
+                    canvasContainer.html('<p class="error-message">Erreur de chargement du PDF : ' + error.message + '</p>');
+                    console.error('PDF load error:', error);
+                });
+
+                pdfViewer.find('.zoom-in').on('click', function() {
+                    if (pdfDoc) {
+                        scale += 0.25;
+                        renderPages(pdfDoc, scale, rotation);
+                    }
+                });
+
+                pdfViewer.find('.zoom-out').on('click', function() {
+                    if (pdfDoc && scale > 0.5) {
+                        scale -= 0.25;
+                        renderPages(pdfDoc, scale, rotation);
+                    }
+                });
+
+                pdfViewer.find('.rotate').on('click', function() {
+                    if (pdfDoc) {
+                        rotation = (rotation + 90) % 360;
+                        renderPages(pdfDoc, scale, rotation);
+                    }
+                });
+
+                pdfViewer.find('.screenshot-btn').on('click', function() {
+                    resetCount();
+                    if (screenshotCount <= 0) {
+                        alert('Limite de captures atteinte. Veuillez attendre 15 minutes.');
+                        return;
+                    }
+
+                    if (pdfDoc) {
+                        const visiblePage = getVisiblePageNum(pdfViewer[0]);
+                        const canvas = pdfViewer.find(`.pdf-page[data-page-num="${visiblePage}"]`)[0];
+                        if (canvas) {
+                            html2canvas(canvas, { scale: window.devicePixelRatio, useCORS: true }).then(imgCanvas => {
+                                const imgData = imgCanvas.toDataURL('image/png');
+                                const link = document.createElement('a');
+                                link.href = imgData;
+                                link.download = `screenshot_page_${visiblePage}.png`;
+                                link.click();
+
+                                screenshotCount--;
+                                localStorage.setItem('screenshotCount', screenshotCount);
+                                updateScreenshotInfo(pdfViewer);
+
+                                $.post('../includes/log_screenshot.php', {
+                                    user_id: '<?php echo $student_id; ?>',
+                                    course_id: '<?php echo $course_id; ?>',
+                                    page_num: visiblePage,
+                                    course_title: courseTitle
+                                }, () => {
+                                    console.log('Screenshot logged:', visiblePage);
+                                });
+                            }).catch(error => {
+                                console.error('Screenshot error:', error);
+                                alert('Erreur lors de la capture.');
                             });
                         }
                     }
+                });
 
-                    pdfjsLib.getDocument(url).promise.then(pdf => {
-                        pdfDoc = pdf;
-                        renderPages(pdf, scale, rotation);
-                        updateScreenshotInfo(pdfViewer);
-                    }).catch(error => {
-                        canvasContainer.html('<p class="error-message">Erreur de chargement du PDF : ' + error.message + '</p>');
-                        console.error('PDF load error:', error);
-                    });
-
-                    pdfViewer.find('.zoom-in').click(() => {
-                        if (pdfDoc) {
-                            scale += 0.25;
-                            renderPages(pdfDoc, scale, rotation);
-                        }
-                    });
-
-                    pdfViewer.find('.zoom-out').click(() => {
-                        if (pdfDoc && scale > 0.5) {
-                            scale -= 0.25;
-                            renderPages(pdfDoc, scale, rotation);
-                        }
-                    });
-
-                    pdfViewer.find('.rotate').click(() => {
-                        if (pdfDoc) {
-                            rotation = (rotation + 90) % 360;
-                            renderPages(pdfDoc, scale, rotation);
-                        }
-                    });
-
-                    pdfViewer.find('.screenshot-btn').click(() => {
-                        resetCount();
-                        if (screenshotCount <= 0) {
-                            alert('Limite de captures atteinte. Veuillez attendre 15 minutes.');
-                            return;
-                        }
-
-                        if (pdfDoc) {
-                            const visiblePage = getVisiblePageNum(pdfViewer[0]);
-                            const canvas = pdfViewer.find(`.pdf-page[data-page-num="${visiblePage}"]`)[0];
-                            if (canvas) {
-                                html2canvas(canvas, { scale: window.devicePixelRatio, useCORS: true }).then(imgCanvas => {
-                                    const imgData = imgCanvas.toDataURL('image/png');
-                                    const link = document.createElement('a');
-                                    link.href = imgData;
-                                    link.download = `screenshot_page_${visiblePage}.png`;
-                                    link.click();
-
-                                    screenshotCount--;
-                                    localStorage.setItem('screenshotCount', screenshotCount);
-                                    updateScreenshotInfo(pdfViewer);
-
-                                    $.post('../includes/log_screenshot.php', {
-                                        user_id: '<?php echo $student_id; ?>',
-                                        course_id: '<?php echo $course_id; ?>',
-                                        page_num: visiblePage,
-                                        course_title: courseTitle
-                                    }, () => {
-                                        console.log('Screenshot logged:', visiblePage);
-                                    });
-                                }).catch(error => {
-                                    console.error('Screenshot error:', error);
-                                    alert('Erreur lors de la capture.');
-                                });
-                            }
-                        }
-                    });
-
-                    function toggleBlur(viewer, enable) {
-                        const canvases = viewer.find('.pdf-page');
-                        canvases.each(function() {
-                            $(this).css('filter', enable ? 'blur(5px)' : 'none');
-                        });
-                    }
-
-                    window.addEventListener('blur', () => {
-                        toggleBlur(pdfViewer, true);
-                    });
-
-                    window.addEventListener('focus', () => {
-                        toggleBlur(pdfViewer, false);
-                        pdfViewer.focus();
-                    });
-
-                    pdfViewer.click(function() {
-                        toggleBlur(pdfViewer, false);
-                        pdfViewer.focus();
+                function toggleBlur(viewer, enable) {
+                    const canvases = viewer.find('.pdf-page');
+                    canvases.each(function() {
+                        $(this).css('filter', enable ? 'blur(5px)' : 'none');
                     });
                 }
 
-                contentSection.find('.video-viewer iframe').each(function() {
-                    const iframe = $(this);
-                    const errorMsg = iframe.siblings('.video-error');
-                    iframe.on('error', function() {
-                        errorMsg.show();
-                    });
-                    $.ajax({
-                        url: iframe.attr('src'),
-                        type: 'HEAD',
-                        success: function() {
-                            errorMsg.hide();
-                        },
-                        error: function() {
-                            errorMsg.show();
-                        }
-                    });
+                window.addEventListener('blur', () => {
+                    toggleBlur(pdfViewer, true);
+                });
+
+                window.addEventListener('focus', () => {
+                    toggleBlur(pdfViewer, false);
+                    pdfViewer.focus();
+                });
+
+                pdfViewer.on('click', function() {
+                    toggleBlur(pdfViewer, false);
+                    pdfViewer.focus();
                 });
             }
-        });
+
+            contentSection.find('.video-viewer iframe').each(function() {
+                const iframe = $(this);
+                const errorMsg = iframe.siblings('.video-error');
+                iframe.on('error', function() {
+                    errorMsg.show();
+                });
+                $.ajax({
+                    url: iframe.attr('src'),
+                    type: 'HEAD',
+                    success: function() {
+                        errorMsg.hide();
+                    },
+                    error: function() {
+                        errorMsg.show();
+                    }
+                });
+            });
+        }
 
         // Prevent PrintScreen
-        $(document).on('keydown', (e) => {
+        $(document).on('keydown', function(e) {
             if (e.key === 'PrintScreen') {
                 navigator.clipboard.writeText('');
-                alert('Les captures d’écran via PrintScreen sont désactivées.');
+                alert('Les captures d'écran via PrintScreen sont désactivées.');
             }
         });
 
@@ -381,17 +401,18 @@ $stmt->execute();
             }
             return 1;
         }
-            // Activity tracking for session
-$(document).on('mousemove keydown', function() {
-    $.ajax({
-        url: 'update_activity.php',
-        method: 'POST',
-        data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
-        error: function() {
-            console.error('Error updating activity');
-        }
-    });
-});
+
+        // Activity tracking for session
+        $(document).on('mousemove keydown', function() {
+            $.ajax({
+                url: 'update_activity.php',
+                method: 'POST',
+                data: { student_id: <?php echo isset($_SESSION['student_id']) ? (int)$_SESSION['student_id'] : 0; ?> },
+                error: function() {
+                    console.error('Error updating activity');
+                }
+            });
+        });
     </script>
 </body>
 </html>

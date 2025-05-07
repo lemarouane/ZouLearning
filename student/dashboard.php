@@ -287,4 +287,4 @@ $graded_quizzes = $db->query("
         });
     </script>
 </body>
-</html>2
+</html>
