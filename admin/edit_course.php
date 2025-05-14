@@ -71,8 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
     $subject_id = (int)$_POST['subject_id'];
     $difficulty = $db->real_escape_string($_POST['difficulty']);
 
-
-
     // Update course
     $stmt = $db->prepare("UPDATE courses SET title = ?, subject_id = ?, difficulty = ? WHERE id = ?");
     $stmt->bind_param("sisi", $title, $subject_id, $difficulty, $course_id);
@@ -166,11 +164,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $video_url = trim($video_url);
                 if (empty($video_url)) continue;
 
-                if (preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/', $video_url, $matches)) {
-                    $video_id = $matches[4];
-                    $video_url = "https://www.youtube.com/embed/$video_id";
+                // Validate and convert Google Drive URL
+                if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view/', $video_url, $matches)) {
+                    $file_id = $matches[1];
+                    $video_url = "https://drive.google.com/file/d/$file_id/preview";
                 } else {
-                    $_SESSION['error'] = "URL YouTube invalide pour '$folder_name' : $video_url";
+                    $_SESSION['error'] = "URL Google Drive invalide pour '$folder_name' : $video_url";
                     continue;
                 }
 
@@ -253,11 +252,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                 $video_url = trim($video_url);
                 if (empty($video_url)) continue;
 
-                if (preg_match('/^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/', $video_url, $matches)) {
-                    $video_id = $matches[4];
-                    $video_url = "https://www.youtube.com/embed/$video_id";
+                // Validate and convert Google Drive URL
+                if (preg_match('/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)\/view/', $video_url, $matches)) {
+                    $file_id = $matches[1];
+                    $video_url = "https://drive.google.com/file/d/$file_id/preview";
                 } else {
-                    $_SESSION['error'] = "URL YouTube invalide pour '$folder_name' : $video_url";
+                    $_SESSION['error'] = "URL Google Drive invalide pour '$folder_name' : $video_url";
                     continue;
                 }
 
@@ -442,7 +442,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                     <?php endwhile; ?>
                 </select>
             </div>
- 
 
             <div class="subfolder-section-test">
                 <h3 class="section-title"><i class="fas fa-folder"></i> Dossiers Existants</h3>
@@ -614,8 +613,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['action'])) {
                             <input type="text" name="${namePrefix}[${folderId}][]" class="course-input" placeholder="ex., Vidéo d'Introduction">
                         </div>
                         <div class="course-input-group">
-                            <label class="course-label">URL YouTube</label>
-                            <input type="url" name="${urlPrefix}[${folderId}][]" class="course-input" placeholder="ex., https://www.youtube.com/watch?v=xyz">
+                            <label class="course-label">URL Google Drive</label>
+                            <input type="url" name="${urlPrefix}[${folderId}][]" class="course-input" placeholder="ex., https://drive.google.com/file/d/xyz/view">
                         </div>
                         <button type="button" class="storm-remove-content"><i class="fas fa-times"></i> Supprimer</button>
                     </div>`;
